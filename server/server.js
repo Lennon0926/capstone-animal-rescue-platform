@@ -1,14 +1,16 @@
+require("dotenv").config({ path: ".env.local" });
+
 const express = require("express");
-const app = express();
 const cors = require("cors");
-const PORT = 8080;
+
+const app = express();
 
 app.use(cors());
 
 app.get("/", (req, res) => {
-  res.json({message: "This is the Capstone Animal Rescue Platform"});
+  res.json({ message: "This is the Capstone Animal Rescue Platform" });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Server started on port ${process.env.PORT}`);
 });
