@@ -6,7 +6,7 @@
 
 PORT=${1:-3000}
 
-echo "🚀 Starting ngrok tunnel for localhost:$PORT"
+echo "Starting ngrok tunnel for localhost:$PORT"
 echo "================================================"
 
 # Check if ngrok is installed
