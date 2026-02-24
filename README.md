@@ -123,6 +123,34 @@ __pycache__/
 
 ---
 
+## Server API — Operational Endpoints
+
+### `GET /health`
+
+Liveness check. Returns `200` whenever the process is running.
+
+```json
+{ "status": "ok", "uptime": 42.5, "startedAt": "2026-02-24T20:00:00.000Z" }
+```
+
+### `GET /ready`
+
+Readiness check. Returns `200` when all required environment variables are set, or `503` if any are missing.
+
+```json
+{ "status": "ready" }
+```
+
+### Environment Validation
+
+The server validates required environment variables at startup and **exits immediately** with actionable error messages if any are missing. Currently required:
+
+- `PORT`
+
+Set them in `server/.env.local` for local development.
+
+---
+
 ## Stack Disclaimer
 
 This setup does **not** define the final architecture, backend language, or deployment strategy of the project.
