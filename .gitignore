@@ -9,4 +9,5 @@ __pycache__/
 
 # GitHub Copilot skills
 .github/*
+!.github/workflows/
 .vscode/PythonImportHelper-v2-Completion.json
