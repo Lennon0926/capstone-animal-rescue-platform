@@ -110,15 +110,33 @@ deactivate
 
 ---
 
-## Files Excluded from Version Control
+## Commit and Ignore Policy
 
-Ensure the following entries exist in `.gitignore`:
+To keep pull requests small, predictable, and secure, commit source/config files and ignore generated output and secrets.
 
-```gitignore
-venv/
-__pycache__/
-*.pyc
-.env
+Commit these:
+
+- Application source code and project docs
+- Lockfiles (`client/package-lock.json`, `server/package-lock.json`)
+- Environment templates (`.env.example`, `client/.env.example`, `server/.env.example`)
+- Supabase config and migrations (for example `supabase/config.toml`, `supabase/migrations/**`)
+
+Do not commit these:
+
+- Dependency folders (`node_modules/`, `client/node_modules/`, `venv/`, `.venv/`)
+- Build/generated artifacts (`client/.next/`, coverage output, caches)
+- Local environment/secret files (`.env`, `.env.*`, `client/.env*`, `server/.env*`)
+- Cloudflare local state (`.wrangler/`, `.dev.vars`, `.dev.vars.*`)
+- Supabase local runtime state (`supabase/.temp/`, `supabase/.env`)
+
+Quick verification:
+
+```bash
+# No generated frontend artifacts should be tracked
+git ls-files | rg '^client/(\.next|node_modules)/'
+
+# Confirm key local artifacts are ignored
+git check-ignore -v client/.next client/node_modules client/.env.local
 ```
 
 ---
@@ -128,4 +146,3 @@ __pycache__/
 This setup does **not** define the final architecture, backend language, or deployment strategy of the project.
 
 All final technical decisions will be documented in the **Technical Approach** section of the project proposal and updated as needed.
-
