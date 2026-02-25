@@ -11,12 +11,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  client:
-    name: Client – lint & build
+  web:
+    name: Web – lint & build
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: client
+        working-directory: apps/web
     steps:
       - uses: actions/checkout@v4
 
@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: client/package-lock.json
+          cache-dependency-path: apps/web/package-lock.json
 
       - run: npm ci
       - run: npm run lint
@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: server
+        working-directory: apps/server
     steps:
       - uses: actions/checkout@v4
 
@@ -43,7 +43,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: server/package-lock.json
+          cache-dependency-path: apps/server/package-lock.json
 
       - run: npm ci
       - run: node --check server.js
