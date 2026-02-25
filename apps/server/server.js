@@ -1,4 +1,5 @@
-require("dotenv").config({ path: ".env.local" });
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, ".env.local") });
 
 const express = require("express");
 const cors = require("cors");
@@ -7,6 +8,7 @@ const { validateEnv, REQUIRED_ENV_VARS } = require("./validateEnv");
 validateEnv();
 
 const app = express();
+const port = Number(process.env.PORT) || 4000;
 const startedAt = new Date().toISOString();
 
 app.use(cors());
@@ -29,6 +31,6 @@ app.get("/ready", (req, res) => {
   res.json({ status: "ready" });
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server started on port ${process.env.PORT}`);
+app.listen(port, () => {
+  console.log(`Server started on port ${port}`);
 });

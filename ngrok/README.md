@@ -19,9 +19,9 @@ This folder contains scripts for exposing the local development server to the in
 
 ## Usage
 
-1. **Start the frontend** (in the client folder):
+1. **Start the frontend** (in the web app folder):
    ```bash
-   cd client
+   cd apps/web
    npm run dev
    ```
 
