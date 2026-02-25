@@ -1,113 +1,105 @@
-# Project Development Setup
+# Capstone Animal Rescue Platform
 
-## Virtual Environment Setup (Provisional)
+A full-stack web application for animal rescue coordination, built with Next.js and Express.
 
-This repository includes a **provisional Python virtual environment** to support early development tasks such as scripts, prototypes, testing, or automation.
+## Project Structure
 
-The final technology stack for this project has **not yet been defined**. This setup exists only to establish good development practices and may change as the project evolves.
+```
+├── apps/
+│   ├── server/          # Express API (Node.js)
+│   └── web/             # Next.js frontend (React + TypeScript)
+├── docs/                # Project documentation and diagram scripts
+├── ngrok/               # Tunnel script for exposing local dev to the internet
+├── .gitignore
+├── LICENSE
+└── README.md
+```
 
----
+## Prerequisites
 
-## Requirements
-
-- Python 3.10 or higher
+- [Node.js](https://nodejs.org/) 18 or higher
+- npm (included with Node.js)
 - Git
-- Terminal (macOS, Linux, or Windows with WSL)
 
-Verify your Python version:
+## Getting Started
 
-```bash
-python3 --version
-```
-
----
-
-## Create the Virtual Environment
-
-From the root of the repository:
+### 1. Clone the repository
 
 ```bash
-python3 -m venv venv
+git clone https://github.com/Lennon0926/capstone-animal-rescue-platform.git
+cd capstone-animal-rescue-platform
 ```
 
-This command creates a local virtual environment inside the `venv/` directory.
-
----
-
-## Activate the Virtual Environment
-
-### macOS / Linux / WSL
+### 2. Install dependencies
 
 ```bash
-source venv/bin/activate
+cd apps/server && npm install
+cd ../web && npm install
 ```
 
-### Windows (PowerShell)
+### 3. Configure environment variables
 
-```powershell
-venv\Scripts\Activate.ps1
+**Server** (`apps/server/.env.local`):
+
+```env
+PORT='8080'
 ```
 
-When activated, your terminal prompt should indicate that the environment is active.
+**Web** (`apps/web/.env.local`):
 
----
+```env
+NEXT_PUBLIC_API_BASE_URL='http://localhost:8080'
+```
 
-## Upgrade Base Tooling
+### 4. Start the development servers
 
-Once the virtual environment is active, upgrade the base Python tooling:
+In one terminal, start the API server:
 
 ```bash
-pip install --upgrade pip setuptools wheel
+cd apps/server
+npm run dev
 ```
 
-These are standard tools required for package management and builds.
-
----
-
-## Install Default Dependencies
-
-If this is the first time setting up the project **and `requirements.txt` already exists**, install all dependencies with:
+In a second terminal, start the frontend:
 
 ```bash
+cd apps/web
+npm run dev
+```
+
+The API will be available at `http://localhost:8080` and the frontend at `http://localhost:3000`.
+
+## Tech Stack
+
+| Layer    | Technology                          |
+| -------- | ----------------------------------- |
+| Frontend | Next.js 16, React 19, Tailwind CSS 4, TypeScript |
+| Backend  | Express 5, Node.js                  |
+| Tooling  | ESLint, Nodemon, PostCSS            |
+
+## Documentation Scripts
+
+The `docs/scripts/` directory contains Python scripts for generating project diagrams (flowcharts, sequence diagrams, timelines, algorithm charts). These are documentation-only utilities and are not required to run the application.
+
+To run them:
+
+```bash
+cd docs/scripts
 pip install -r requirements.txt
+python flowchart/generate_flowchart.py
 ```
 
-This is the recommended approach for new team members.
+## ngrok Tunnel
 
-If the file does not exist yet, install a minimal set of commonly used dependencies for general development:
+The `ngrok/` directory includes a script to expose the local frontend via a public URL for testing. See [`ngrok/README.md`](ngrok/README.md) for setup instructions.
 
 ```bash
-pip install python-dotenv requests pytest
+./ngrok/start-ngrok.sh
 ```
 
-Purpose of these packages:
+## License
 
-- `python-dotenv`: environment variable management
-- `requests`: HTTP client for prototyping and testing
-- `pytest`: basic testing framework
-
----
-
-## Generate `requirements.txt`
-
-After installing dependencies, generate the dependency file:
-
-```bash
-pip freeze > requirements.txt
-```
-
-This file should be updated whenever new dependencies are added.
-
----
-
-## Deactivate the Virtual Environment
-
-When finished working:
-
-```bash
-deactivate
-```
-
+See [LICENSE](LICENSE) for details.
 ---
 
 ## Commit and Ignore Policy

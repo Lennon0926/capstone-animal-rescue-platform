@@ -8,6 +8,8 @@
 venv/
 .venv/
 __pycache__/
+*.pyc
+.next/
 *.py[cod]
 
 # Node dependencies and generated frontend artifacts
