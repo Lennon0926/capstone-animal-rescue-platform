@@ -8,4 +8,7 @@ function Index() {
   );
 }
 
+const x = 1;
+x = 2;
+
 export default Index;
