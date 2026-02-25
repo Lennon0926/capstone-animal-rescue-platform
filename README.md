@@ -109,15 +109,15 @@ To keep pull requests small, predictable, and secure, commit source/config files
 Commit these:
 
 - Application source code and project docs
-- Lockfiles (`client/package-lock.json`, `server/package-lock.json`)
-- Environment templates (`.env.example`, `client/.env.example`, `server/.env.example`)
+- Lockfiles (`apps/web/package-lock.json`, `apps/server/package-lock.json`)
+- Environment templates (`.env.example`, `apps/web/.env.example`, `apps/server/.env.example`)
 - Supabase config and migrations (for example `supabase/config.toml`, `supabase/migrations/**`)
 
 Do not commit these:
 
-- Dependency folders (`node_modules/`, `client/node_modules/`, `venv/`, `.venv/`)
-- Build/generated artifacts (`client/.next/`, coverage output, caches)
-- Local environment/secret files (`.env`, `.env.*`, `client/.env*`, `server/.env*`)
+- Dependency folders (`node_modules/`, `apps/web/node_modules/`, `apps/server/node_modules/`, `venv/`, `.venv/`)
+- Build/generated artifacts (`apps/web/.next/`, coverage output, caches)
+- Local environment/secret files (`.env`, `.env.*`, `apps/web/.env*`, `apps/server/.env*`)
 - Cloudflare local state (`.wrangler/`, `.dev.vars`, `.dev.vars.*`)
 - Supabase local runtime state (`supabase/.temp/`, `supabase/.env`)
 
@@ -125,10 +125,10 @@ Quick verification:
 
 ```bash
 # No generated frontend artifacts should be tracked
-git ls-files | rg '^client/(\.next|node_modules)/'
+git ls-files | rg '^apps/web/(\.next|node_modules)/'
 
 # Confirm key local artifacts are ignored
-git check-ignore -v client/.next client/node_modules client/.env.local
+git check-ignore -v apps/web/.next apps/web/node_modules apps/web/.env.local
 ```
 
 ---
