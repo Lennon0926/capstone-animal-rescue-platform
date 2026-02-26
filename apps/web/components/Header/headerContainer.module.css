@@ -1,60 +1,102 @@
 .header {
   position: sticky;
   top: 0;
-  width: 100%;
   background-color: var(--color-bg);
   border-bottom: 1px solid var(--color-border);
   z-index: 50;
 }
 
 .inner {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 72px;
 }
 
 .logo a {
-  font-size: var(--text-lg);
   font-weight: var(--font-weight-semibold);
+  font-size: var(--text-lg);
   color: var(--color-text);
 }
 
-.nav {
+/* ================= DESKTOP NAV ================= */
+
+.navDesktop {
   display: flex;
   align-items: center;
   gap: var(--space-6);
 }
 
-.navLink {
+.navDesktop a {
   font-size: var(--text-sm);
   color: var(--color-text-muted);
-  transition: color var(--transition-fast);
 }
 
-.navLink:hover {
+.navDesktop a:hover {
   color: var(--color-text);
 }
 
-/* Donate Button */
 .donateButton {
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: var(--font-weight-medium);
-
   background-color: var(--color-primary);
-  color: var(--color-text-inverse);
 
-  transition: background-color var(--transition-fast);
+  color: var(--color-text-inverse) !important;
+  text-decoration: none;
+
+  font-weight: var(--font-weight-medium);
 }
 
-.donateButton:hover {
-  background-color: var(--color-primary-hover);
+/* ================= MOBILE ================= */
+
+.menuButton {
+  display: none;
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
 }
 
-.wrapper {
-  width: 100%;
-  padding-left: var(--space-4);
-  padding-right: var(--space-4);
+.navMobile {
+  display: none;
+}
+
+/* ================= RESPONSIVE BREAKPOINT ================= */
+
+@media (max-width: 768px) {
+  .navDesktop {
+    display: none;
+  }
+
+  .menuButton {
+    display: block;
+  }
+
+  .navMobile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+
+    padding: var(--space-6) var(--space-4);
+    border-top: 1px solid var(--color-border);
+    background-color: var(--color-bg);
+  }
+
+  .navMobile a {
+    font-size: var(--text-base);
+    color: var(--color-text);
+  }
+
+  .donateButtonMobile {
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    background-color: var(--color-primary);
+    color: var(--color-text-inverse) !important;
+    text-decoration: none;
+    width: fit-content;
+  }
 }
