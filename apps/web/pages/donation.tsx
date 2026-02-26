@@ -1,4 +1,3 @@
-import React from "react";
 import HeaderContainer from "@/components/Header/headerContainer";
 
 export const Donation = () => {
