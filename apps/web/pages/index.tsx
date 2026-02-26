@@ -1,9 +1,9 @@
-import HelloWorldDisplay from "@/components/helloWorld";
+import HeaderContainer from "@/components/Header/headerContainer";
 
 function Index() {
   return (
     <div>
-      <HelloWorldDisplay />
+      <HeaderContainer />
     </div>
   );
 }
