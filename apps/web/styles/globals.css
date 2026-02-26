@@ -4,23 +4,24 @@
 
   /* ================= COLORS ================= */
 
-  /* Brand */
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-soft: #dbeafe;
+  /* Brand Primary */
+  --color-primary: #111111;
+  --color-primary-hover: #000000;
+  --color-primary-soft: #f3f3f3;
 
-  /* Semantic */
-  --color-error: #dc2626;
-  --color-success: #16a34a;
-  --color-warning: #d97706;
+  --color-accent: #f4a261;        
+  --color-accent-hover: #e76f51;  
 
-  /* Neutrals */
+  --color-error: #c1121f;
+  --color-success: #2a9d8f;
+  --color-warning: #e9c46a;
+
   --color-bg: #ffffff;
-  --color-surface: #f9fafb;
-  --color-border: #e5e7eb;
+  --color-surface: #f7f7f7;
+  --color-border: #e0e0e0;
 
-  --color-text: #111827;
-  --color-text-muted: #6b7280;
+  --color-text: #1a1a1a;
+  --color-text-muted: #6c757d;
   --color-text-inverse: #ffffff;
 
   /* ================= TYPOGRAPHY ================= */

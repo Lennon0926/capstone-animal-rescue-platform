@@ -16,7 +16,7 @@ export default function Header() {
           <Link href="/">Home</Link>
           <Link href="/animals">Animals</Link>
           <Link href="/about">About</Link>
-          <Link href="/donate" className={styles.donateButton}>
+          <Link href="/donation" className={styles.donateButton}>
             Donate
           </Link>
         </nav>
