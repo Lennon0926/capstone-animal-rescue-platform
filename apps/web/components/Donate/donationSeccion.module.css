@@ -56,7 +56,7 @@
 
 .image {
   width: 100%;
-  max-width: 600px; 
+  max-width: 520px; 
   border-radius: var(--radius-xl);
   object-fit: cover;
 }
