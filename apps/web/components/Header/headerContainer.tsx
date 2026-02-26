@@ -32,11 +32,11 @@ export default function Header() {
 
       {isOpen && (
         <nav className={styles.navMobile}>
+          <Link href="/">Home</Link>
+          <Link href="/animals">Animales</Link>
           <Link href="/about">About</Link>
-          <Link href="/animals">Animals</Link>
-          <Link href="/how-it-works">How It Works</Link>
-          <Link href="/donate" className={styles.donateButtonMobile}>
-            Donate
+          <Link href="/donation" className={styles.donateButtonMobile}>
+            Donar
           </Link>
         </nav>
       )}
