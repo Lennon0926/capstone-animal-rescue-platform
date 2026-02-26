@@ -14,10 +14,10 @@ export default function Header() {
 
         <nav className={styles.navDesktop}>
           <Link href="/">Home</Link>
-          <Link href="/animals">Animals</Link>
+          <Link href="/animals">Animales</Link>
           <Link href="/about">About</Link>
           <Link href="/donation" className={styles.donateButton}>
-            Donate
+            Donar
           </Link>
         </nav>
 

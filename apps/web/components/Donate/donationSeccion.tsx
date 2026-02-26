@@ -8,16 +8,17 @@ export default function DonationSection() {
         
         <div className={styles.content}>
           <h1 className={styles.title}>
-            Giving Every Animal <br /> a Second Chance
+            Cada animal merece <br />
+            una segunda oportunidad
           </h1>
 
           <p className={styles.description}>
-            We connect abandoned and rescued animals with loving families.
-            Join our mission to provide care, shelter, and hope to animals in need.
+            Ayudamos a animales abandonados y rescatados a encontrar familias que les brinden amor y un nuevo comienzo.
+            Únete a nuestra misión para ofrecer cuidado, refugio y esperanza a quienes más lo necesitan.
           </p>
 
           <button className={styles.donateButton}>
-            Donate Now
+            Dona Ahora
           </button>
         </div>
 
