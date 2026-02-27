@@ -3,6 +3,7 @@
 
 # GitHub Copilot skills
 .github/*
+!.github/workflows/
 
 # Python local env/cache artifacts
 venv/
