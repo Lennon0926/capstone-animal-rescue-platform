@@ -11,9 +11,13 @@ const express = require("express");
 const multer = require("multer");
 
 dotenv.config({ path: path.resolve(__dirname, ".env.local") });
+const { validateEnv, REQUIRED_ENV_VARS } = require("./validateEnv");
+
+validateEnv();
 
 const app = express();
 const port = Number(process.env.PORT) || 4000;
+const startedAt = new Date().toISOString();
 
 const ALLOWED_MIME_TYPES = new Set([
   "image/jpeg",
@@ -154,6 +158,20 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
   res.json({ message: "This is the Capstone Animal Rescue Platform" });
+});
+
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", uptime: process.uptime(), startedAt });
+});
+
+app.get("/ready", (req, res) => {
+  const envReady = REQUIRED_ENV_VARS.every((key) => !!process.env[key]);
+
+  if (!envReady) {
+    return res.status(503).json({ status: "not ready", reason: "missing env" });
+  }
+
+  res.json({ status: "ready" });
 });
 
 app.get("/api/uploads/config", (req, res) => {
