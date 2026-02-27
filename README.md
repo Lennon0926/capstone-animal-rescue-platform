@@ -77,6 +77,28 @@ The API will be available at `http://localhost:8080` and the frontend at `http:/
 | Backend  | Express 5, Node.js                  |
 | Tooling  | ESLint, Nodemon, PostCSS            |
 
+## API Endpoints
+
+### Health & Readiness
+
+| Endpoint  | Method | Description | Success | Failure |
+| --------- | ------ | ----------- | ------- | ------- |
+| `/health` | GET    | Liveness check — confirms the process is running. Returns uptime and start timestamp. | `200 { "status": "ok", "uptime": ..., "startedAt": "..." }` | N/A (if the server is down the request won't reach it) |
+| `/ready`  | GET    | Readiness check — confirms all required environment variables are set. | `200 { "status": "ready" }` | `503 { "status": "not ready", "reason": "missing env" }` |
+
+### Environment Validation
+
+On startup the server validates that every variable listed in `apps/server/validateEnv.js` (`REQUIRED_ENV_VARS`) is present. If any are missing the process exits immediately with an actionable error listing each missing variable.
+
+**Local usage:**
+
+```bash
+curl http://localhost:8080/health
+curl http://localhost:8080/ready
+```
+
+**Deployment:** Point your orchestrator's liveness probe at `/health` and its readiness probe at `/ready`.
+
 ## Documentation Scripts
 
 The `docs/scripts/` directory contains Python scripts for generating project diagrams (flowcharts, sequence diagrams, timelines, algorithm charts). These are documentation-only utilities and are not required to run the application.
