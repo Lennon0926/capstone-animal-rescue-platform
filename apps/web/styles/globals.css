@@ -4,24 +4,23 @@
 
   /* ================= COLORS ================= */
 
-  /* Brand Primary */
-  --color-primary: #111111;
-  --color-primary-hover: #000000;
-  --color-primary-soft: #f3f3f3;
+  --color-primary: #3f4e6b;          
+  --color-primary-hover: #34425c;
+  --color-primary-soft: #eef2f7;
 
-  --color-accent: #f4a261;        
-  --color-accent-hover: #e76f51;  
+  --color-accent: #e07a5f;
+  --color-accent-hover: #c7654b;
 
-  --color-error: #c1121f;
-  --color-success: #2a9d8f;
-  --color-warning: #e9c46a;
+  --color-error: #b23a48;
+  --color-success: #4f8a8b;
+  --color-warning: #e3a857;
 
-  --color-bg: #ffffff;
-  --color-surface: #f7f7f7;
-  --color-border: #e0e0e0;
+  --color-bg: #fbf6f1;       
+  --color-surface: #ffffff;
+  --color-border: #e8ded5;
 
-  --color-text: #1a1a1a;
-  --color-text-muted: #6c757d;
+  --color-text: #2a2a2a;
+  --color-text-muted: #7a7a7a;
   --color-text-inverse: #ffffff;
 
   /* ================= TYPOGRAPHY ================= */

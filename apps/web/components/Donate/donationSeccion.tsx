@@ -24,7 +24,7 @@ export default function DonationSection() {
 
         <div className={styles.imageWrapper}>
           <Image
-            src="/donationDogPicture.jpeg"
+            src="/donationDogPicture.jpg"
             alt="Rescued dog being petted"
             className={styles.image}
             width={500}

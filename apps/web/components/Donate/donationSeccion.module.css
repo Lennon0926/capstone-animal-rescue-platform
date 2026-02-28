@@ -1,52 +1,60 @@
 .section {
-  padding: var(--space-16) var(--space-2);
-  background-color: var(--color-bg);
+  padding: 100px 24px;
+  background: linear-gradient(
+    to bottom,
+    #faf6f1 0%,
+    #f5eee8 100%
+  );
 }
 
 .inner {
-  max-width: 1400px;
+  max-width: 1350px;
   margin: 0 auto;
 
   display: grid;
-  grid-template-columns: 1fr 1fr; 
-  gap: var(--space-8);
+  grid-template-columns: 1.3fr 0.7fr;
+  gap: 60px;
   align-items: center;
 }
 
 .content {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: 28px;
 }
 
 .title {
-  font-size: clamp(44px, 5vw, 64px);
-  font-weight: var(--font-weight-bold);
+  font-size: clamp(42px, 5vw, 64px);
+  font-weight: 700;
   line-height: 1.05;
-  color: var(--color-primary);
+  letter-spacing: -1px;
+  max-width: 600px;
 }
 
 .description {
-  font-size: var(--text-lg);
-  color: var(--color-text-muted);
-  max-width: 650px;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #6b6b6b;
+  max-width: 520px;
 }
 
 .donateButton {
   width: fit-content;
-  padding: var(--space-3) var(--space-6);
+  padding: 16px 32px;
 
   background-color: var(--color-primary);
   color: var(--color-text-inverse);
 
-  border-radius: var(--radius-md);
-  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-semibold);
 
-  transition: background-color var(--transition-fast);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-fast);
 }
 
 .donateButton:hover {
   background-color: var(--color-primary-hover);
+  transform: translateY(-2px);
 }
 
 .imageWrapper {
@@ -56,15 +64,42 @@
 
 .image {
   width: 100%;
-  max-width: 520px; 
-  border-radius: var(--radius-xl);
-  object-fit: cover;
+  max-width: 520px;
+  border-radius: 24px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08);
 }
 
+/* ================= MOBILE ================= */
+
 @media (max-width: 900px) {
+
+  .section {
+    padding: 70px 20px;
+  }
+
   .inner {
     grid-template-columns: 1fr;
-    gap: var(--space-8);
+    gap: 40px;
+  }
+
+  .content {
+    text-align: center;
+    align-items: center;
+  }
+
+  .title {
+    font-size: 36px;
+    max-width: 100%;
+  }
+
+  .description {
+    font-size: 16px;
+    max-width: 90%;
+  }
+
+  .donateButton {
+    width: 100%;
+    max-width: 320px;
   }
 
   .imageWrapper {
