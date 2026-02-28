@@ -4,6 +4,7 @@ import OurMissionSeccion from "@/components/LandingPage/Mission/ourMissionSectio
 import AnimalsSection from "@/components/LandingPage/Animals/animalsSection";
 import HowItWorks from "@/components/LandingPage/HowItWorks/howItWorksSection";
 import DonationBanner from "@/components/LandingPage/Donate/donationBanner";
+import FooterSection from "@/components/LandingPage/Footer/footerSection";
 
 function Index() {
   return (
@@ -14,6 +15,7 @@ function Index() {
       <AnimalsSection />
       <HowItWorks />
       <DonationBanner />
+      <FooterSection />
     </div>
   );
 }

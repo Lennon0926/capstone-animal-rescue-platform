@@ -27,7 +27,7 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section className={styles.section}>
+    <section id="adoption_process" className={styles.section}>
       <div className={styles.inner}>
         <h1 className={styles.title}>Proceso de Adopción</h1>
         <p className={styles.subtitle}>
