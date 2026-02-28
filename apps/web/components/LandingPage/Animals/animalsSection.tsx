@@ -79,7 +79,7 @@ export default function AnimalsSection() {
             </div>
           ))}
         </div>
-        <Link href="/animals" className={styles.viewAll}>
+        <Link href="/adopt" className={styles.viewAll}>
             Ver Todos →
           </Link>
       </div>

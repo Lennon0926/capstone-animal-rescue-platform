@@ -1,11 +1,13 @@
-import Header from "@/components/LandingPage/Header/headerSection";
+import HeaderSection from "@/components/Header/headerSection";
 import AnimalInfo from "@/components/AnimalInfoPage/animalInfo";
+import FooterSection from "@/components/Footer/footerSection";
 
 function AnimalInfoPage() {
   return (
     <div>
-      <Header />
+      <HeaderSection />
       <AnimalInfo />
+      <FooterSection />
     </div>
   );
 }

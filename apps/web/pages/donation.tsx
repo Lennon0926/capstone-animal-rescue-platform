@@ -1,10 +1,12 @@
-import HeaderContainer from "@/components/LandingPage/Header/headerSection";
+import HeaderSection from "@/components/Header/headerSection";
+import FooterSection from "@/components/Footer/footerSection";
 
 export const Donation = () => {
   return (
     <div>
-      <HeaderContainer />
+      <HeaderSection />
       <h1>Donation Page</h1>
+      <FooterSection />
     </div>
   );
 };

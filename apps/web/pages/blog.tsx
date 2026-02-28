@@ -1,11 +1,13 @@
 import Blog from "@/components/BlogPage/blog";
-import Header from "@/components/LandingPage/Header/headerSection";
+import HeaderSection from "@/components/Header/headerSection";
+import FooterSection from "@/components/Footer/footerSection";
 
 function BlogPage() {
   return (
     <div>
-      <Header />
+      <HeaderSection />
       <Blog />
+      <FooterSection />
     </div>
   );
 }

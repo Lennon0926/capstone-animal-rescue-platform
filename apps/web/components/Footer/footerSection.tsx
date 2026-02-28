@@ -20,7 +20,7 @@ export default function Footer() {
           <h4 className={styles.heading}>Enlaces Rápidos</h4>
           <ul>
             <li><Link href="/about">Sobre Nosotros</Link></li>
-            <li><Link href="/animals">Animales Disponibles</Link></li>
+            <li><Link href="/adopt">Animales Disponibles</Link></li>
             <li><Link href="/#adoption_process">Proceso de Adopción</Link></li>
           </ul>
         </div>
@@ -28,7 +28,7 @@ export default function Footer() {
         <div className={styles.column}>
           <h4 className={styles.heading}>Apoyo</h4>
           <ul>
-            <li><Link href="/donate">Donar</Link></li>
+            <li><Link href="/donation">Donar</Link></li>
             <li><Link href="/volunteer">Ser Voluntario</Link></li>
             <li><Link href="/foster">Programa de Hogar Temporal</Link></li>
           </ul>

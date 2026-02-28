@@ -1,10 +1,12 @@
-import HeaderContainer from "@/components/LandingPage/Header/headerSection";
+import HeaderSection from "@/components/Header/headerSection";
+import FooterSection from "@/components/Footer/footerSection";
 
 export const About = () => {
   return (
     <div>
-      <HeaderContainer />
+      <HeaderSection />
       <h1>About Us</h1>
+      <FooterSection />
     </div>
   );
 };
