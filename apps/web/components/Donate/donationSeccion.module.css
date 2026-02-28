@@ -44,6 +44,7 @@
 
   background-color: var(--color-primary);
   color: var(--color-text-inverse);
+  text-decoration: none;
 
   border-radius: var(--radius-lg);
   font-weight: var(--font-weight-semibold);
@@ -54,6 +55,7 @@
 
 .donateButton:hover {
   background-color: var(--color-primary-hover);
+  color: var(--color-text-inverse); 
   transform: translateY(-2px);
 }
 

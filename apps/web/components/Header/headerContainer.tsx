@@ -14,7 +14,7 @@ export default function Header() {
 
         <nav className={styles.navDesktop}>
           <Link href="/">Home</Link>
-          <Link href="/animals">Animales</Link>
+          <Link href="/adopt">Adoptar</Link>
           <Link href="/about">About</Link>
           <Link href="/donation" className={styles.donateButton}>
             Donar
@@ -33,7 +33,7 @@ export default function Header() {
       {isOpen && (
         <nav className={styles.navMobile}>
           <Link href="/">Home</Link>
-          <Link href="/animals">Animales</Link>
+          <Link href="/adopt">Adoptar</Link>
           <Link href="/about">About</Link>
           <Link href="/donation" className={styles.donateButtonMobile}>
             Donar
