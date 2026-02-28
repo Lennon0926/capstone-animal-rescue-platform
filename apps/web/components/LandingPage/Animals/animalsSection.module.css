@@ -44,10 +44,7 @@
 }
 
 .viewAll {
-  grid-column: 2;
-  grid-row: 1;
   align-self: start;
-
   padding: var(--space-4) var(--space-8);
   background-color: var(--color-primary);
   color: var(--color-text-inverse);
@@ -56,6 +53,7 @@
   text-decoration: none;
   box-shadow: var(--shadow-md);
   transition: all var(--transition-fast);
+  margin-top: var(--space-8);
 }
 
 .viewAll:hover {
@@ -151,17 +149,12 @@
     row-gap: var(--space-6);
   }
 
-  .section {
-    text-align: center;
-    align-items: center;
-  }
+
 
   .viewAll {
-    grid-column: 1;
-    grid-row: auto;              
+    grid-column: 1;         
     justify-self: start;
-    margin-top: var(--space-1);
-    margin-bottom: var(--spacing-16);
+    margin-top: var(--space-8);
   }
 
   .meta {

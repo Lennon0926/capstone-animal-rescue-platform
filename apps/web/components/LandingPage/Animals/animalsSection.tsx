@@ -44,9 +44,6 @@ export default function AnimalsSection() {
               cuidado y la oportunidad de comenzar una nueva etapa llena de esperanza.
             </p>
           </div>
-          <Link href="/animals" className={styles.viewAll}>
-            Ver Todos →
-          </Link>
         </div>
 
         <div className={styles.grid}>
@@ -82,6 +79,9 @@ export default function AnimalsSection() {
             </div>
           ))}
         </div>
+        <Link href="/animals" className={styles.viewAll}>
+            Ver Todos →
+          </Link>
       </div>
     </section>
   );

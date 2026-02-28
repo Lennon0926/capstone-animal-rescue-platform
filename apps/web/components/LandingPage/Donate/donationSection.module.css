@@ -73,14 +73,14 @@
     padding: var(--space-12) var(--space-5);
   }
 
+  .content {
+    display: flex;
+    flex-direction: column;
+  }
+
   .inner {
     grid-template-columns: 1fr;
     gap: var(--space-10);
-  }
-
-  .content {
-    text-align: center;
-    align-items: center;
   }
 
   .title {
@@ -93,7 +93,8 @@
 
   .donateButton {
     width: 100%;
-    max-width: 320px;
+    text-align: center;
+    align-self: center;
   }
 
   .imageWrapper {
