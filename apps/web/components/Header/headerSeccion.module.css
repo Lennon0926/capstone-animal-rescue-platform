@@ -2,7 +2,7 @@
   position: sticky;
   top: 0;
 
-  background-color: var(--color-surface);
+  background-color: var(--color-bg);
   backdrop-filter: none;
   opacity: 1;
 

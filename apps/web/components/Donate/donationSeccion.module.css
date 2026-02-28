@@ -1,6 +1,6 @@
 .section {
   padding: 100px 24px;
-  background: var(--color-bg)
+  background: var(--color-surface);
 }
 
 .inner {
