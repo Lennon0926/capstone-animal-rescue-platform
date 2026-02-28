@@ -147,7 +147,7 @@
 @media (max-width: 768px) {
 
   .header {
-    grid-template-columns: 1fr;   /* 👈 una sola columna */
+    grid-template-columns: 1fr;  
     row-gap: var(--space-6);
   }
 
@@ -162,6 +162,10 @@
     justify-self: start;
     margin-top: var(--space-1);
     margin-bottom: var(--spacing-16);
+  }
+
+  .meta {
+    text-align: left;
   }
 
   .grid {
