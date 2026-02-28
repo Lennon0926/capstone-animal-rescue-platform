@@ -27,6 +27,21 @@
   color: var(--color-text);
 }
 
+.logoContainer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.logoLink {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+  color: inherit;
+  font-weight: var(--font-weight-semibold);
+}
+
 .navDesktop {
   display: flex;
   align-items: center;
@@ -68,6 +83,10 @@
 @media (max-width: 768px) {
   .navDesktop {
     display: none;
+  }
+
+  .logo a {
+    font-size: var(--text-sm);
   }
 
   .menuButton {

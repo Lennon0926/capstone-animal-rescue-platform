@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./headerSection.module.css";
 
 export default function Header() {
@@ -8,8 +9,17 @@ export default function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
-        <div className={styles.logo}>
-          <Link href="/">Animal Rescue Platform</Link>
+        <div className={styles.logoContainer}>
+          <Image
+            src="/org-logo.png"
+            width={50}
+            height={50}
+            className={styles.logoImage}
+            alt="CPAAA Logo"
+          />
+          <div className={styles.logo}>
+            <Link href="/">Ciudadanos Pro Albergue de Animales de Aguadilla</Link>
+          </div>
         </div>
 
         <nav className={styles.navDesktop}>

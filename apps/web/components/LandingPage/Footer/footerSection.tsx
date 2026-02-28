@@ -9,10 +9,10 @@ export default function Footer() {
 
         <div className={styles.brand}>
           <div className={styles.logo}>
-            <span>Animal Rescue Platform</span>
+            <span>Ciudadanos Pro Albergue de Animales de Aguadilla</span>
           </div>
           <p className={styles.description}>
-            Conectando animales rescatados con familias amorosas desde 1990
+            Trabajando por el bienestar y la protección animal desde 1990
           </p>
         </div>
 
@@ -48,7 +48,7 @@ export default function Footer() {
           </div>
 
           <div className={styles.contactItem}>
-            <MapPin size={68} />
+            <MapPin className={styles.mapIcon} />
             <span>
               Ciudadanos Pro Albergue de Animales de Aguadilla, Inc.
               Box 4152
@@ -57,10 +57,6 @@ export default function Footer() {
           </div>
         </div>
 
-      </div>
-
-      <div className={styles.bottom}>
-        © {new Date().getFullYear()} Animal Rescue Platform. Todos los derechos reservados.
       </div>
     </footer>
   );
