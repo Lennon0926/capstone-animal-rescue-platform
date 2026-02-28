@@ -2,6 +2,7 @@ import HeaderSeccion from "@/components/LandingPage/Header/headerSection";
 import DonationSection from "@/components/LandingPage/Donate/donationSection";
 import OurMissionSeccion from "@/components/LandingPage/Mission/ourMissionSection";
 import AnimalsSection from "@/components/LandingPage/Animals/animalsSection";
+import HowItWorks from "@/components/LandingPage/HowItWorks/howItWorksSection";
 
 function Index() {
   return (
@@ -10,6 +11,7 @@ function Index() {
       <DonationSection />
       <OurMissionSeccion />
       <AnimalsSection />
+      <HowItWorks />
     </div>
   );
 }
