@@ -1,4 +1,4 @@
-import HeaderContainer from "@/components/Header/headerContainer";
+import HeaderContainer from "@/components/Header/headerSeccion";
 
 export const About = () => {
   return (
