@@ -1,6 +1,6 @@
 .section {
   padding: 100px 24px;
-  background: var(--color-surface);
+  background: var(--color-bg);
 }
 
 .inner {
@@ -20,7 +20,7 @@
 }
 
 .title {
-  font-size: clamp(42px, 5vw, 64px);
+  font-size: var(--text-hero-xl);
   font-weight: 700;
   line-height: 1.05;
   letter-spacing: -1px;

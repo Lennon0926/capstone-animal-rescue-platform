@@ -1,6 +1,7 @@
-import HeaderSeccion from "@/components/Header/headerSeccion";
-import DonationSection from "@/components/Donate/donationSeccion";
-import OurMissionSeccion from "@/components/Mission/ourMissionSeccion";
+import HeaderSeccion from "@/components/LandingPage/Header/headerSeccion";
+import DonationSection from "@/components/LandingPage/Donate/donationSeccion";
+import OurMissionSeccion from "@/components/LandingPage/Mission/ourMissionSeccion";
+import AnimalsSection from "@/components/LandingPage/Animals/animalsSeccion";
 
 function Index() {
   return (
@@ -8,6 +9,7 @@ function Index() {
       <HeaderSeccion />
       <DonationSection />
       <OurMissionSeccion />
+      <AnimalsSection />
     </div>
   );
 }

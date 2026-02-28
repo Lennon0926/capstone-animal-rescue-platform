@@ -1,4 +1,4 @@
-import HeaderContainer from "@/components/Header/headerSeccion";
+import HeaderContainer from "@/components/LandingPage/Header/headerSeccion";
 
 export const Donation = () => {
   return (
@@ -7,6 +7,6 @@ export const Donation = () => {
       <h1>Donation Page</h1>
     </div>
   );
-}
+};
 
 export default Donation;

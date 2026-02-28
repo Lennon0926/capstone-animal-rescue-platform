@@ -1,4 +1,4 @@
-import HeaderContainer from "@/components/Header/headerSeccion";
+import HeaderContainer from "@/components/LandingPage/Header/headerSeccion";
 
 export const Animals = () => {
   return (
@@ -7,6 +7,6 @@ export const Animals = () => {
       <h1>Animals Page</h1>
     </div>
   );
-}
+};
 
 export default Animals;

@@ -1,6 +1,6 @@
 .missionSection {
   padding: var(--space-16) var(--space-4);
-  background-color: var(--color-surface);
+  background-color: var(--color-bg);
   text-align: center;
 }
 
