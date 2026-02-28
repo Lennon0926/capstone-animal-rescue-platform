@@ -1,10 +1,6 @@
 .section {
   padding: 100px 24px;
-  background: linear-gradient(
-    to bottom,
-    #faf6f1 0%,
-    #f5eee8 100%
-  );
+  background: var(--color-bg)
 }
 
 .inner {

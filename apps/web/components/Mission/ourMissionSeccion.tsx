@@ -1,6 +1,6 @@
 import styles from "./ourMissionSeccion.module.css";
 
-export default function OurMissionSeccion () {
+export default function MissionSection() {
   return (
     <section className={styles.missionSection}>
       <div className={styles.missionInner}>
@@ -10,19 +10,11 @@ export default function OurMissionSeccion () {
         </h2>
 
         <p className={styles.missionText}>
-          Somos una organización sin fines de lucro impulsada por voluntarios 
-          que abren las puertas de sus hogares y familias para brindar cuidado 
-          y protección a animales rescatados.
-        </p>
-
-        <p className={styles.missionText}>
-          Actualmente no contamos con un albergue físico. Cada rescate es posible 
-          gracias a nuestra red de hogares temporales y al apoyo de personas comprometidas.
-        </p>
-
-        <p className={styles.missionText}>
-          A pesar de nuestras limitaciones de espacio y recursos, hemos logrado 
-          ayudar a miles de animales a encontrar una segunda oportunidad.
+          Somos una organización sin fines de lucro que cuenta con el trabajo de voluntarios, 
+          sus hogares y familia para brindar cuidados a aquellos animales que nuestra capacidad 
+          económica y de espacio nos permite. A pesar del nombre no contamos todavía con un 
+          albergue o santuario que pueda acoger a los animales abandonados. Aún así hemos 
+          logrado ayudar a miles de animales rescatados.
         </p>
 
       </div>

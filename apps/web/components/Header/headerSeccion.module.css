@@ -1,9 +1,13 @@
 .header {
   position: sticky;
   top: 0;
-  background-color: var(--color-bg);
+
+  background-color: var(--color-surface);
+  backdrop-filter: none;
+  opacity: 1;
+
   border-bottom: 1px solid var(--color-border);
-  z-index: 50;
+  z-index: 999;
 }
 
 .inner {
