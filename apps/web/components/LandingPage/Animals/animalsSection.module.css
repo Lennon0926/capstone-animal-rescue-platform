@@ -8,38 +8,52 @@
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: var(--space-12);
 }
 
 .header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  column-gap: var(--space-8);
+  row-gap: var(--space-8);
+  align-items: start;
+}
+
+.headerContainer {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: var(--space-6);
+  flex-direction: column;
+  gap: var(--space-8);
 }
 
 .title {
-  font-size: var(--text-3xl);
+  grid-column: 1;
+  grid-row: 1;
+  font-size: var(--text-hero-xl);
   font-weight: var(--font-weight-bold);
-  color: var(--color-text);
+  line-height: 1.05;
+  letter-spacing: var(--letter-tight);
 }
 
 .subtitle {
-  margin-top: var(--space-2);
-  color: var(--color-text-muted);
+  grid-column: 1;
+  grid-row: 2;
+  max-width: 700px;
+  font-size: var(--text-lg);
+  line-height: 1.6;
+  color: var(--text-muted);
 }
 
 .viewAll {
-  width: fit-content;
-  padding: 16px 32px;
+  grid-column: 2;
+  grid-row: 1;
+  align-self: start;
 
+  padding: var(--space-4) var(--space-8);
   background-color: var(--color-primary);
   color: var(--color-text-inverse);
-  text-decoration: none;
-
   border-radius: var(--radius-lg);
   font-weight: var(--font-weight-semibold);
-
+  text-decoration: none;
   box-shadow: var(--shadow-md);
   transition: all var(--transition-fast);
 }
@@ -124,8 +138,6 @@
   color: var(--color-text-inverse);
 }
 
-/* Responsive */
-
 @media (max-width: 1024px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
@@ -133,10 +145,23 @@
 }
 
 @media (max-width: 768px) {
+
   .header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--space-4);
+    grid-template-columns: 1fr;   /* 👈 una sola columna */
+    row-gap: var(--space-6);
+  }
+
+  .section {
+    text-align: center;
+    align-items: center;
+  }
+
+  .viewAll {
+    grid-column: 1;
+    grid-row: auto;              
+    justify-self: start;
+    margin-top: var(--space-1);
+    margin-bottom: var(--spacing-16);
   }
 
   .grid {

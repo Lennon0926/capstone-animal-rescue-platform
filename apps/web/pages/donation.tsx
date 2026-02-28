@@ -1,4 +1,4 @@
-import HeaderContainer from "@/components/LandingPage/Header/headerSeccion";
+import HeaderContainer from "@/components/LandingPage/Header/headerSection";
 
 export const Donation = () => {
   return (

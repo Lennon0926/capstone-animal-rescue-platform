@@ -1,42 +1,42 @@
 .section {
-  padding: 100px 24px;
+  padding: var(--space-section-y) var(--space-section-x);
   background: var(--color-bg);
 }
 
 .inner {
-  max-width: 1350px;
+  max-width: var(--container-max-width);
   margin: 0 auto;
 
   display: grid;
   grid-template-columns: 1.3fr 0.7fr;
-  gap: 60px;
+  gap: var(--space-grid-gap);
   align-items: center;
 }
 
 .content {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: var(--space-8);
 }
 
 .title {
   font-size: var(--text-hero-xl);
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   line-height: 1.05;
-  letter-spacing: -1px;
-  max-width: 600px;
+  letter-spacing: var(--letter-tight);
+  max-width: 600px; 
 }
 
 .description {
-  font-size: 18px;
+  font-size: var(--text-lg);
   line-height: 1.6;
-  color: #6b6b6b;
-  max-width: 520px;
+  color: var(--text-muted);
+  max-width: 520px; 
 }
 
 .donateButton {
   width: fit-content;
-  padding: 16px 32px;
+  padding: var(--space-4) var(--space-8);
 
   background-color: var(--color-primary);
   color: var(--color-text-inverse);
@@ -51,7 +51,7 @@
 
 .donateButton:hover {
   background-color: var(--color-primary-hover);
-  color: var(--color-text-inverse); 
+  color: var(--color-text-inverse);
   transform: translateY(-2px);
 }
 
@@ -63,21 +63,19 @@
 .image {
   width: 100%;
   max-width: 520px;
-  border-radius: 24px;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-hero);
+  box-shadow: var(--shadow-hero);
 }
-
-/* ================= MOBILE ================= */
 
 @media (max-width: 900px) {
 
   .section {
-    padding: 70px 20px;
+    padding: var(--space-12) var(--space-5);
   }
 
   .inner {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: var(--space-10);
   }
 
   .content {
@@ -86,12 +84,10 @@
   }
 
   .title {
-    font-size: 36px;
     max-width: 100%;
   }
 
   .description {
-    font-size: 16px;
     max-width: 90%;
   }
 

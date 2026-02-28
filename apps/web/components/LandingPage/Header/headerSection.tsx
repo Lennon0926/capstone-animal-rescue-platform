@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Link from "next/link";
-import styles from "./headerSeccion.module.css";
+import styles from "./headerSection.module.css";
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);

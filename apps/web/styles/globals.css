@@ -26,8 +26,8 @@
   --color-text-muted: #6f6f6f;
   --color-text-inverse: #ffffff;
 
-  --status-available-bg: #d1fae5;
-  --status-available-text: #065f46;
+  --status-available-bg: #bfe3d6;
+  --status-available-text: #0f3d32;
 
   --status-adopted-bg: #fde2e1;
   --status-adopted-text: #b42318;
@@ -39,7 +39,7 @@
                "Helvetica Neue", sans-serif;
 
   --text-xs: 12px;
-  --text-sm: 14px;
+  --text-sm: 18px;
   --text-base: 16px;
   --text-lg: 20px;
   --text-xl: 24px;
@@ -51,6 +51,8 @@
   --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
+
+  --font-size-mobile-hero: var(--text-2xl);
 
   /* ================= SPACING SCALE ================= */
 
@@ -64,6 +66,8 @@
   --space-10: 40px;
   --space-12: 48px;
   --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
 
   /* ================= RADIUS ================= */
 
@@ -83,7 +87,20 @@
   --transition-fast: 0.15s ease;
   --transition-normal: 0.25s ease;
 
-  /* ================= LAYOUT ================= */
+/* ==================== LAYOUT ====================== */
+
+  --space-section-y: var(--space-16);
+  --space-section-x: var(--space-6);
+
+  --space-grid-gap: var(--space-12);
+
+  --radius-hero: var(--radius-xl);
+
+  --shadow-hero: 0 30px 60px rgba(0, 0, 0, 0.08);
+
+  --text-muted: var(--color-text-muted);
+
+  --letter-tight: -1px;
 
   --container-max-width: 1200px;
 }

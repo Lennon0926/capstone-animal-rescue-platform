@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import styles from "./donationSeccion.module.css";
+import styles from "./donationSection.module.css";
 
 export default function DonationSection() {
   return (

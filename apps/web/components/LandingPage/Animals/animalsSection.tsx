@@ -1,4 +1,4 @@
-import styles from "./animalsSeccion.module.css";
+import styles from "./animalsSection.module.css";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -37,13 +37,13 @@ export default function AnimalsSection() {
     <section className={styles.section}>
       <div className={styles.inner}>
         <div className={styles.header}>
-          <div>
+          <div className={styles.headerContainer}>
             <h2 className={styles.title}>Conoce a Nuestros Animales</h2>
             <p className={styles.subtitle}>
-              Estos maravillosos compañeros esperan su hogar definitivo
+              Cada uno de estos maravillosos compañeros espera una familia que le brinde amor,
+              cuidado y la oportunidad de comenzar una nueva etapa llena de esperanza.
             </p>
           </div>
-
           <Link href="/animals" className={styles.viewAll}>
             Ver Todos →
           </Link>
@@ -73,7 +73,7 @@ export default function AnimalsSection() {
                 </p>
 
                 <Link
-                  href={`/animals/${animal.id}`}
+                  href={`/animalInfo/`}
                   className={styles.learnMore}
                 >
                   Conoce Más

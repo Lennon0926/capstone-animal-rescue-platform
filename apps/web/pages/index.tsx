@@ -1,7 +1,7 @@
-import HeaderSeccion from "@/components/LandingPage/Header/headerSeccion";
-import DonationSection from "@/components/LandingPage/Donate/donationSeccion";
-import OurMissionSeccion from "@/components/LandingPage/Mission/ourMissionSeccion";
-import AnimalsSection from "@/components/LandingPage/Animals/animalsSeccion";
+import HeaderSeccion from "@/components/LandingPage/Header/headerSection";
+import DonationSection from "@/components/LandingPage/Donate/donationSection";
+import OurMissionSeccion from "@/components/LandingPage/Mission/ourMissionSection";
+import AnimalsSection from "@/components/LandingPage/Animals/animalsSection";
 
 function Index() {
   return (
