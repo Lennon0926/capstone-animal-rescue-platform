@@ -1,0 +1,104 @@
+.section {
+  padding: var(--space-20) var(--space-6);
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.inner {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-16);
+}
+
+.content {
+  max-width: 650px;
+}
+
+.title {
+  font-size: var(--text-hero-xl);
+  font-weight: var(--font-weight-bold);
+  margin-bottom: var(--space-6);
+}
+
+.description {
+  font-size: var(--text-lg);
+  color: #c7cbd4;
+  line-height: 1.6;
+  margin-bottom: var(--space-8);
+}
+
+.benefits {
+  display: flex;
+  gap: var(--space-8);
+  flex-wrap: wrap;
+}
+
+.benefit {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--text-base);
+  color: #d8dde6;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-6);
+}
+
+.primaryButton {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+
+  padding: var(--space-4) var(--space-8);
+  background-color: white;
+  color: #060a1a;
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+.primaryButton:hover {
+  transform: translateY(-2px);
+}
+
+.secondaryButton {
+  padding: var(--space-4) var(--space-8);
+  background-color: rgba(255, 255, 255, 0.15);
+  color: white;
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+.secondaryButton:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+@media (max-width: 900px) {
+
+  .inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-12);
+  }
+
+  .actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+}

@@ -3,6 +3,7 @@ import DonationSection from "@/components/LandingPage/Donate/donationSection";
 import OurMissionSeccion from "@/components/LandingPage/Mission/ourMissionSection";
 import AnimalsSection from "@/components/LandingPage/Animals/animalsSection";
 import HowItWorks from "@/components/LandingPage/HowItWorks/howItWorksSection";
+import DonationBanner from "@/components/LandingPage/Donate/donationBanner";
 
 function Index() {
   return (
@@ -12,6 +13,7 @@ function Index() {
       <OurMissionSeccion />
       <AnimalsSection />
       <HowItWorks />
+      <DonationBanner />
     </div>
   );
 }
