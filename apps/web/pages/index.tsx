@@ -1,10 +1,10 @@
-import HeaderContainer from "@/components/Header/headerContainer";
+import HeaderSeccion from "@/components/Header/headerSeccion";
 import DonationSection from "@/components/Donate/donationSeccion";
 
 function Index() {
   return (
     <div>
-      <HeaderContainer />
+      <HeaderSeccion />
       <DonationSection />
     </div>
   );
