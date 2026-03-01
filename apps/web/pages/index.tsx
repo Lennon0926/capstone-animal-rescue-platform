@@ -1,13 +1,22 @@
-import AnimalImageUploadForm from "@/components/animalImageUploadForm";
-import HelloWorldDisplay from "@/components/helloWorld";
+import HeaderSection from "@/components/Header/headerSection";
+import DonationSection from "@/components/LandingPage/Donate/donationSection";
+import OurMissionSection from "@/components/LandingPage/Mission/ourMissionSection";
+import AnimalsSection from "@/components/LandingPage/Animals/animalsSection";
+import HowItWorks from "@/components/LandingPage/HowItWorks/howItWorksSection";
+import DonationBanner from "@/components/LandingPage/Donate/donationBanner";
+import FooterSection from "@/components/Footer/footerSection";
 
 function Index() {
   return (
-    <main style={{ padding: "2rem", fontFamily: "sans-serif" }}>
-      <h1>Capstone Animal Rescue Platform</h1>
-      <HelloWorldDisplay />
-      <AnimalImageUploadForm />
-    </main>
+    <div>
+      <HeaderSection />
+      <DonationSection />
+      <OurMissionSection />
+      <AnimalsSection />
+      <HowItWorks />
+      <DonationBanner />
+      <FooterSection />
+    </div>
   );
 }
 
