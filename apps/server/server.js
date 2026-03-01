@@ -162,7 +162,56 @@ const getObjectUrl = async (objectKey, client) => {
 app.use(cors());
 app.use(express.json());
 
-// Health check endpoint
+// Swagger UI - only enabled in non-production environments
+if (process.env.NODE_ENV !== "production") {
+  const swaggerUi = require("swagger-ui-express");
+  const { swaggerSpec } = require("./config/swagger");
+
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    explorer: true,
+    customSiteTitle: "Animal Rescue API Documentation",
+  }));
+
+  app.get("/api-docs.json", (req, res) => {
+    res.setHeader("Content-Type", "application/json");
+    res.send(swaggerSpec);
+  });
+}
+
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: API Root
+ *     description: Returns API information and available endpoints
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: API information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Capstone Animal Rescue Platform API
+ *                 version:
+ *                   type: string
+ *                   example: "1.0.0"
+ *                 endpoints:
+ *                   type: object
+ *                   properties:
+ *                     animals:
+ *                       type: string
+ *                       example: /api/animals
+ *                     health:
+ *                       type: string
+ *                       example: /api/health
+ */
 app.get("/", (req, res) => {
   res.json({
     success: true,
@@ -175,7 +224,27 @@ app.get("/", (req, res) => {
   });
 });
 
-// Health check with database connection status
+/**
+ * @swagger
+ * /api/health:
+ *   get:
+ *     summary: Health check with database status
+ *     description: Returns server health status including database connection status
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: Server is healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HealthWithDbResponse'
+ *       503:
+ *         description: Server is degraded (database connection issue)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HealthWithDbResponse'
+ */
 app.get("/api/health", async (req, res) => {
   const dbStatus = await verifyConnection();
 
@@ -190,11 +259,46 @@ app.get("/api/health", async (req, res) => {
   });
 });
 
-// Simple health/ready endpoints
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Simple health check
+ *     description: Returns basic server health status with uptime
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: Server is running
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HealthResponse'
+ */
 app.get("/health", (req, res) => {
   res.json({ status: "ok", uptime: process.uptime(), startedAt });
 });
 
+/**
+ * @swagger
+ * /ready:
+ *   get:
+ *     summary: Readiness check
+ *     description: Checks if all required environment variables are configured and server is ready to accept traffic
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: Server is ready
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ReadyResponse'
+ *       503:
+ *         description: Server is not ready
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ReadyResponse'
+ */
 app.get("/ready", (req, res) => {
   const envReady = REQUIRED_ENV_VARS.every((key) => !!process.env[key]);
 
@@ -205,7 +309,21 @@ app.get("/ready", (req, res) => {
   res.json({ status: "ready" });
 });
 
-// R2 Upload config endpoint
+/**
+ * @swagger
+ * /api/uploads/config:
+ *   get:
+ *     summary: Get upload configuration
+ *     description: Returns upload configuration including allowed file types and size limits
+ *     tags: [Uploads]
+ *     responses:
+ *       200:
+ *         description: Upload configuration
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UploadConfig'
+ */
 app.get("/api/uploads/config", (req, res) => {
   res.json({
     data: {
@@ -218,7 +336,88 @@ app.get("/api/uploads/config", (req, res) => {
   });
 });
 
-// R2 Image upload endpoint
+/**
+ * @swagger
+ * /api/uploads/animals/{animalId}/image:
+ *   post:
+ *     summary: Upload animal image
+ *     description: Upload an image for a specific animal. Images are stored in Cloudflare R2.
+ *     tags: [Uploads]
+ *     parameters:
+ *       - in: path
+ *         name: animalId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           pattern: '^[a-zA-Z0-9_-]{1,64}$'
+ *         description: Animal ID (1-64 alphanumeric chars, underscores, or dashes)
+ *         example: dog-001
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - image
+ *             properties:
+ *               image:
+ *                 type: string
+ *                 format: binary
+ *                 description: Image file (JPEG, PNG, or WebP)
+ *     responses:
+ *       201:
+ *         description: Image uploaded successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UploadResponse'
+ *       400:
+ *         description: Invalid request (missing file or invalid animal ID)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             examples:
+ *               invalidAnimalId:
+ *                 summary: Invalid animal ID
+ *                 value:
+ *                   error:
+ *                     code: INVALID_ANIMAL_ID
+ *                     message: "animalId must be 1-64 chars using only letters, numbers, underscores, or dashes."
+ *               missingFile:
+ *                 summary: Missing image file
+ *                 value:
+ *                   error:
+ *                     code: MISSING_IMAGE_FILE
+ *                     message: 'No upload file found. Send one file using multipart field name "image".'
+ *       413:
+ *         description: Image file too large
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error:
+ *                 code: IMAGE_TOO_LARGE
+ *                 message: "Image exceeds the 5242880 byte upload limit."
+ *       415:
+ *         description: Unsupported media type
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *             example:
+ *               error:
+ *                 code: INVALID_IMAGE_TYPE
+ *                 message: "Unsupported content type. Allowed types: image/jpeg, image/png, image/webp."
+ *       500:
+ *         description: Server error or R2 not configured
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 app.post(
   "/api/uploads/animals/:animalId/image",
   upload.single("image"),
@@ -346,6 +545,9 @@ const server = app.listen(port, () => {
   console.log(`Server started on port ${port}`);
   console.log(`Health check: http://localhost:${port}/api/health`);
   console.log(`Animals API: http://localhost:${port}/api/animals`);
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`API Documentation: http://localhost:${port}/api-docs`);
+  }
 });
 
 // Graceful shutdown handling
