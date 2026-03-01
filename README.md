@@ -42,16 +42,32 @@ cd ../web && npm install
 **Server** (`apps/server/.env.local`):
 
 ```env
-PORT='8080'
+PORT=4000
+
+# Supabase Configuration (Required)
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
 ```
 
 **Web** (`apps/web/.env.local`):
 
 ```env
-NEXT_PUBLIC_API_BASE_URL='http://localhost:8080'
+NEXT_PUBLIC_API_BASE_URL=http://localhost:4000
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
+NEXT_PUBLIC_GOOGLE_FORM_URL=https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform
 ```
 
-### 4. Start the development servers
+> 📖 See [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) for detailed Supabase configuration instructions.
+
+### 4. Apply database schema and seed data
+
+```bash
+cd apps/server
+npm run seed
+```
+
+### 5. Start the development servers
 
 In one terminal, start the API server:
 
@@ -67,7 +83,7 @@ cd apps/web
 npm run dev
 ```
 
-The API will be available at `http://localhost:8080` and the frontend at `http://localhost:3000`.
+The API will be available at `http://localhost:4000` and the frontend at `http://localhost:3000`.
 
 ## Tech Stack
 
@@ -75,7 +91,26 @@ The API will be available at `http://localhost:8080` and the frontend at `http:/
 | -------- | ----------------------------------- |
 | Frontend | Next.js 16, React 19, Tailwind CSS 4, TypeScript |
 | Backend  | Express 5, Node.js                  |
+| Database | Supabase (PostgreSQL)               |
 | Tooling  | ESLint, Nodemon, PostCSS            |
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/health` | Health check with database status |
+| GET | `/api/animals` | List animals with filters/pagination |
+| GET | `/api/animals/:aid` | Get single animal by ID |
+| GET | `/api/animals/filters` | Get available filter options |
+
+See [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) for full API documentation.
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) | Database setup, schema, and API reference |
+| [docs/GOOGLE_FORMS_INTEGRATION.md](docs/GOOGLE_FORMS_INTEGRATION.md) | Adoption application intake via Google Forms |
 
 ## Documentation Scripts
 
