@@ -300,6 +300,10 @@ app.use((error, req, res, next) => {
     );
 });
 
-app.listen(port, () => {
-  console.log(`Server started on port ${port}`);
-});
+if (require.main === module) {
+  app.listen(port, () => {
+    console.log(`Server started on port ${port}`);
+  });
+}
+
+module.exports = app;
