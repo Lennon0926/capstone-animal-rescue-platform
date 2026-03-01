@@ -29,8 +29,8 @@ export default function Footer() {
           <h4 className={styles.heading}>Apoyo</h4>
           <ul>
             <li><Link href="/donation">Donar</Link></li>
-            <li><Link href="/volunteer">Ser Voluntario</Link></li>
-            <li><Link href="/foster">Programa de Hogar Temporal</Link></li>
+            {/* <li><Link href="/volunteer">Ser Voluntario</Link></li>
+            <li><Link href="/foster">Programa de Hogar Temporal</Link></li> */}
           </ul>
         </div>
 
