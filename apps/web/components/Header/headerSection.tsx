@@ -12,9 +12,9 @@ export default function Header() {
         <div className={styles.logoContainer}>
           <Image
             src="/org-logo.png"
-            width={50}
-            height={50}
             className={styles.logoImage}
+            width={45}
+            height={45}
             alt="CPAAA Logo"
           />
           <div className={styles.logo}>

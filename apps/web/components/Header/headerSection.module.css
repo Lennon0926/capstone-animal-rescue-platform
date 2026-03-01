@@ -42,6 +42,11 @@
   font-weight: var(--font-weight-semibold);
 }
 
+.logoImage {
+  width: 50px;
+  height: 50px;
+}
+
 .navDesktop {
   display: flex;
   align-items: center;
