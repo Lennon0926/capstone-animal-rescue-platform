@@ -7,10 +7,10 @@ export default function DonationSection() {
     <section className={styles.section}>
       <div className={styles.inner}>
         <div className={styles.content}>
-          <h1 className={styles.title}>
+          <h2 className={styles.title}>
             Cada animal merece <br />
             una segunda oportunidad
-          </h1>
+          </h2>
 
           <p className={styles.description}>
             Ayudamos a animales abandonados y rescatados a encontrar familias

@@ -29,7 +29,7 @@ export default function HowItWorks() {
   return (
     <section id="adoption_process" className={styles.section}>
       <div className={styles.inner}>
-        <h1 className={styles.title}>Proceso de Adopción</h1>
+        <h2 className={styles.title}>Proceso de Adopción</h2>
         <p className={styles.subtitle}>
           Nuestro proceso de adopción es simple y transparente. Sigue estos pasos para darle a un animal rescatado la oportunidad de encontrar un hogar amoroso.
         </p>

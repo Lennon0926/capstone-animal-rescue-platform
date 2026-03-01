@@ -55,7 +55,7 @@ export default function AnimalsSection() {
                   alt={animal.name}
                   width={400}
                   height={300}
-                  style={{ objectFit: "cover", width: "100%", height: "auto" }}
+                  style={{ objectFit: "cover", width: "100%", height: "100%" }}
                 />
               </div>
 

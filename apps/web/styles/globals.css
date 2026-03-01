@@ -30,6 +30,8 @@
   --color-banner-text: #c7cbd4;
   --color-banner-benefit: #d8dde6;
 
+  --color-dark: #0b0f1a;
+
   --status-available-bg: #bfe3d6;
   --status-available-text: #0f3d32;
 
@@ -43,7 +45,7 @@
                "Helvetica Neue", sans-serif;
 
   --text-xs: 12px;
-  --text-sm: 18px;
+  --text-sm: 14px;
   --text-base: 16px;
   --text-lg: 20px;
   --text-xl: 24px;
