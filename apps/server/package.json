@@ -9,11 +9,15 @@
   "scripts": {
     "test": "jest --verbose",
     "start": "node server",
-    "dev": "nodemon server"
+    "dev": "nodemon server",
+    "seed": "node scripts/seed.js",
+    "seed:force": "node scripts/seed.js --force",
+    "seed:append": "node scripts/seed.js --append"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.998.0",
     "@aws-sdk/s3-request-presigner": "^3.998.0",
+    "@supabase/supabase-js": "^2.98.0",
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
