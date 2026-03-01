@@ -16,7 +16,7 @@ __pycache__/
 node_modules/
 apps/web/node_modules/
 apps/server/node_modules/
-apps/web/.next/
+.next/
 
 # Local environment files (never commit real secrets)
 .env
