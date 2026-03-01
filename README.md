@@ -111,6 +111,25 @@ See [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) for full API documentation.
 |----------|-------------|
 | [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) | Database setup, schema, and API reference |
 | [docs/GOOGLE_FORMS_INTEGRATION.md](docs/GOOGLE_FORMS_INTEGRATION.md) | Adoption application intake via Google Forms |
+### Health & Readiness
+
+| Endpoint  | Method | Description | Success | Failure |
+| --------- | ------ | ----------- | ------- | ------- |
+| `/health` | GET    | Liveness check — confirms the process is running. Returns uptime and start timestamp. | `200 { "status": "ok", "uptime": ..., "startedAt": "..." }` | N/A (if the server is down the request won't reach it) |
+| `/ready`  | GET    | Readiness check — confirms all required environment variables are set. | `200 { "status": "ready" }` | `503 { "status": "not ready", "reason": "missing env" }` |
+
+### Environment Validation
+
+On startup the server validates that every variable listed in `apps/server/validateEnv.js` (`REQUIRED_ENV_VARS`) is present. If any are missing the process exits immediately with an actionable error listing each missing variable.
+
+**Local usage:**
+
+```bash
+curl http://localhost:8080/health
+curl http://localhost:8080/ready
+```
+
+**Deployment:** Point your orchestrator's liveness probe at `/health` and its readiness probe at `/ready`.
 
 ## Documentation Scripts
 
