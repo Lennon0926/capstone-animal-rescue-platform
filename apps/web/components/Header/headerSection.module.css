@@ -73,6 +73,11 @@
   font-weight: var(--font-weight-medium);
 }
 
+.donateButton:hover {
+  background-color: var(--color-primary-hover);
+  color: var(--color-text-inverse);
+}
+
 .menuButton {
   display: none;
   font-size: var(--text-xl);
