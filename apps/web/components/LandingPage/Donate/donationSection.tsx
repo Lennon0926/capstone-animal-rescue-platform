@@ -29,6 +29,7 @@ export default function DonationSection() {
             src="/Animals/donationDogPicture.jpg"
             alt="Rescued dog being petted"
             className={styles.image}
+            priority
             width={500}
             height={500}
           />

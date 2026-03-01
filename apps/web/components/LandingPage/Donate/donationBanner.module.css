@@ -26,7 +26,7 @@
 
 .description {
   font-size: var(--text-lg);
-  color: #c7cbd4;
+  color: var(--color-banner-text);
   line-height: 1.6;
   margin-bottom: var(--space-8);
 }
@@ -42,7 +42,7 @@
   align-items: center;
   gap: var(--space-3);
   font-size: var(--text-base);
-  color: #d8dde6;
+  color: var(--color-banner-text);
 }
 
 .actions {

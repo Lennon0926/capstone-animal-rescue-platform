@@ -7,7 +7,6 @@ export default function DonationBanner() {
     <section className={styles.section}>
       <div className={styles.inner}>
 
-        {/* LEFT SIDE */}
         <div className={styles.content}>
           <h2 className={styles.title}>Ayúdanos a Salvar Más Vidas</h2>
 
