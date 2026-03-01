@@ -1,7 +1,7 @@
 .section {
   padding: var(--space-20) var(--space-6);
   background-color: var(--color-primary);
-  color: white;
+  color: var(--color-text-inverse);
 }
 
 .inner {
@@ -56,8 +56,8 @@
   gap: var(--space-3);
 
   padding: var(--space-4) var(--space-8);
-  background-color: white;
-  color: #060a1a;
+  background-color: var(--color-text-inverse);
+  color: var(--color-text);
   border-radius: var(--radius-lg);
   font-weight: var(--font-weight-semibold);
   text-decoration: none;
@@ -66,19 +66,6 @@
 
 .primaryButton:hover {
   transform: translateY(-2px);
-}
-
-.secondaryButton {
-  padding: var(--space-4) var(--space-8);
-  background-color: rgba(255, 255, 255, 0.15);
-  color: white;
-  border-radius: var(--radius-lg);
-  text-decoration: none;
-  transition: var(--transition-fast);
-}
-
-.secondaryButton:hover {
-  background-color: rgba(255, 255, 255, 0.25);
 }
 
 @media (max-width: 900px) {
@@ -94,11 +81,9 @@
     flex-direction: column;
   }
 
-  .primaryButton,
-  .secondaryButton {
+  .primaryButton {
     width: 100%;
     justify-content: center;
     text-align: center;
   }
-
 }
