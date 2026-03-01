@@ -1,7 +1,40 @@
 const request = require("supertest");
 
+const MOCK_ANIMALS = [
+  {
+    aid: 1,
+    name: "Buddy",
+    species: "Dog",
+    status: "available",
+    size: "medium",
+    gender: "male",
+    created_at: "2025-01-01T00:00:00Z",
+  },
+];
+
+function buildChainableMock(resolvedValue) {
+  const chain = {};
+  const methods = ["select", "eq", "ilike", "not", "order", "range", "single", "limit"];
+  for (const m of methods) {
+    chain[m] = jest.fn(() => chain);
+  }
+  chain.then = (resolve) => resolve(resolvedValue);
+  return chain;
+}
+
+const mockFrom = jest.fn();
+
+jest.mock("../lib/supabase", () => ({
+  getSupabaseClient: () => ({ from: mockFrom }),
+  verifyConnection: () => Promise.resolve({ connected: true }),
+}));
+
 beforeAll(() => {
   process.env.PORT = "4000";
+});
+
+beforeEach(() => {
+  jest.clearAllMocks();
 });
 
 const getApp = () => require("../server");
@@ -54,5 +87,54 @@ describe("Smoke: core animal flow", () => {
       });
     expect(badId.status).toBe(400);
     expect(badId.body.error.code).toBe("INVALID_ANIMAL_ID");
+  });
+
+  it("animal fetch: list animals, then fetch a single animal by ID", async () => {
+    const app = getApp();
+
+    const listChain = buildChainableMock({
+      data: MOCK_ANIMALS,
+      error: null,
+      count: 1,
+    });
+    mockFrom.mockReturnValue(listChain);
+
+    const list = await request(app).get("/api/animals");
+    expect(list.status).toBe(200);
+    expect(list.body.success).toBe(true);
+    expect(Array.isArray(list.body.data)).toBe(true);
+    expect(list.body.data.length).toBeGreaterThan(0);
+    expect(list.body.pagination).toBeDefined();
+
+    const firstAnimalId = list.body.data[0].aid;
+
+    const singleChain = buildChainableMock({
+      data: MOCK_ANIMALS[0],
+      error: null,
+    });
+    mockFrom.mockReturnValue(singleChain);
+
+    const detail = await request(app).get(`/api/animals/${firstAnimalId}`);
+    expect(detail.status).toBe(200);
+    expect(detail.body.success).toBe(true);
+    expect(detail.body.data.aid).toBe(firstAnimalId);
+    expect(detail.body.data.name).toBeDefined();
+  });
+
+  it("animal fetch: invalid ID returns 400", async () => {
+    const app = getApp();
+
+    const res = await request(app).get("/api/animals/not-a-number");
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+  });
+
+  it("undefined routes return 404 with structured error", async () => {
+    const app = getApp();
+
+    const res = await request(app).get("/api/does-not-exist");
+    expect(res.status).toBe(404);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/route not found/i);
   });
 });
