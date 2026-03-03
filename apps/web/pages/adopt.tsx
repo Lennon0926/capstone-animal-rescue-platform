@@ -1,14 +1,13 @@
 import HeaderSection from "@/components/Header/headerSection";
 import FooterSection from "@/components/Footer/footerSection";
+import AdoptPage from "@/components/AdoptPage/adoptPage";
 
-export const Animals = () => {
+export default function Adopt() {
   return (
-    <div>
+    <>
       <HeaderSection />
-      <h1>Animals Page</h1>
+      <AdoptPage />
       <FooterSection />
-    </div>
+    </>
   );
-};
-
-export default Animals;
+}
