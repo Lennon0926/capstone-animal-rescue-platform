@@ -341,26 +341,27 @@ app.use("/api/animals", animalsRouter);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-// Start server
-const server = app.listen(port, () => {
-  console.log(`Server started on port ${port}`);
-  console.log(`Health check: http://localhost:${port}/api/health`);
-  console.log(`Animals API: http://localhost:${port}/api/animals`);
-});
-
-// Graceful shutdown handling
-const shutdown = (signal) => {
-  console.log(`\n${signal} received, shutting down gracefully...`);
-  server.close(() => {
-    console.log("Server closed");
-    process.exit(0);
+if (require.main === module) {
+  const server = app.listen(port, () => {
+    console.log(`Server started on port ${port}`);
+    console.log(`Health check: http://localhost:${port}/api/health`);
+    console.log(`Animals API: http://localhost:${port}/api/animals`);
   });
-  // Force exit after 5 seconds if server doesn't close
-  setTimeout(() => {
-    console.error("Forcing shutdown after timeout");
-    process.exit(1);
-  }, 5000);
-};
 
-process.on("SIGTERM", () => shutdown("SIGTERM"));
-process.on("SIGINT", () => shutdown("SIGINT"));
+  const shutdown = (signal) => {
+    console.log(`\n${signal} received, shutting down gracefully...`);
+    server.close(() => {
+      console.log("Server closed");
+      process.exit(0);
+    });
+    setTimeout(() => {
+      console.error("Forcing shutdown after timeout");
+      process.exit(1);
+    }, 5000);
+  };
+
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+  process.on("SIGINT", () => shutdown("SIGINT"));
+}
+
+module.exports = app;
