@@ -53,12 +53,12 @@
   gap: var(--space-6);
 }
 
-.navDesktop a {
+.navDesktop a:not(.donateButton) {
   font-size: var(--text-sm);
   color: var(--color-text-muted);
 }
 
-.navDesktop a:hover {
+.navDesktop a:not(.donateButton):hover {
   color: var(--color-text);
 }
 
