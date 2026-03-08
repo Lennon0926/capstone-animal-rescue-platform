@@ -173,11 +173,41 @@ async function createAnimal(animalData) {
   }
 }
 
+/**
+ * Deletes an animal record by ID.
+ * 
+ * @param {number} aid 
+ * @returns 
+ */
+async function deleteAnimal(aid) {
+  try {
+    const client = getSupabaseClient();
+    const { data, error } = await client
+      .from("animals")
+      .delete()
+      .eq("aid", aid)
+      .select("*")
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") {
+        return { data: null, error: "Animal not found" };
+      }
+      return { data: null, error: error.message };
+    }
+
+    return { data, error: null };
+  } catch (err) {
+    return { data: null, error: err.message };  
+  }
+}
+
 module.exports = {
   getAnimals,
   getAnimalById,
   getDistinctValues,
   createAnimal,
+  deleteAnimal,
   VALID_FILTERS,
   VALID_SORT_FIELDS,
 };

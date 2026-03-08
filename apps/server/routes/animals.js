@@ -11,6 +11,7 @@ const {
   getAnimalById,
   getDistinctValues,
   createAnimal,
+  deleteAnimal,
 } = require("../repositories/animalsRepository");
 const { validateAnimalsQuery, validateAnimalId, validateCreateAnimal } = require("../middleware/validation");
 const { asyncHandler, ApiError } = require("../middleware/errorHandler");
@@ -127,6 +128,31 @@ router.post(
     }
 
     res.status(201).json({
+      success: true,
+      data: result.data,
+    });
+  })
+);
+
+/**
+ * DELETE /api/animals/:aid
+ * Deletes an animal by ID.
+ */
+router.delete(
+  "/:aid",
+  validateAnimalId,
+  asyncHandler(async (req, res) => {
+    const result = await deleteAnimal(req.params.aid);
+
+    if (result.error === "Animal not found") {
+      throw new ApiError(404, `Animal with ID ${req.params.aid} not found`);
+    }
+
+    if (result.error) {
+      throw new ApiError(500, "Failed to delete animal", result.error);
+    }
+
+    res.json({
       success: true,
       data: result.data,
     });
