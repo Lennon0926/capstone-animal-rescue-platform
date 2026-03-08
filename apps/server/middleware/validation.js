@@ -126,6 +126,70 @@ function validateAnimalId(req, res, next) {
   next();
 }
 
+/**
+ * Middleware to validate create animal request body.
+ */
+function validateCreateAnimal(req, res, next) {
+  try {
+    const name = sanitizeString(req.body.name);
+    const description = sanitizeString(req.body.description);
+    const species = sanitizeString(req.body.species).toLowerCase();
+    const size = sanitizeString(req.body.size).toLowerCase();
+    const gender = sanitizeString(req.body.gender).toLowerCase();
+    const status = sanitizeString(req.body.status).toLowerCase();
+    const image_url = typeof req.body.image_url === "string"
+      ? req.body.image_url.trim().slice(0, 500)
+      : "";
+
+    const validSpecies = ["dog", "cat"];
+    const validSizes = ["small", "medium", "large", "extra_large"];
+    const validGenders = ["male", "female", "unknown"];
+    const validStatuses = ["available", "adopted", "pending", "fostered", "medical_hold"];
+
+    if (!name) {
+      throw new ApiError(400, "Name is required.");
+    }
+
+    if (!description) {
+      throw new ApiError(400, "Description is required.");
+    }
+
+    if (!validSpecies.includes(species)) {
+      throw new ApiError(400, "Invalid species.");
+    }
+
+    if (!validSizes.includes(size)) {
+      throw new ApiError(400, "Invalid size.");
+    }
+
+    if (!validGenders.includes(gender)) {
+      throw new ApiError(400, "Invalid gender.");
+    }
+
+    if (!validStatuses.includes(status)) {
+      throw new ApiError(400, "Invalid status.");
+    }
+
+    if (!image_url) {
+      throw new ApiError(400, "Image URL is required.");
+    }
+
+    req.validatedBody = {
+      name,
+      description,
+      species,
+      size,
+      gender,
+      status,
+      image_url,
+    };
+
+    next();
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   sanitizeString,
   validatePagination,
@@ -133,4 +197,5 @@ module.exports = {
   validateAnimalFilters,
   validateAnimalsQuery,
   validateAnimalId,
+  validateCreateAnimal
 };

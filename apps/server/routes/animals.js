@@ -10,8 +10,9 @@ const {
   getAnimals,
   getAnimalById,
   getDistinctValues,
+  createAnimal,
 } = require("../repositories/animalsRepository");
-const { validateAnimalsQuery, validateAnimalId } = require("../middleware/validation");
+const { validateAnimalsQuery, validateAnimalId, validateCreateAnimal } = require("../middleware/validation");
 const { asyncHandler, ApiError } = require("../middleware/errorHandler");
 
 /**
@@ -105,6 +106,27 @@ router.get(
     }
 
     res.json({
+      success: true,
+      data: result.data,
+    });
+  })
+);
+
+/**
+ * POST /api/animals
+ * Creates a new animal.
+ */
+router.post(
+  "/",
+  validateCreateAnimal,
+  asyncHandler(async (req, res) => {
+    const result = await createAnimal(req.validatedBody);
+
+    if (result.error) {
+      throw new ApiError(500, "Failed to create animal", result.error);
+    }
+
+    res.status(201).json({
       success: true,
       data: result.data,
     });

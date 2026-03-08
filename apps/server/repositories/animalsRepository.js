@@ -147,10 +147,37 @@ async function getDistinctValues(field) {
   }
 }
 
+/**
+ * Inserts a new animal record into the database.
+ * 
+ * @param {*} animalData 
+ * @returns 
+ */
+async function createAnimal(animalData) {
+  try {
+    const client = getSupabaseClient();
+
+    const { data, error } = await client
+      .from("animals")
+      .insert(animalData)
+      .select("*")
+      .single();
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+
+    return { data, error: null };
+  } catch (err) {
+    return { data: null, error: err.message };
+  }
+}
+
 module.exports = {
   getAnimals,
   getAnimalById,
   getDistinctValues,
+  createAnimal,
   VALID_FILTERS,
   VALID_SORT_FIELDS,
 };
