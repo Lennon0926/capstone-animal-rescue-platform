@@ -1,5 +1,6 @@
 import { GetServerSideProps } from "next";
 import AnimalInfo from "@/components/Animal/AnimalInfoPage/animalInfo";
+import HeaderSeccion from "@/components/Header/headerSection";
 
 type AnimalApiData = {
   aid: number;
@@ -28,7 +29,12 @@ export default function AnimalInfoPage({ animal }: AnimalInfoPageProps) {
     return <div>No se encontró el animal.</div>;
   }
 
-  return <AnimalInfo animal={animal} />;
+  return (
+    <div>
+      <HeaderSeccion />
+      <AnimalInfo animal={animal} />
+    </div>
+  );
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
