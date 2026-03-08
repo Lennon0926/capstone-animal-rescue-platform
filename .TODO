@@ -1,0 +1,17 @@
+## Issue #66 – CD Pipeline Setup Checklist
+
+### GitHub
+- [x] Create `staging` environment (Settings → Environments)
+- [x] Create `production` environment (Settings → Environments)
+- [ ] Optionally add a required reviewer to the `production` environment for manual approval gate
+- [ ] Add secret: VERCEL_TOKEN
+- [ ] Add secret: VERCEL_ORG_ID
+- [ ] Add secret: VERCEL_WEB_PROJECT_ID
+- [ ] Add secret: VERCEL_SERVER_PROJECT_ID
+
+### Vercel
+- [ ] Create a Vercel project for the web app (root directory: `apps/web`)
+- [ ] Create a Vercel project for the server (root directory: `apps/server`)
+- [ ] Add app env vars to web Vercel project (NEXT_PUBLIC_API_BASE_URL, NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, NEXT_PUBLIC_GOOGLE_FORM_URL)
+- [ ] Add app env vars to server Vercel project (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_PUBLIC_BASE_URL)
+- [ ] Set different env var values per Vercel environment (Preview = staging, Production = production) if using separate Supabase/R2 projects per env
