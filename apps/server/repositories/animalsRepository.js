@@ -202,12 +202,44 @@ async function deleteAnimal(aid) {
   }
 }
 
+/**
+ * Updates an animal by ID.
+ *
+ * @param {number} aid - Animal ID
+ * @param {Object} updates - Fields to update
+ * @returns {Promise<{data: Object|null, error?: string}>}
+ */
+async function updateAnimalById(aid, updates) {
+  try {
+    const client = getSupabaseClient();
+
+    const { data, error } = await client
+      .from("animals")
+      .update(updates)
+      .eq("aid", aid)
+      .select("*")
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") {
+        return { data: null, error: "Animal not found" };
+      }
+      return { data: null, error: error.message };
+    }
+
+    return { data, error: null };
+  } catch (err) {
+    return { data: null, error: err.message };
+  }
+}
+
 module.exports = {
   getAnimals,
   getAnimalById,
   getDistinctValues,
   createAnimal,
   deleteAnimal,
+  updateAnimalById,
   VALID_FILTERS,
   VALID_SORT_FIELDS,
 };

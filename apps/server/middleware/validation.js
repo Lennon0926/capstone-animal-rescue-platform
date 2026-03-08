@@ -18,6 +18,16 @@ function sanitizeString(value) {
 }
 
 /**
+ * Sanitizes a long text value (e.g., description) to prevent injection.
+ * @param {string} value - Value to sanitize
+ * @returns {string} Sanitized value
+ */
+function sanitizeLongText(value) {
+  if (typeof value !== "string") return "";
+  return value.replace(/[;'"\\]/g, "").trim().slice(0, 1000);
+}
+
+/**
  * Validates pagination parameters.
  * @param {Object} query - Request query parameters
  * @returns {{limit: number, offset: number}}
@@ -190,6 +200,93 @@ function validateCreateAnimal(req, res, next) {
   }
 }
 
+/**
+ * Middleware to validate update animal request body.
+ */
+function validateUpdateAnimal(req, res, next) {
+  try {
+    const updates = {};
+
+    if (req.body.name !== undefined) {
+      const name = sanitizeString(req.body.name);
+      if (!name) {
+        throw new ApiError(400, "Invalid name.");
+      }
+      updates.name = name;
+    }
+
+    if (req.body.description !== undefined) {
+      const description = sanitizeLongText(req.body.description);
+      if (!description) {
+        throw new ApiError(400, "Invalid description.");
+      }
+      updates.description = description;
+    }
+
+    if (req.body.species !== undefined) {
+      const species = sanitizeString(req.body.species).toLowerCase();
+      const validSpecies = ["dog", "cat"];
+      if (!validSpecies.includes(species)) {
+        throw new ApiError(400, "Invalid species.");
+      }
+      updates.species = species;
+    }
+
+    if (req.body.size !== undefined) {
+      const size = sanitizeString(req.body.size).toLowerCase();
+      const validSizes = ["small", "medium", "large", "extra_large"];
+      if (!validSizes.includes(size)) {
+        throw new ApiError(400, "Invalid size.");
+      }
+      updates.size = size;
+    }
+
+    if (req.body.gender !== undefined) {
+      const gender = sanitizeString(req.body.gender).toLowerCase();
+      const validGenders = ["male", "female", "unknown"];
+      if (!validGenders.includes(gender)) {
+        throw new ApiError(400, "Invalid gender.");
+      }
+      updates.gender = gender;
+    }
+
+    if (req.body.status !== undefined) {
+      const status = sanitizeString(req.body.status).toLowerCase();
+      const validStatuses = ["available", "adopted", "pending", "fostered", "medical_hold"];
+      if (!validStatuses.includes(status)) {
+        throw new ApiError(400, "Invalid status.");
+      }
+      updates.status = status;
+    }
+
+    if (req.body.image_url !== undefined) {
+      const image_url =
+        typeof req.body.image_url === "string"
+          ? req.body.image_url.trim().slice(0, 500)
+          : "";
+
+      if (!image_url) {
+        throw new ApiError(400, "Invalid image_url.");
+      }
+
+      updates.image_url = image_url;
+    }
+
+    if (req.body.record_id !== undefined) {
+      updates.record_id = req.body.record_id;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      throw new ApiError(400, "No valid fields provided for update.");
+    }
+
+    req.validatedBody = updates;
+    next();
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   sanitizeString,
   validatePagination,
@@ -197,5 +294,6 @@ module.exports = {
   validateAnimalFilters,
   validateAnimalsQuery,
   validateAnimalId,
-  validateCreateAnimal
+  validateCreateAnimal,
+  validateUpdateAnimal
 };

@@ -12,8 +12,9 @@ const {
   getDistinctValues,
   createAnimal,
   deleteAnimal,
+  updateAnimalById
 } = require("../repositories/animalsRepository");
-const { validateAnimalsQuery, validateAnimalId, validateCreateAnimal } = require("../middleware/validation");
+const { validateAnimalsQuery, validateAnimalId, validateCreateAnimal, validateUpdateAnimal } = require("../middleware/validation");
 const { asyncHandler, ApiError } = require("../middleware/errorHandler");
 
 /**
@@ -150,6 +151,32 @@ router.delete(
 
     if (result.error) {
       throw new ApiError(500, "Failed to delete animal", result.error);
+    }
+
+    res.json({
+      success: true,
+      data: result.data,
+    });
+  })
+);
+
+/**
+ * PATCH /api/animals/:aid
+ * Updates an animal by ID.
+ */
+router.patch(
+  "/:aid",
+  validateAnimalId,
+  validateUpdateAnimal,
+  asyncHandler(async (req, res) => {
+    const result = await updateAnimalById(req.params.aid, req.validatedBody);
+
+    if (result.error === "Animal not found") {
+      throw new ApiError(404, `Animal with ID ${req.params.aid} not found`);
+    }
+
+    if (result.error) {
+      throw new ApiError(500, "Failed to update animal", result.error);
     }
 
     res.json({
