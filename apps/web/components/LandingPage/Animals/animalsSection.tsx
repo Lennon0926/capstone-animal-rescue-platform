@@ -70,11 +70,11 @@ export default function AnimalsSection() {
                 </p>
 
                 <Link
-                  href={`/animalInfo/`}
-                  className={styles.learnMore}
-                >
-                  Conoce Más
-                </Link>
+                href={`/animalInfo/${animal.id}`}
+                className={styles.learnMore}
+              >
+                Conoce Más
+              </Link>
               </div>
             </div>
           ))}

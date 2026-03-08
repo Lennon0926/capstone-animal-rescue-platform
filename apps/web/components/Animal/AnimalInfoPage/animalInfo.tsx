@@ -2,33 +2,52 @@ import styles from "./animalInfo.module.css";
 import Image from "next/image";
 import Link from "next/link";
 
-const animal = {
-  name: "Max",
-  species: "Perro",
-  breed: "Mixed Breed",
-  age: "3 años",
-  size: "Mediano",
-  gender: "Macho",
-  status: "Available",
-  image: "/Animals/dog1.jpeg",
-  description:
-    "Max es un perro muy cariñoso y juguetón que disfruta pasar tiempo con las personas. Le encanta salir a caminar, jugar con pelotas y recibir mucha atención. Está buscando una familia que pueda brindarle amor, estabilidad y un hogar para siempre.",
+type Animal = {
+  aid: number;
+  name: string;
+  description: string;
+  species: string;
+  size: string;
+  gender: string;
+  status: string;
+  image_url: string;
+  created_at: string;
+  record_id: number | null;
 };
 
-export default function AnimalDetailsPage() {
+type AnimalInfoProps = {
+  animal: Animal;
+};
+
+function capitalize(text: string) {
+  if (!text) return "";
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function formatStatus(status: string) {
+  const map: Record<string, string> = {
+    available: "Disponible",
+    adopted: "Adoptado",
+    pending: "Pendiente",
+  };
+
+  return map[status?.toLowerCase()] || status;
+}
+
+export default function AnimalInfo({ animal }: AnimalInfoProps) {
+  const isAvailable = animal.status?.toLowerCase() === "available";
+
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
-
         <Link href="/animals" className={styles.back}>
           ← Volver a Animales
         </Link>
 
         <div className={styles.container}>
-
           <div className={styles.imageWrapper}>
             <Image
-              src={animal.image}
+              src={animal.image_url}
               alt={animal.name}
               width={600}
               height={600}
@@ -39,37 +58,38 @@ export default function AnimalDetailsPage() {
           <div className={styles.content}>
             <div className={styles.header}>
               <h1 className={styles.title}>{animal.name}</h1>
+            </div>
+
+            <div className={styles.metaHeader}>
               <span
                 className={`${styles.status} ${
-                  animal.status === "Available"
-                    ? styles.available
-                    : styles.adopted
+                  isAvailable ? styles.available : styles.adopted
                 }`}
               >
-                {animal.status === "Available" ? "Disponible" : "Adoptado"}
+                {formatStatus(animal.status)}
               </span>
             </div>
 
             <div className={styles.meta}>
-              <p><strong>Especie:</strong> {animal.species}</p>
-              <p><strong>Raza:</strong> {animal.breed}</p>
-              <p><strong>Edad:</strong> {animal.age}</p>
-              <p><strong>Tamaño:</strong> {animal.size}</p>
-              <p><strong>Género:</strong> {animal.gender}</p>
+              <p>
+                <strong>Especie:</strong> {capitalize(animal.species)}
+              </p>
+              <p>
+                <strong>Tamaño:</strong> {capitalize(animal.size)}
+              </p>
+              <p>
+                <strong>Género:</strong> {capitalize(animal.gender)}
+              </p>
             </div>
 
-            <p className={styles.description}>
-              {animal.description}
-            </p>
+            <p className={styles.description}>{animal.description}</p>
 
             <div className={styles.actions}>
               <Link href="/adopt" className={styles.adoptButton}>
                 Iniciar Proceso de Adopción
               </Link>
             </div>
-
           </div>
-
         </div>
       </div>
     </section>
