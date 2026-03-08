@@ -7,17 +7,33 @@ A full-stack web application for animal rescue coordination, built with Next.js 
 ```
 ├── apps/
 │   ├── server/          # Express API (Node.js)
+│   │   ├── routes/      # Route handlers (animals, uploads, health)
+│   │   ├── services/    # Business logic (r2Service)
+│   │   ├── middleware/  # Error handling, request validation
+│   │   ├── lib/         # Shared clients (Supabase)
+│   │   ├── __tests__/   # Jest test suites
+│   │   └── server.js    # Entry point
 │   └── web/             # Next.js frontend (React + TypeScript)
-├── docs/                # Project documentation and diagram scripts
-├── ngrok/               # Tunnel script for exposing local dev to the internet
-├── .gitignore
-├── LICENSE
-└── README.md
+├── docs/                # Project documentation
+├── ngrok/               # Tunnel script for local → public URL
+├── supabase/            # DB schema and migrations
+├── dev.sh               # Start both servers in one command
+└── init_db.sql          # Initial database schema
 ```
+
+## Tech Stack
+
+| Layer    | Technology |
+|----------|------------|
+| Frontend | Next.js 16, React 19, TypeScript 5, Tailwind CSS 4 |
+| Backend  | Express 5, Node.js 20 |
+| Database | Supabase (PostgreSQL) |
+| Storage  | Cloudflare R2 (image uploads) |
+| CI/CD    | GitHub Actions |
 
 ## Prerequisites
 
-- [Node.js](https://nodejs.org/) 18 or higher
+- [Node.js](https://nodejs.org/) 20 or higher
 - npm (included with Node.js)
 - Git
 
@@ -39,25 +55,23 @@ cd ../web && npm install
 
 ### 3. Configure environment variables
 
+Copy the example files and fill in your values:
+
+```bash
+cp apps/server/.env.example apps/server/.env.local
+cp apps/web/.env.example apps/web/.env.local
+```
+
 **Server** (`apps/server/.env.local`):
 
 ```env
 PORT=4000
-
-# Supabase Configuration (Required)
 SUPABASE_URL=https://your-project-ref.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
-
-# Cloudflare R2 Configuration (for image uploads)
 R2_ACCOUNT_ID=your_cloudflare_account_id
 R2_ACCESS_KEY_ID=your_r2_access_key_id
 R2_SECRET_ACCESS_KEY=your_r2_secret_access_key
 R2_BUCKET_NAME=your_bucket_name
-R2_PUBLIC_BASE_URL=https://cdn.your-domain.com
-# Optional override (default is 5 MB):
-R2_MAX_IMAGE_SIZE_BYTES=5242880
-# Optional signed URL duration when public base URL is not set:
-R2_SIGNED_READ_URL_TTL_SECONDS=3600
 ```
 
 **Web** (`apps/web/.env.local`):
@@ -69,16 +83,10 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
 NEXT_PUBLIC_GOOGLE_FORM_URL=https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform
 ```
 
-You can copy from templates first:
+> See [docs/SECRETS_MANAGEMENT.md](docs/SECRETS_MANAGEMENT.md) for the full variable reference, optional vars, and secret rotation procedures.
+> See [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) for Supabase project setup instructions.
 
-```bash
-cp apps/server/.env.example apps/server/.env.local
-cp apps/web/.env.example apps/web/.env.local
-```
-
-> 📖 See [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) for detailed Supabase configuration instructions.
-
-### 4. Apply database schema and seed data
+### 4. Seed the database
 
 ```bash
 cd apps/server
@@ -87,44 +95,60 @@ npm run seed
 
 ### 5. Start the development servers
 
-In one terminal, start the API server:
-
 ```bash
-cd apps/server
-npm run dev
-```
-
-In a second terminal, start the frontend:
-
-```bash
-cd apps/web
-npm run dev
-```
-
-The API will be available at `http://localhost:4000` and the frontend at `http://localhost:3000`.
-
-Or run both from the repository root:
-
-```bash
+# Start both servers at once from the repo root:
 ./dev.sh
 ```
 
-## Cloudflare R2 Image Upload API
+Or start them separately:
 
-- Endpoint: `POST /api/uploads/animals/:animalId/image`
-- Request format: `multipart/form-data` with file field name `image`
-- Allowed MIME types: `image/jpeg`, `image/png`, `image/webp`
-- Max upload size: `5 MB` by default (`R2_MAX_IMAGE_SIZE_BYTES` can override)
-- Object key format: `animals/{animalId}/{timestamp}-{filename}`
-- Response includes stored object key and an accessible URL for frontend use (public URL when `R2_PUBLIC_BASE_URL` is set, signed read URL otherwise)
+```bash
+# Terminal 1 — API server
+cd apps/server && npm run dev
 
-Example success response:
+# Terminal 2 — Frontend
+cd apps/web && npm run dev
+```
+
+- API: `http://localhost:4000`
+- Frontend: `http://localhost:3000`
+
+## API Endpoints
+
+### Health & System
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | API info and available endpoints |
+| GET | `/api/health` | Health check with database connectivity status |
+| GET | `/health` | Liveness probe — returns uptime, no dependency check |
+| GET | `/ready` | Readiness probe — 503 if required env vars are missing |
+
+### Animals
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/animals` | List animals with filters and pagination |
+| GET | `/api/animals/:aid` | Get a single animal by ID |
+| GET | `/api/animals/filters` | Get available filter values (species, status, etc.) |
+
+### Uploads
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/uploads/animals/:animalId/image` | Upload an animal image to Cloudflare R2 |
+
+**Upload details:**
+- Request: `multipart/form-data`, field name `image`
+- Allowed types: `image/jpeg`, `image/png`, `image/webp`
+- Max size: 5 MB (override with `R2_MAX_IMAGE_SIZE_BYTES`)
+- Returns: object key and a public or signed URL
 
 ```json
 {
   "data": {
-    "objectKey": "animals/demo-animal/1739932938123-shelter-dog.jpg",
-    "url": "https://cdn.your-domain.com/animals/demo-animal/1739932938123-shelter-dog.jpg",
+    "objectKey": "animals/1/1739932938123-shelter-dog.jpg",
+    "url": "https://cdn.your-domain.com/animals/1/1739932938123-shelter-dog.jpg",
     "urlType": "public",
     "contentType": "image/jpeg",
     "size": 381248
@@ -132,134 +156,58 @@ Example success response:
 }
 ```
 
-### Image Size Choice
+## Environment Validation
 
-The default `5 MB` limit is a simple balance between quality and performance:
+On startup, the server validates that all required environment variables are present. Missing variables cause an immediate exit with a clear error listing each missing var.
 
-- Typical 1600x1200 JPEG images are often around 1-2 MB.
-- PNG files can be significantly larger for the same dimensions.
-- 5 MB allows normal shelter images while still preventing oversized uploads.
+The `/ready` endpoint also returns `503` if any required variable is absent — useful for orchestrator readiness probes.
 
-## Manual Verification (Issue #20)
+## Testing
 
-Success case:
+```bash
+# Server tests
+cd apps/server && npm test
 
-1. Start `apps/server` and `apps/web`.
-2. Open `http://localhost:3000`.
-3. Use the upload form with an `animalId` and a `.jpg`, `.png`, or `.webp` file under 5 MB.
-4. Confirm a returned `objectKey` and `url`, and verify the file exists in your R2 bucket.
+# Web tests
+cd apps/web && npm test
+```
 
-Failure cases:
-
-1. Upload a file larger than 5 MB and confirm `413 IMAGE_TOO_LARGE`.
-2. Upload a non-supported file type (for example `.gif`) and confirm `415 INVALID_IMAGE_TYPE`.
-3. Use an invalid `animalId` (for example `dog/123`) and confirm `400 INVALID_ANIMAL_ID`.
-4. Remove one required `R2_*` server variable and confirm `500 R2_NOT_CONFIGURED`.
-
-## Tech Stack
-
-| Layer    | Technology                          |
-| -------- | ----------------------------------- |
-| Frontend | Next.js 16, React 19, Tailwind CSS 4, TypeScript |
-| Backend  | Express 5, Node.js                  |
-| Database | Supabase (PostgreSQL)               |
-| Tooling  | ESLint, Nodemon, PostCSS            |
-
-## API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/health` | Health check with database status |
-| GET | `/api/animals` | List animals with filters/pagination |
-| GET | `/api/animals/:aid` | Get single animal by ID |
-| GET | `/api/animals/filters` | Get available filter options |
-
-See [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) for full API documentation.
+CI runs lint, build, and tests for both apps on every push and pull request to `main` and `develop`. Required GitHub Secrets are validated before any job runs.
 
 ## Documentation
 
 | Document | Description |
 |----------|-------------|
-| [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) | Database setup, schema, and API reference |
+| [docs/SECRETS_MANAGEMENT.md](docs/SECRETS_MANAGEMENT.md) | All env vars, GitHub Secrets setup, deployment config, rotation procedures |
+| [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) | Database setup and schema reference |
 | [docs/GOOGLE_FORMS_INTEGRATION.md](docs/GOOGLE_FORMS_INTEGRATION.md) | Adoption application intake via Google Forms |
-### Health & Readiness
-
-| Endpoint  | Method | Description | Success | Failure |
-| --------- | ------ | ----------- | ------- | ------- |
-| `/health` | GET    | Liveness check — confirms the process is running. Returns uptime and start timestamp. | `200 { "status": "ok", "uptime": ..., "startedAt": "..." }` | N/A (if the server is down the request won't reach it) |
-| `/ready`  | GET    | Readiness check — confirms all required environment variables are set. | `200 { "status": "ready" }` | `503 { "status": "not ready", "reason": "missing env" }` |
-
-### Environment Validation
-
-On startup the server validates that every variable listed in `apps/server/validateEnv.js` (`REQUIRED_ENV_VARS`) is present. If any are missing the process exits immediately with an actionable error listing each missing variable.
-
-**Local usage:**
-
-```bash
-curl http://localhost:8080/health
-curl http://localhost:8080/ready
-```
-
-**Deployment:** Point your orchestrator's liveness probe at `/health` and its readiness probe at `/ready`.
-
-## Documentation Scripts
-
-The `docs/scripts/` directory contains Python scripts for generating project diagrams (flowcharts, sequence diagrams, timelines, algorithm charts). These are documentation-only utilities and are not required to run the application.
-
-To run them:
-
-```bash
-cd docs/scripts
-pip install -r requirements.txt
-python flowchart/generate_flowchart.py
-```
+| [docs/SECURITY_ALERTS.md](docs/SECURITY_ALERTS.md) | Security alert handling and procedures |
+| [docs/api/contract-v1.md](docs/api/contract-v1.md) | Full API contract |
 
 ## ngrok Tunnel
 
-The `ngrok/` directory includes a script to expose the local frontend via a public URL for testing. See [`ngrok/README.md`](ngrok/README.md) for setup instructions.
+Expose the local frontend via a public URL for testing:
 
 ```bash
 ./ngrok/start-ngrok.sh
 ```
 
-## License
-
-See [LICENSE](LICENSE) for details.
----
+See [`ngrok/README.md`](ngrok/README.md) for setup instructions.
 
 ## Commit and Ignore Policy
 
-To keep pull requests small, predictable, and secure, commit source/config files and ignore generated output and secrets.
-
-Commit these:
-
+**Commit:**
 - Application source code and project docs
 - Lockfiles (`apps/web/package-lock.json`, `apps/server/package-lock.json`)
-- Environment templates (`.env.example`, `apps/web/.env.example`, `apps/server/.env.example`)
-- Supabase config and migrations (for example `supabase/config.toml`, `supabase/migrations/**`)
+- Environment templates (`.env.example`)
+- DB schema and migrations
 
-Do not commit these:
+**Do not commit:**
+- `node_modules/`, `.next/`, build artifacts, caches
+- `.env.local` or any file containing real secrets
+- Cloudflare local state (`.wrangler/`, `.dev.vars`)
+- Supabase local runtime state (`supabase/.temp/`)
 
-- Dependency folders (`node_modules/`, `apps/web/node_modules/`, `apps/server/node_modules/`, `venv/`, `.venv/`)
-- Build/generated artifacts (`apps/web/.next/`, coverage output, caches)
-- Local environment/secret files (`.env`, `.env.*`, `apps/web/.env*`, `apps/server/.env*`)
-- Cloudflare local state (`.wrangler/`, `.dev.vars`, `.dev.vars.*`)
-- Supabase local runtime state (`supabase/.temp/`, `supabase/.env`)
+## License
 
-Quick verification:
-
-```bash
-# No generated frontend artifacts should be tracked
-git ls-files | rg '^apps/web/(\.next|node_modules)/'
-
-# Confirm key local artifacts are ignored
-git check-ignore -v apps/web/.next apps/web/node_modules apps/web/.env.local
-```
-
----
-
-## Stack Disclaimer
-
-This setup does **not** define the final architecture, backend language, or deployment strategy of the project.
-
-All final technical decisions will be documented in the **Technical Approach** section of the project proposal and updated as needed.
+See [LICENSE](LICENSE) for details.
