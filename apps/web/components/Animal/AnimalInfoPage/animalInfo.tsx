@@ -35,7 +35,6 @@ function formatStatus(status: string) {
 }
 
 export default function AnimalInfo({ animal }: AnimalInfoProps) {
-  const isAvailable = animal.status?.toLowerCase() === "available";
 
   return (
     <section className={styles.section}>
@@ -63,7 +62,11 @@ export default function AnimalInfo({ animal }: AnimalInfoProps) {
             <div className={styles.metaHeader}>
               <span
                 className={`${styles.status} ${
-                  isAvailable ? styles.available : styles.adopted
+                  animal.status === "available"
+                    ? styles.available
+                    : animal.status === "pending"
+                    ? styles.pending
+                    : styles.adopted
                 }`}
               >
                 {formatStatus(animal.status)}

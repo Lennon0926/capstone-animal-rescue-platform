@@ -77,6 +77,11 @@
   color: var(--status-adopted-text);
 }
 
+.pending {
+  background: var(--status-pending-bg);
+  color: var(--status-pending-text);
+}
+
 .meta {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
