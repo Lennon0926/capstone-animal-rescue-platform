@@ -23,10 +23,11 @@ function buildChainableMock(resolvedValue) {
 }
 
 const mockFrom = jest.fn();
+const mockVerifyConnection = jest.fn();
 
 jest.mock("../lib/supabase", () => ({
   getSupabaseClient: () => ({ from: mockFrom }),
-  verifyConnection: () => Promise.resolve({ connected: true }),
+  verifyConnection: (...args) => mockVerifyConnection(...args),
 }));
 
 beforeAll(() => {
@@ -35,9 +36,39 @@ beforeAll(() => {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockVerifyConnection.mockResolvedValue({ connected: true });
 });
 
 const getApp = () => require("../server");
+
+describe("GET /api/health", () => {
+  it("returns 200 with healthy status when database is connected", async () => {
+    const app = getApp();
+
+    const res = await request(app).get("/api/health");
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.status).toBe("healthy");
+    expect(res.body.database.connected).toBe(true);
+    expect(res.body.database.error).toBeNull();
+    expect(res.body).toHaveProperty("timestamp");
+  });
+
+  it("returns 503 with degraded status when database is not connected", async () => {
+    mockVerifyConnection.mockResolvedValue({
+      connected: false,
+      error: "Connection refused",
+    });
+    const app = getApp();
+
+    const res = await request(app).get("/api/health");
+    expect(res.status).toBe(503);
+    expect(res.body.success).toBe(false);
+    expect(res.body.status).toBe("degraded");
+    expect(res.body.database.connected).toBe(false);
+    expect(res.body.database.error).toBe("Connection refused");
+  });
+});
 
 describe("Smoke: core animal flow", () => {
   it("server is healthy and ready", async () => {
