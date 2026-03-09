@@ -3,8 +3,12 @@
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Search, RotateCcw, PawPrint, Ruler, Users } from "lucide-react";
+import { Search, RotateCcw, PawPrint, Ruler, Users, Tag, ChevronDown } from "lucide-react";
+
+// Pagination config
+const ITEMS_PER_PAGE = 12;
 import styles from "./adoptPage.module.css";
+import { getAnimalImageUrl } from "@/utils/animalImages";
 
 // Types - matching what comes from Supabase API
 interface Animal {
@@ -16,6 +20,7 @@ interface Animal {
   gender: string;
   status: string;
   image_url: string;
+  tags: string[];
   created_at: string;
   record_id: number | null;
 }
@@ -30,15 +35,39 @@ function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-// Filter tags
-const FILTER_TAGS = [
-  { id: "all", label: "Todos" },
-  { id: "Perro", label: "Perros" },
-  { id: "Gato", label: "Gatos" },
-  { id: "Grande", label: "Grandes" },
-  { id: "Mediano", label: "Medianos" },
-  { id: "Pequeño", label: "Pequeños" },
-];
+// Extract all unique filter options from animals (tags + species + size + gender + status)
+function getAllFilterOptions(animals: Animal[]): string[] {
+  const allOptions: string[] = [];
+  
+  // Add tags
+  animals.forEach((animal) => {
+    if (animal.tags) {
+      allOptions.push(...animal.tags);
+    }
+  });
+  
+  // Add species, size, gender, status
+  animals.forEach((animal) => {
+    if (animal.species) allOptions.push(animal.species);
+    if (animal.size) allOptions.push(animal.size);
+    if (animal.gender) allOptions.push(animal.gender);
+    if (animal.status) allOptions.push(animal.status);
+  });
+  
+  return [...new Set(allOptions)].sort();
+}
+
+// Check if animal matches filter
+function animalMatchesFilter(animal: Animal, filter: string): boolean {
+  // Check tags
+  if (animal.tags?.includes(filter)) return true;
+  // Check species, size, gender, status (case-insensitive)
+  if (animal.species?.toLowerCase() === filter.toLowerCase()) return true;
+  if (animal.size?.toLowerCase() === filter.toLowerCase()) return true;
+  if (animal.gender?.toLowerCase() === filter.toLowerCase()) return true;
+  if (animal.status?.toLowerCase() === filter.toLowerCase()) return true;
+  return false;
+}
 
 // Flip Card Component
 function FlipCard({ animal }: { animal: Animal }) {
@@ -67,7 +96,7 @@ function FlipCard({ animal }: { animal: Animal }) {
         <div className={`${styles.cardFace} ${styles.cardFront}`}>
           <div className={styles.imageWrapper}>
             <Image
-              src={animal.image_url || "/Animals/dog1.jpeg"}
+              src={getAnimalImageUrl(animal.image_url, animal.species, animal.aid)}
               alt={animal.name}
               fill
               sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 25vw"
@@ -110,6 +139,17 @@ function FlipCard({ animal }: { animal: Animal }) {
 
             <p className={styles.cardDescription}>{animal.description}</p>
 
+            {animal.tags && animal.tags.length > 0 && (
+              <div className={styles.cardTags}>
+                <Tag size={12} className={styles.tagIcon} />
+                {animal.tags.map((tag, index) => (
+                  <span key={index} className={styles.cardTag}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
             <Link
               href={`/adopt/${animal.aid}`}
               className={styles.learnMore}
@@ -127,34 +167,53 @@ function FlipCard({ animal }: { animal: Animal }) {
 // Main Component
 export default function AdoptPage({ animals }: AdoptPageProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeFilter, setActiveFilter] = useState("all");
+  const [activeTagFilter, setActiveTagFilter] = useState("all");
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 
-  // Filter animals - uses species/size from Supabase (lowercase values)
+  // Get all unique filter options from animals
+  const availableTags = useMemo(() => getAllFilterOptions(animals), [animals]);
+
+  // Filter animals by search query and selected tag
   const filteredAnimals = useMemo(() => {
     return animals.filter((animal) => {
-      const matchesSearch = animal.name
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
+      const query = searchQuery.toLowerCase();
       
-      // Map filter IDs to match lowercase API values
-      const filterMap: Record<string, string> = {
-        "Perro": "dog",
-        "Gato": "cat",
-        "Grande": "large",
-        "Mediano": "medium",
-        "Pequeño": "small",
-      };
-
-      const filterValue = filterMap[activeFilter] || activeFilter;
+      // Search by name OR tags
+      const matchesName = animal.name.toLowerCase().includes(query);
+      const matchesTags = animal.tags?.some((tag) =>
+        tag.toLowerCase().includes(query)
+      ) ?? false;
+      const matchesSearch = !searchQuery || matchesName || matchesTags;
       
-      const matchesFilter =
-        activeFilter === "all" ||
-        animal.species?.toLowerCase() === filterValue ||
-        animal.size?.toLowerCase() === filterValue;
+      // Filter by selected tag (now includes species, size, gender, status)
+      const matchesTagFilter =
+        activeTagFilter === "all" ||
+        animalMatchesFilter(animal, activeTagFilter);
 
-      return matchesSearch && matchesFilter;
+      return matchesSearch && matchesTagFilter;
     });
-  }, [animals, searchQuery, activeFilter]);
+  }, [animals, searchQuery, activeTagFilter]);
+
+  // Paginated animals
+  const paginatedAnimals = useMemo(() => {
+    return filteredAnimals.slice(0, visibleCount);
+  }, [filteredAnimals, visibleCount]);
+
+  const hasMore = visibleCount < filteredAnimals.length;
+
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + ITEMS_PER_PAGE);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setVisibleCount(ITEMS_PER_PAGE);
+  };
+
+  const handleTagFilterChange = (tag: string) => {
+    setActiveTagFilter(tag);
+    setVisibleCount(ITEMS_PER_PAGE);
+  };
 
   return (
     <div className={styles.page}>
@@ -163,32 +222,53 @@ export default function AdoptPage({ animals }: AdoptPageProps) {
         <Search size={20} className={styles.searchIcon} />
         <input
           type="text"
-          placeholder="Buscar"
+          placeholder="Buscar por nombre o etiquetas..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChange={handleSearchChange}
           className={styles.searchInput}
         />
       </div>
 
       {/* Filter Tags */}
       <div className={styles.tags}>
-        {FILTER_TAGS.map((tag) => (
+        <button
+          className={`${styles.tag} ${activeTagFilter === "all" ? styles.tagActive : ""}`}
+          onClick={() => handleTagFilterChange("all")}
+        >
+          Todos
+        </button>
+        {availableTags.map((tag) => (
           <button
-            key={tag.id}
-            className={`${styles.tag} ${activeFilter === tag.id ? styles.tagActive : ""}`}
-            onClick={() => setActiveFilter(tag.id)}
+            key={tag}
+            className={`${styles.tag} ${activeTagFilter === tag ? styles.tagActive : ""}`}
+            onClick={() => handleTagFilterChange(tag)}
           >
-            {tag.label}
+            {tag}
           </button>
         ))}
       </div>
 
+      {/* Results count */}
+      <p className={styles.resultsCount}>
+        Mostrando {paginatedAnimals.length} de {filteredAnimals.length} animales
+      </p>
+
       {/* Animals Grid */}
       <div className={styles.grid}>
-        {filteredAnimals.map((animal) => (
+        {paginatedAnimals.map((animal) => (
           <FlipCard key={animal.aid} animal={animal} />
         ))}
       </div>
+
+      {/* Load More Button */}
+      {hasMore && (
+        <div className={styles.loadMoreWrapper}>
+          <button className={styles.loadMoreBtn} onClick={handleLoadMore}>
+            <span>Cargar Más</span>
+            <ChevronDown size={18} />
+          </button>
+        </div>
+      )}
 
       {/* Empty State */}
       {filteredAnimals.length === 0 && (

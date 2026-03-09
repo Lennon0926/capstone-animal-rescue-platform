@@ -106,3 +106,120 @@ describe("uploadAnimalImage", () => {
     expect(url).toBe(`${MOCK_API_BASE}/api/uploads/animals/a%20b/image`);
   });
 });
+
+describe("fetchAnimals", () => {
+  let fetchAnimals: typeof import("@/services/animalImageUploadService").fetchAnimals;
+
+  beforeEach(() => {
+    fetchAnimals = require("@/services/animalImageUploadService").fetchAnimals;
+  });
+
+  it("fetches animals from the API", async () => {
+    const mockAnimals = [
+      { aid: 1, name: "Max", species: "dog" },
+      { aid: 2, name: "Luna", species: "cat" },
+    ];
+
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ success: true, data: mockAnimals }),
+    });
+
+    const result = await fetchAnimals();
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      `${MOCK_API_BASE}/api/animals?limit=100`
+    );
+    expect(result).toEqual(mockAnimals);
+  });
+
+  it("throws on failed response", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      json: () => Promise.resolve({ success: false }),
+    });
+
+    await expect(fetchAnimals()).rejects.toThrow("Failed to fetch animals");
+  });
+});
+
+describe("updateAnimalImageUrl", () => {
+  let updateAnimalImageUrl: typeof import("@/services/animalImageUploadService").updateAnimalImageUrl;
+
+  beforeEach(() => {
+    updateAnimalImageUrl = require("@/services/animalImageUploadService").updateAnimalImageUrl;
+  });
+
+  it("sends PATCH request with image_url", async () => {
+    const mockAnimal = { aid: 1, name: "Max", image_url: "https://cdn.example.com/image.jpg" };
+
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ success: true, data: mockAnimal }),
+    });
+
+    const result = await updateAnimalImageUrl(1, "https://cdn.example.com/image.jpg");
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      `${MOCK_API_BASE}/api/animals/1`,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image_url: "https://cdn.example.com/image.jpg" }),
+      }
+    );
+    expect(result).toEqual(mockAnimal);
+  });
+
+  it("throws on failed update", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      json: () => Promise.resolve({ error: "Animal not found" }),
+    });
+
+    await expect(updateAnimalImageUrl(999, "https://example.com/img.jpg")).rejects.toThrow(
+      "Animal not found"
+    );
+  });
+});
+
+describe("uploadAndUpdateAnimalImage", () => {
+  let uploadAndUpdateAnimalImage: typeof import("@/services/animalImageUploadService").uploadAndUpdateAnimalImage;
+
+  beforeEach(() => {
+    uploadAndUpdateAnimalImage = require("@/services/animalImageUploadService").uploadAndUpdateAnimalImage;
+  });
+
+  it("uploads image and updates animal record", async () => {
+    const mockUploadResult = {
+      objectKey: "animals/1/1-photo.jpg",
+      url: "https://cdn.example.com/animals/1/1-photo.jpg",
+      urlType: "public" as const,
+      contentType: "image/jpeg",
+      size: 1024,
+    };
+
+    const mockAnimal = {
+      aid: 1,
+      name: "Max",
+      image_url: "https://cdn.example.com/animals/1/1-photo.jpg",
+    };
+
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ data: mockUploadResult }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ success: true, data: mockAnimal }),
+      });
+
+    const file = new File(["img"], "photo.jpg", { type: "image/jpeg" });
+    const result = await uploadAndUpdateAnimalImage(1, file);
+
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(result.uploadResult).toEqual(mockUploadResult);
+    expect(result.animal).toEqual(mockAnimal);
+  });
+});

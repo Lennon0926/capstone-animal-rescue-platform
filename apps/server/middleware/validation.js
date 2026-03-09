@@ -102,6 +102,16 @@ function validateAnimalFilters(query) {
     filters.name = sanitizeString(query.name);
   }
 
+  // Validate tags filter (single tag)
+  if (query.tags) {
+    filters.tags = sanitizeString(query.tags).toLowerCase();
+  }
+
+  // Validate combined search (name + tags)
+  if (query.search) {
+    filters.search = sanitizeString(query.search);
+  }
+
   return filters;
 }
 

@@ -11,6 +11,7 @@ type AnimalApiData = {
   gender: string;
   status: string;
   image_url: string;
+  tags: string[];
   created_at: string;
   record_id: number | null;
 };

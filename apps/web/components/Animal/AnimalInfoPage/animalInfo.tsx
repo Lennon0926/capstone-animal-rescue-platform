@@ -1,6 +1,7 @@
 import styles from "./animalInfo.module.css";
 import Image from "next/image";
 import Link from "next/link";
+import { getAnimalImageUrl } from "@/utils/animalImages";
 
 type Animal = {
   aid: number;
@@ -11,6 +12,7 @@ type Animal = {
   gender: string;
   status: string;
   image_url: string;
+  tags: string[];
   created_at: string;
   record_id: number | null;
 };
@@ -46,7 +48,7 @@ export default function AnimalInfo({ animal }: AnimalInfoProps) {
         <div className={styles.container}>
           <div className={styles.imageWrapper}>
             <Image
-              src={animal.image_url}
+              src={getAnimalImageUrl(animal.image_url, animal.species, animal.aid)}
               alt={animal.name}
               width={600}
               height={600}
@@ -86,6 +88,19 @@ export default function AnimalInfo({ animal }: AnimalInfoProps) {
             </div>
 
             <p className={styles.description}>{animal.description}</p>
+
+            {animal.tags && animal.tags.length > 0 && (
+              <div className={styles.tagsSection}>
+                <strong>Etiquetas:</strong>
+                <div className={styles.tagsList}>
+                  {animal.tags.map((tag, index) => (
+                    <span key={index} className={styles.tag}>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className={styles.actions}>
               <Link href="/adopt" className={styles.adoptButton}>

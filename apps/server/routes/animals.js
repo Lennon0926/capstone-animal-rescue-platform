@@ -27,6 +27,8 @@ const { asyncHandler, ApiError } = require("../middleware/errorHandler");
  * - size: Filter by size (small, medium, large, extra_large)
  * - gender: Filter by gender (male, female, unknown)
  * - name: Search by name (partial match)
+ * - tags: Filter by tag (exact match within tags array)
+ * - search: Combined search by name OR tags (partial match)
  * - sortBy: Sort field (aid, name, species, status, created_at)
  * - sortOrder: Sort direction (asc, desc)
  * - limit: Number of records (1-100, default: 50)
