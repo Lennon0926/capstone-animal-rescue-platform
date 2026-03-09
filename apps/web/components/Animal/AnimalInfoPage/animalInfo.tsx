@@ -39,7 +39,7 @@ export default function AnimalInfo({ animal }: AnimalInfoProps) {
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
-        <Link href="/animals" className={styles.back}>
+        <Link href="/adopt" className={styles.back}>
           ← Volver a Animales
         </Link>
 

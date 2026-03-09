@@ -3,122 +3,32 @@
 import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Search, RotateCcw, PawPrint, Calendar, Ruler, Users } from "lucide-react";
+import { Search, RotateCcw, PawPrint, Ruler, Users } from "lucide-react";
 import styles from "./adoptPage.module.css";
 
-// Types
+// Types - matching what comes from Supabase API
 interface Animal {
-  id: number;
+  aid: number;
   name: string;
-  species: string;
-  breed: string;
-  age: string;
-  gender: string;
-  size: string;
-  status: string;
   description: string;
-  image: string;
+  species: string;
+  size: string;
+  gender: string;
+  status: string;
+  image_url: string;
+  created_at: string;
+  record_id: number | null;
 }
 
-// Mock data
-const mockAnimals: Animal[] = [
-  {
-    id: 1,
-    name: "Max",
-    species: "Perro",
-    breed: "Pastor Alemán",
-    age: "3 años",
-    gender: "Macho",
-    size: "Grande",
-    status: "available",
-    description: "Max es un perro leal y protector. Adora los paseos largos y jugar en el parque.",
-    image: "/Animals/dog1.jpeg",
-  },
-  {
-    id: 2,
-    name: "Luna",
-    species: "Gato",
-    breed: "Siamés",
-    age: "2 años",
-    gender: "Hembra",
-    size: "Pequeño",
-    status: "available",
-    description: "Luna es una gata cariñosa y tranquila. Le encanta dormir al sol.",
-    image: "/Animals/cat1.jpeg",
-  },
-  {
-    id: 3,
-    name: "Rocky",
-    species: "Perro",
-    breed: "Bulldog",
-    age: "5 años",
-    gender: "Macho",
-    size: "Mediano",
-    status: "available",
-    description: "Rocky es juguetón y le encanta la compañía de niños.",
-    image: "/Animals/dog2.jpeg",
-  },
-  {
-    id: 4,
-    name: "Mia",
-    species: "Gato",
-    breed: "Persa",
-    age: "1 año",
-    gender: "Hembra",
-    size: "Pequeño",
-    status: "available",
-    description: "Mia es elegante y le gusta que la cepillen.",
-    image: "/Animals/cat2.jpeg",
-  },
-  {
-    id: 5,
-    name: "Buddy",
-    species: "Perro",
-    breed: "Golden Retriever",
-    age: "4 años",
-    gender: "Macho",
-    size: "Grande",
-    status: "available",
-    description: "Buddy es el compañero perfecto para familias activas.",
-    image: "/Animals/dog1.jpeg",
-  },
-  {
-    id: 6,
-    name: "Cleo",
-    species: "Gato",
-    breed: "Maine Coon",
-    age: "3 años",
-    gender: "Hembra",
-    size: "Grande",
-    status: "available",
-    description: "Cleo es independiente pero muy cariñosa cuando quiere.",
-    image: "/Animals/cat1.jpeg",
-  },
-  {
-    id: 7,
-    name: "Thor",
-    species: "Perro",
-    breed: "Husky",
-    age: "2 años",
-    gender: "Macho",
-    size: "Grande",
-    status: "available",
-    description: "Thor necesita mucho ejercicio y le encanta correr.",
-    image: "/Animals/dog2.jpeg",
-  },
-  {
-    id: 8,
-    name: "Nala",
-    species: "Gato",
-    breed: "Bengalí",
-    age: "1 año",
-    gender: "Hembra",
-    size: "Mediano",
-    status: "available",
-    description: "Nala es muy activa y curiosa, siempre explorando.",
-    image: "/Animals/cat2.jpeg",
-  },
-];
+interface AdoptPageProps {
+  animals: Animal[];
+}
+
+// Helper function to capitalize first letter
+function capitalize(text: string) {
+  if (!text) return "";
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
 
 // Filter tags
 const FILTER_TAGS = [
@@ -157,7 +67,7 @@ function FlipCard({ animal }: { animal: Animal }) {
         <div className={`${styles.cardFace} ${styles.cardFront}`}>
           <div className={styles.imageWrapper}>
             <Image
-              src={animal.image}
+              src={animal.image_url || "/Animals/dog1.jpeg"}
               alt={animal.name}
               fill
               sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 25vw"
@@ -165,7 +75,7 @@ function FlipCard({ animal }: { animal: Animal }) {
             />
             <div className={styles.cardOverlay}>
               <h3 className={styles.cardName}>{animal.name}</h3>
-              <p className={styles.cardSpecies}>{animal.species} · {animal.breed}</p>
+              <p className={styles.cardSpecies}>{capitalize(animal.species)}</p>
             </div>
             <div className={styles.flipHint}>
               <RotateCcw size={12} />
@@ -186,30 +96,26 @@ function FlipCard({ animal }: { animal: Animal }) {
             <div className={styles.cardDetails}>
               <div className={styles.detailItem}>
                 <PawPrint size={14} className={styles.detailIcon} />
-                <span>{animal.breed}</span>
-              </div>
-              <div className={styles.detailItem}>
-                <Calendar size={14} className={styles.detailIcon} />
-                <span>{animal.age}</span>
+                <span>{capitalize(animal.species)}</span>
               </div>
               <div className={styles.detailItem}>
                 <Ruler size={14} className={styles.detailIcon} />
-                <span>{animal.size}</span>
+                <span>{capitalize(animal.size)}</span>
               </div>
               <div className={styles.detailItem}>
                 <Users size={14} className={styles.detailIcon} />
-                <span>{animal.gender}</span>
+                <span>{capitalize(animal.gender)}</span>
               </div>
             </div>
 
             <p className={styles.cardDescription}>{animal.description}</p>
 
             <Link
-              href={`/animals/${animal.id}`}
+              href={`/adopt/${animal.aid}`}
               className={styles.learnMore}
               onClick={(e) => e.stopPropagation()}
             >
-              Conoce Más
+              Conocer Más
             </Link>
           </div>
         </div>
@@ -219,25 +125,36 @@ function FlipCard({ animal }: { animal: Animal }) {
 }
 
 // Main Component
-export default function AdoptPage() {
+export default function AdoptPage({ animals }: AdoptPageProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState("all");
 
-  // Filter animals
+  // Filter animals - uses species/size from Supabase (lowercase values)
   const filteredAnimals = useMemo(() => {
-    return mockAnimals.filter((animal) => {
+    return animals.filter((animal) => {
       const matchesSearch = animal.name
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
       
+      // Map filter IDs to match lowercase API values
+      const filterMap: Record<string, string> = {
+        "Perro": "dog",
+        "Gato": "cat",
+        "Grande": "large",
+        "Mediano": "medium",
+        "Pequeño": "small",
+      };
+
+      const filterValue = filterMap[activeFilter] || activeFilter;
+      
       const matchesFilter =
         activeFilter === "all" ||
-        animal.species === activeFilter ||
-        animal.size === activeFilter;
+        animal.species?.toLowerCase() === filterValue ||
+        animal.size?.toLowerCase() === filterValue;
 
       return matchesSearch && matchesFilter;
     });
-  }, [searchQuery, activeFilter]);
+  }, [animals, searchQuery, activeFilter]);
 
   return (
     <div className={styles.page}>
@@ -269,7 +186,7 @@ export default function AdoptPage() {
       {/* Animals Grid */}
       <div className={styles.grid}>
         {filteredAnimals.map((animal) => (
-          <FlipCard key={animal.id} animal={animal} />
+          <FlipCard key={animal.aid} animal={animal} />
         ))}
       </div>
 
