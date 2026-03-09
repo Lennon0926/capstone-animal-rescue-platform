@@ -167,32 +167,36 @@ function FlipCard({ animal }: { animal: Animal }) {
 // Main Component
 export default function AdoptPage({ animals }: AdoptPageProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTagFilter, setActiveTagFilter] = useState("all");
+  const [activeTagFilters, setActiveTagFilters] = useState<string[]>([]);
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
 
   // Get all unique filter options from animals
   const availableTags = useMemo(() => getAllFilterOptions(animals), [animals]);
 
-  // Filter animals by search query and selected tag
+  // Filter animals by search query and selected tags (multi-select)
   const filteredAnimals = useMemo(() => {
     return animals.filter((animal) => {
       const query = searchQuery.toLowerCase();
       
-      // Search by name OR tags
+      // Search by name, species, size, gender, status, or tags
       const matchesName = animal.name.toLowerCase().includes(query);
+      const matchesSpecies = animal.species?.toLowerCase().includes(query) ?? false;
+      const matchesSize = animal.size?.toLowerCase().includes(query) ?? false;
+      const matchesGender = animal.gender?.toLowerCase().includes(query) ?? false;
+      const matchesStatus = animal.status?.toLowerCase().includes(query) ?? false;
       const matchesTags = animal.tags?.some((tag) =>
         tag.toLowerCase().includes(query)
       ) ?? false;
-      const matchesSearch = !searchQuery || matchesName || matchesTags;
+      const matchesSearch = !searchQuery || matchesName || matchesSpecies || matchesSize || matchesGender || matchesStatus || matchesTags;
       
-      // Filter by selected tag (now includes species, size, gender, status)
+      // Filter by selected tags - animal must match ALL selected filters (AND logic)
       const matchesTagFilter =
-        activeTagFilter === "all" ||
-        animalMatchesFilter(animal, activeTagFilter);
+        activeTagFilters.length === 0 ||
+        activeTagFilters.every((filter) => animalMatchesFilter(animal, filter));
 
       return matchesSearch && matchesTagFilter;
     });
-  }, [animals, searchQuery, activeTagFilter]);
+  }, [animals, searchQuery, activeTagFilters]);
 
   // Paginated animals
   const paginatedAnimals = useMemo(() => {
@@ -210,8 +214,16 @@ export default function AdoptPage({ animals }: AdoptPageProps) {
     setVisibleCount(ITEMS_PER_PAGE);
   };
 
-  const handleTagFilterChange = (tag: string) => {
-    setActiveTagFilter(tag);
+  const handleTagFilterToggle = (tag: string) => {
+    setActiveTagFilters((prev) => {
+      if (prev.includes(tag)) {
+        // Remove tag if already selected
+        return prev.filter((t) => t !== tag);
+      } else {
+        // Add tag to selection
+        return [...prev, tag];
+      }
+    });
     setVisibleCount(ITEMS_PER_PAGE);
   };
 
@@ -222,36 +234,27 @@ export default function AdoptPage({ animals }: AdoptPageProps) {
         <Search size={20} className={styles.searchIcon} />
         <input
           type="text"
-          placeholder="Buscar por nombre o etiquetas..."
+          placeholder="Buscar animales..."
           value={searchQuery}
           onChange={handleSearchChange}
           className={styles.searchInput}
         />
       </div>
 
-      {/* Filter Tags */}
-      <div className={styles.tags}>
-        <button
-          className={`${styles.tag} ${activeTagFilter === "all" ? styles.tagActive : ""}`}
-          onClick={() => handleTagFilterChange("all")}
-        >
-          Todos
-        </button>
-        {availableTags.map((tag) => (
-          <button
-            key={tag}
-            className={`${styles.tag} ${activeTagFilter === tag ? styles.tagActive : ""}`}
-            onClick={() => handleTagFilterChange(tag)}
-          >
-            {tag}
-          </button>
-        ))}
+      {/* Filter Tags - Multi-select */}
+      <div className={styles.tagsContainer}>
+        <div className={styles.tags}>
+          {availableTags.map((tag) => (
+            <button
+              key={tag}
+              className={`${styles.tag} ${activeTagFilters.includes(tag) ? styles.tagActive : ""}`}
+              onClick={() => handleTagFilterToggle(tag)}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
       </div>
-
-      {/* Results count */}
-      <p className={styles.resultsCount}>
-        Mostrando {paginatedAnimals.length} de {filteredAnimals.length} animales
-      </p>
 
       {/* Animals Grid */}
       <div className={styles.grid}>

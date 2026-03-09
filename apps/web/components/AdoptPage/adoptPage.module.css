@@ -43,13 +43,16 @@
   color: var(--color-text-muted);
 }
 
-/* Filter Tags - YouTube chip style */
+/* Filter Tags - YouTube chip style with multi-select */
+.tagsContainer {
+  margin-bottom: var(--space-6);
+}
+
 .tags {
   display: flex;
   gap: var(--space-3);
   overflow-x: auto;
   padding-bottom: var(--space-4);
-  margin-bottom: var(--space-6);
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
@@ -84,6 +87,8 @@
 .tagActive:hover {
   background-color: var(--color-primary-hover);
 }
+
+
 
 /* Animals Grid */
 .grid {
