@@ -114,6 +114,10 @@ async function run() {
   }
 
   console.log(`\nDone. ${successCount} updated, ${failCount} failed.`);
+
+  if (failCount > 0) {
+    process.exit(1);
+  }
 }
 
 run().catch((err) => {

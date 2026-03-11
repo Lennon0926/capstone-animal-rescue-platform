@@ -104,12 +104,20 @@ function validateAnimalFilters(query) {
 
   // Validate tags filter (single tag)
   if (query.tags) {
-    filters.tags = sanitizeString(query.tags).toLowerCase();
+    const cleanedTag = sanitizeString(query.tags).toLowerCase();
+    if (/^[\w\s\-]+$/.test(cleanedTag)) {
+      filters.tags = cleanedTag;
+    }
   }
 
   // Validate combined search (name + tags)
+  // Only allow alphanumeric, spaces, hyphens, and underscores to prevent
+  // PostgREST filter injection via special characters like { } , %
   if (query.search) {
-    filters.search = sanitizeString(query.search);
+    const cleaned = sanitizeString(query.search);
+    if (/^[\w\s\-]+$/.test(cleaned)) {
+      filters.search = cleaned;
+    }
   }
 
   return filters;

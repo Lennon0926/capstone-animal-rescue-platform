@@ -2,24 +2,11 @@ import { GetServerSideProps } from "next";
 import HeaderSection from "@/components/Header/headerSection";
 import FooterSection from "@/components/Footer/footerSection";
 import AdoptPage from "@/components/AdoptPage/adoptPage";
-
-type AnimalApiData = {
-  aid: number;
-  name: string;
-  description: string;
-  species: string;
-  size: string;
-  gender: string;
-  status: string;
-  image_url: string;
-  tags: string[];
-  created_at: string;
-  record_id: number | null;
-};
+import type { Animal } from "@/types/animal";
 
 type ApiResponse = {
   success: boolean;
-  data: AnimalApiData[];
+  data: Animal[];
   pagination: {
     total: number;
     limit: number;
@@ -29,7 +16,8 @@ type ApiResponse = {
 };
 
 type AdoptPageProps = {
-  animals: AnimalApiData[];
+  animals: Animal[];
+  fetchError?: boolean;
 };
 
 export default function Adopt({ animals }: AdoptPageProps) {
@@ -71,10 +59,12 @@ export const getServerSideProps: GetServerSideProps = async () => {
         animals: result.data,
       },
     };
-  } catch {
+  } catch (err) {
+    console.error("[adopt/index] getServerSideProps failed:", err);
     return {
       props: {
         animals: [],
+        fetchError: true,
       },
     };
   }

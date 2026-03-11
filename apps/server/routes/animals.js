@@ -79,6 +79,14 @@ router.get(
       getDistinctValues("gender"),
     ]);
 
+    const errors = [speciesResult, statusResult, sizeResult, genderResult]
+      .filter((r) => r.error)
+      .map((r) => r.error);
+
+    if (errors.length > 0) {
+      throw new ApiError(500, "Failed to fetch filter options", errors.join("; "));
+    }
+
     res.json({
       success: true,
       data: {

@@ -9,21 +9,7 @@ import { Search, RotateCcw, PawPrint, Ruler, Users, Tag, ChevronDown } from "luc
 const ITEMS_PER_PAGE = 12;
 import styles from "./adoptPage.module.css";
 import { getAnimalImageUrl } from "@/utils/animalImages";
-
-// Types - matching what comes from Supabase API
-interface Animal {
-  aid: number;
-  name: string;
-  description: string;
-  species: string;
-  size: string;
-  gender: string;
-  status: string;
-  image_url: string;
-  tags: string[];
-  created_at: string;
-  record_id: number | null;
-}
+import type { Animal } from "@/types/animal";
 
 interface AdoptPageProps {
   animals: Animal[];
@@ -34,6 +20,14 @@ function capitalize(text: string) {
   if (!text) return "";
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
+
+const STATUS_LABELS: Record<string, string> = {
+  available: "Disponible",
+  pending: "Pendiente",
+  adopted: "Adoptado",
+  fostered: "En Hogar Temporal",
+  medical_hold: "En Atención Médica",
+};
 
 // Extract all unique filter options from animals (tags + species + size + gender + status)
 function getAllFilterOptions(animals: Animal[]): string[] {
@@ -117,8 +111,8 @@ function FlipCard({ animal }: { animal: Animal }) {
           <div className={styles.cardBackContent}>
             <div className={styles.cardBackHeader}>
               <h3 className={styles.cardBackName}>{animal.name}</h3>
-              <span className={`${styles.status} ${styles.statusAvailable}`}>
-                Disponible
+              <span className={`${styles.status} ${styles[`status${capitalize(animal.status)}`] ?? styles.statusAvailable}`}>
+                {STATUS_LABELS[animal.status] ?? animal.status}
               </span>
             </div>
 

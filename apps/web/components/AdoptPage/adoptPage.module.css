@@ -209,6 +209,26 @@
   color: var(--status-available-text);
 }
 
+.statusPending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.statusAdopted {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.statusFostered {
+  background-color: #ede9fe;
+  color: #5b21b6;
+}
+
+.statusMedical_hold {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
 .cardDetails {
   display: flex;
   flex-direction: column;

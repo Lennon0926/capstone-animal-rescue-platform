@@ -55,8 +55,9 @@
 .heroOverlay {
   position: absolute;
   inset: 0;
-  background: url('/Animals/hero-pattern.svg') repeat;
-  opacity: 0.05;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.3;
 }
 
 .heroContent {
@@ -580,5 +581,15 @@
 
   .teamGrid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fadeInUp,
+  .fadeInLeft,
+  .fadeInRight {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }

@@ -1,28 +1,16 @@
 import { GetServerSideProps } from "next";
 import AnimalInfo from "@/components/Animal/AnimalInfoPage/animalInfo";
 import HeaderSection from "@/components/Header/headerSection";
-
-type AnimalApiData = {
-  aid: number;
-  name: string;
-  description: string;
-  species: string;
-  size: string;
-  gender: string;
-  status: string;
-  image_url: string;
-  tags: string[];
-  created_at: string;
-  record_id: number | null;
-};
+import FooterSection from "@/components/Footer/footerSection";
+import type { Animal } from "@/types/animal";
 
 type ApiResponse = {
   success: boolean;
-  data: AnimalApiData;
+  data: Animal;
 };
 
 type AnimalInfoPageProps = {
-  animal: AnimalApiData | null;
+  animal: Animal | null;
 };
 
 export default function AdoptAnimalPage({ animal }: AnimalInfoPageProps) {
@@ -34,6 +22,7 @@ export default function AdoptAnimalPage({ animal }: AnimalInfoPageProps) {
     <div>
       <HeaderSection />
       <AnimalInfo animal={animal} />
+      <FooterSection />
     </div>
   );
 }
@@ -69,7 +58,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         animal: result.data,
       },
     };
-  } catch {
+  } catch (err) {
+    console.error("[adopt/[id]] getServerSideProps failed:", err);
     return {
       props: {
         animal: null,

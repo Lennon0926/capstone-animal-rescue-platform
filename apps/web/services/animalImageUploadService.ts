@@ -8,18 +8,8 @@ export type AnimalImageUploadResult = {
   size: number;
 };
 
-export type Animal = {
-  aid: number;
-  name: string;
-  description: string;
-  species: string;
-  size: string;
-  gender: string;
-  status: string;
-  image_url: string;
-  created_at: string;
-  record_id: number | null;
-};
+export type { Animal } from "@/types/animal";
+import type { Animal } from "@/types/animal";
 
 type UploadApiResponse = {
   data?: AnimalImageUploadResult;
@@ -62,7 +52,10 @@ const getApiBaseUrl = () => {
 export const fetchAnimals = async (): Promise<Animal[]> => {
   const response = await fetch(`${getApiBaseUrl()}/api/animals?limit=100`);
   
-  const payload = (await response.json().catch(() => null)) as AnimalsListResponse | null;
+  const payload = (await response.json().catch((err: unknown) => {
+    console.error("[fetchAnimals] Failed to parse response JSON:", err);
+    return null;
+  })) as AnimalsListResponse | null;
 
   if (!response.ok || !payload?.success) {
     throw new Error("Failed to fetch animals.");
@@ -96,7 +89,10 @@ export const uploadAnimalImage = async (
     }
   );
 
-  const payload = (await response.json().catch(() => null)) as
+  const payload = (await response.json().catch((err: unknown) => {
+    console.error("[uploadAnimalImage] Failed to parse response JSON:", err);
+    return null;
+  })) as
     | UploadApiResponse
     | null;
 
@@ -129,7 +125,10 @@ export const updateAnimalImageUrl = async (
     }
   );
 
-  const payload = (await response.json().catch(() => null)) as AnimalApiResponse | null;
+  const payload = (await response.json().catch((err: unknown) => {
+    console.error("[updateAnimalImageUrl] Failed to parse response JSON:", err);
+    return null;
+  })) as AnimalApiResponse | null;
 
   if (!response.ok) {
     throw new Error(payload?.error || "Failed to update animal image.");

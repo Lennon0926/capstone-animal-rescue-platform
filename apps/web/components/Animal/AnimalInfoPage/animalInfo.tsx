@@ -2,20 +2,7 @@ import styles from "./animalInfo.module.css";
 import Image from "next/image";
 import Link from "next/link";
 import { getAnimalImageUrl } from "@/utils/animalImages";
-
-type Animal = {
-  aid: number;
-  name: string;
-  description: string;
-  species: string;
-  size: string;
-  gender: string;
-  status: string;
-  image_url: string;
-  tags: string[];
-  created_at: string;
-  record_id: number | null;
-};
+import type { Animal } from "@/types/animal";
 
 type AnimalInfoProps = {
   animal: Animal;
