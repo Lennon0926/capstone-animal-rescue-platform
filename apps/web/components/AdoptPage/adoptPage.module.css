@@ -45,20 +45,15 @@
 
 /* Filter Tags - YouTube chip style with multi-select */
 .tagsContainer {
-  margin-bottom: var(--space-6);
+  max-width: 1000px;
+  margin: 0 auto var(--space-6);
 }
 
 .tags {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: var(--space-3);
-  overflow-x: auto;
-  padding-bottom: var(--space-4);
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-
-.tags::-webkit-scrollbar {
-  display: none;
 }
 
 .tag {
