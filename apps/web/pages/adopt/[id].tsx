@@ -1,38 +1,28 @@
 import { GetServerSideProps } from "next";
 import AnimalInfo from "@/components/Animal/AnimalInfoPage/animalInfo";
-import HeaderSeccion from "@/components/Header/headerSection";
-
-type AnimalApiData = {
-  aid: number;
-  name: string;
-  description: string;
-  species: string;
-  size: string;
-  gender: string;
-  status: string;
-  image_url: string;
-  created_at: string;
-  record_id: number | null;
-};
+import HeaderSection from "@/components/Header/headerSection";
+import FooterSection from "@/components/Footer/footerSection";
+import type { Animal } from "@/types/animal";
 
 type ApiResponse = {
   success: boolean;
-  data: AnimalApiData;
+  data: Animal;
 };
 
 type AnimalInfoPageProps = {
-  animal: AnimalApiData | null;
+  animal: Animal | null;
 };
 
-export default function AnimalInfoPage({ animal }: AnimalInfoPageProps) {
+export default function AdoptAnimalPage({ animal }: AnimalInfoPageProps) {
   if (!animal) {
     return <div>No se encontró el animal.</div>;
   }
 
   return (
     <div>
-      <HeaderSeccion />
+      <HeaderSection />
       <AnimalInfo animal={animal} />
+      <FooterSection />
     </div>
   );
 }
@@ -68,7 +58,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         animal: result.data,
       },
     };
-  } catch {
+  } catch (err) {
+    console.error("[adopt/[id]] getServerSideProps failed:", err);
     return {
       props: {
         animal: null,

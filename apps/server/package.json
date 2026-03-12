@@ -12,7 +12,9 @@
     "dev": "nodemon server",
     "seed": "node scripts/seed.js",
     "seed:force": "node scripts/seed.js --force",
-    "seed:append": "node scripts/seed.js --append"
+    "seed:append": "node scripts/seed.js --append",
+    "migrate:image-urls": "node scripts/migrateImageUrls.js",
+    "migrate:image-urls:apply": "node scripts/migrateImageUrls.js --apply"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.998.0",

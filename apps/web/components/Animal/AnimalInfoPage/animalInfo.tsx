@@ -1,19 +1,8 @@
 import styles from "./animalInfo.module.css";
 import Image from "next/image";
 import Link from "next/link";
-
-type Animal = {
-  aid: number;
-  name: string;
-  description: string;
-  species: string;
-  size: string;
-  gender: string;
-  status: string;
-  image_url: string;
-  created_at: string;
-  record_id: number | null;
-};
+import { getAnimalImageUrl } from "@/utils/animalImages";
+import type { Animal } from "@/types/animal";
 
 type AnimalInfoProps = {
   animal: Animal;
@@ -39,14 +28,14 @@ export default function AnimalInfo({ animal }: AnimalInfoProps) {
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
-        <Link href="/animals" className={styles.back}>
+        <Link href="/adopt" className={styles.back}>
           ← Volver a Animales
         </Link>
 
         <div className={styles.container}>
           <div className={styles.imageWrapper}>
             <Image
-              src={animal.image_url}
+              src={getAnimalImageUrl(animal.image_url, animal.species, animal.aid)}
               alt={animal.name}
               width={600}
               height={600}
@@ -86,6 +75,19 @@ export default function AnimalInfo({ animal }: AnimalInfoProps) {
             </div>
 
             <p className={styles.description}>{animal.description}</p>
+
+            {animal.tags && animal.tags.length > 0 && (
+              <div className={styles.tagsSection}>
+                <strong>Etiquetas:</strong>
+                <div className={styles.tagsList}>
+                  {animal.tags.map((tag, index) => (
+                    <span key={index} className={styles.tag}>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className={styles.actions}>
               <Link href="/adopt" className={styles.adoptButton}>

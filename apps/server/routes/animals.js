@@ -27,6 +27,8 @@ const { asyncHandler, ApiError } = require("../middleware/errorHandler");
  * - size: Filter by size (small, medium, large, extra_large)
  * - gender: Filter by gender (male, female, unknown)
  * - name: Search by name (partial match)
+ * - tags: Filter by tag (exact match within tags array)
+ * - search: Combined search by name OR tags (partial match)
  * - sortBy: Sort field (aid, name, species, status, created_at)
  * - sortOrder: Sort direction (asc, desc)
  * - limit: Number of records (1-100, default: 50)
@@ -76,6 +78,14 @@ router.get(
       getDistinctValues("size"),
       getDistinctValues("gender"),
     ]);
+
+    const errors = [speciesResult, statusResult, sizeResult, genderResult]
+      .filter((r) => r.error)
+      .map((r) => r.error);
+
+    if (errors.length > 0) {
+      throw new ApiError(500, "Failed to fetch filter options", errors.join("; "));
+    }
 
     res.json({
       success: true,
