@@ -82,10 +82,8 @@ describe("validateAnimalFilters", () => {
     });
   });
 
-  it("ignores invalid status values and falls back to available", () => {
-    expect(validateAnimalFilters({ status: "flying" })).toEqual({
-      status: "available",
-    });
+  it("ignores invalid status values without applying default", () => {
+    expect(validateAnimalFilters({ status: "flying" })).toEqual({});
   });
 
   it("accepts valid size values", () => {
