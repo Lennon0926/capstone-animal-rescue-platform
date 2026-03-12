@@ -70,13 +70,15 @@ function validateAnimalFilters(query) {
     filters.species = sanitizeString(query.species);
   }
 
-  // Validate status filter
+  // Validate status filter — default to "available" if not provided
+  const validStatuses = ["available", "adopted", "pending", "fostered", "medical_hold"];
   if (query.status) {
     const status = sanitizeString(query.status);
-    const validStatuses = ["available", "adopted", "pending", "fostered", "medical_hold"];
     if (validStatuses.includes(status.toLowerCase())) {
       filters.status = status;
     }
+  } else {
+    filters.status = "available";
   }
 
   // Validate size filter
