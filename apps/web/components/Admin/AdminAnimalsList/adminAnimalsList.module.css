@@ -53,9 +53,23 @@
   gap: var(--space-4);
 }
 
+.searchBarWrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: var(--space-3);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
 .searchInput {
   flex: 1;
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-3) var(--space-4) var(--space-3) var(--space-10);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   font-size: var(--text-sm);

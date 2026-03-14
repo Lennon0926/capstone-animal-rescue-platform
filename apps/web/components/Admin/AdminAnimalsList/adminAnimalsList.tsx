@@ -1,71 +1,95 @@
-import { useEffect, useState } from "react";
-import { fetchAnimals } from "@/services/animalImageUploadService";
+"use client";
+
+import { useState, useMemo } from "react";
 import type { Animal } from "@/types/animal";
+import { getAnimalImageUrl } from "@/utils/animalImages";
 import styles from "./adminAnimalsList.module.css";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Search } from "lucide-react";
 
 const ITEMS_PER_PAGE = 10;
 
-export default function AdminAnimalsList() {
-  const [animals, setAnimals] = useState<Animal[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface AdminAnimalsListProps {
+  initialAnimals: Animal[];
+}
+
+// Helper function to capitalize first letter
+function capitalize(text: string) {
+  if (!text) return "";
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListProps) {
+  const [searchQuery, setSearchQuery] = useState("");
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Animal;
     direction: "asc" | "desc";
-  }>({ key: "name", direction: "asc" });
-  const [searchTerm, setSearchTerm] = useState("");
+  }>({ key: "aid", direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    const loadAnimals = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await fetchAnimals();
-        setAnimals(data);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to fetch animals"
-        );
-      } finally {
-        setLoading(false);
+  // Filter animals by search query
+  const filteredAnimals = useMemo(() => {
+    return initialAnimals.filter((animal) => {
+      const query = searchQuery.toLowerCase();
+
+      // Search by name, species, size, gender, or status
+      const matchesName = animal.name.toLowerCase().includes(query);
+      const matchesSpecies = animal.species?.toLowerCase().includes(query) ?? false;
+      const matchesSize = animal.size?.toLowerCase().includes(query) ?? false;
+      const matchesGender = animal.gender?.toLowerCase().includes(query) ?? false;
+      const matchesStatus = animal.status?.toLowerCase().includes(query) ?? false;
+
+      return (
+        !searchQuery ||
+        matchesName ||
+        matchesSpecies ||
+        matchesSize ||
+        matchesGender ||
+        matchesStatus
+      );
+    });
+  }, [initialAnimals, searchQuery]);
+
+  // Sort animals
+  const sortedAnimals = useMemo(() => {
+    const sorted = [...filteredAnimals];
+    sorted.sort((a, b) => {
+      const aValue = a[sortConfig.key];
+      const bValue = b[sortConfig.key];
+
+      // Handle different types
+      if (typeof aValue === "number" && typeof bValue === "number") {
+        return sortConfig.direction === "asc" ? aValue - bValue : bValue - aValue;
       }
-    };
 
-    loadAnimals();
-  }, []);
+      if (typeof aValue === "string" && typeof bValue === "string") {
+        const comparison = aValue.localeCompare(bValue);
+        return sortConfig.direction === "asc" ? comparison : -comparison;
+      }
 
-  const filteredAnimals = animals.filter(
-    (animal) =>
-      animal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      animal.species.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      animal.status.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      return 0;
+    });
+    return sorted;
+  }, [filteredAnimals, sortConfig]);
 
-  const sortedAnimals = [...filteredAnimals].sort((a, b) => {
-    if (a.aid !== b.aid) {
-      return a.aid - b.aid;
-    }
-
-    return a.name.localeCompare(b.name);
-  });
-
+  // Paginate animals
   const totalPages = Math.ceil(sortedAnimals.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
-  const paginatedAnimals = sortedAnimals.slice(startIndex, endIndex);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
+  const paginatedAnimals = useMemo(() => {
+    return sortedAnimals.slice(startIndex, endIndex);
+  }, [sortedAnimals, startIndex, endIndex]);
 
   const handleSort = (key: keyof Animal) => {
     setSortConfig((prev) => ({
       key,
-      direction:
-        prev.key === key && prev.direction === "asc" ? "desc" : "asc",
+      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
     }));
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setCurrentPage(1); // Reset to first page when searching
   };
 
   const getStatusStyle = (status: string) => {
@@ -93,33 +117,14 @@ export default function AdminAnimalsList() {
     }
   };
 
-  if (loading) {
+  if (initialAnimals.length === 0) {
     return (
       <div className={styles.container}>
         <div className={styles.header}>
           <h1>Admin Animal Management</h1>
         </div>
-        <div className={styles.loadingState}>
-          <p>Loading animals...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.header}>
-          <h1>Admin Animal Management</h1>
-        </div>
-        <div className={styles.errorState}>
-          <p>Error: {error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className={styles.retryButton}
-          >
-            Retry
-          </button>
+        <div className={styles.emptyState}>
+          <p>No animals found.</p>
         </div>
       </div>
     );
@@ -131,8 +136,8 @@ export default function AdminAnimalsList() {
         <div>
           <h1>Admin Animal Management</h1>
           <p className={styles.subtitle}>
-            Total animals: <strong>{animals.length}</strong>
-            {searchTerm && ` • Filtered: ${sortedAnimals.length}`}
+            Total animals: <strong>{initialAnimals.length}</strong>
+            {searchQuery && ` • Filtered: ${sortedAnimals.length}`}
           </p>
         </div>
         <div className={styles.actions}>
@@ -140,14 +145,18 @@ export default function AdminAnimalsList() {
         </div>
       </div>
 
+      {/* Search Bar */}
       <div className={styles.filterSection}>
-        <input
-          type="text"
-          placeholder="Search by name, species, or status..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className={styles.searchInput}
-        />
+        <div className={styles.searchBarWrapper}>
+          <Search size={20} className={styles.searchIcon} />
+          <input
+            type="text"
+            placeholder="Search by name, species, size, gender, or status..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className={styles.searchInput}
+          />
+        </div>
       </div>
 
       {paginatedAnimals.length === 0 ? (
@@ -269,30 +278,26 @@ export default function AdminAnimalsList() {
                   <tr key={animal.aid}>
                     <td>{animal.aid}</td>
                     <td className={styles.nameCell}>{animal.name}</td>
-                    <td>{animal.species}</td>
-                    <td>{animal.gender}</td>
-                    <td>{animal.size}</td>
+                    <td>{capitalize(animal.species)}</td>
+                    <td>{capitalize(animal.gender)}</td>
+                    <td>{capitalize(animal.size)}</td>
                     <td>
                       <span
                         className={styles.statusBadge}
                         style={getStatusStyle(animal.status)}
                       >
-                        {animal.status}
+                        {capitalize(animal.status)}
                       </span>
                     </td>
                     <td>
-                      {animal.image_url ? (
-                        <img
-                          src={animal.image_url}
-                          alt={animal.name}
-                          className={styles.thumbnail}
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                          }}
-                        />
-                      ) : (
-                        <span className={styles.noImage}>No image</span>
-                      )}
+                      <img
+                        src={getAnimalImageUrl(animal.image_url, animal.species, animal.aid)}
+                        alt={animal.name}
+                        className={styles.thumbnail}
+                        onError={(e) => {
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
                     </td>
                     <td>
                       <div className={styles.actionButtons}>
