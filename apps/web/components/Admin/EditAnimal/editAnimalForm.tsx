@@ -2,10 +2,11 @@
 
 import { FormEvent, useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { getAnimalImageUrl } from "@/utils/animalImages";
 import type { Animal } from "@/types/animal";
 import styles from "./editAnimalForm.module.css";
-import { X, Plus } from "lucide-react";
+import { X, Plus, ArrowLeft } from "lucide-react";
 
 interface EditAnimalFormProps {
   animal: Animal;
@@ -140,7 +141,13 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
   return (
     <div className={styles.container}>
       <div className={styles.formWrapper}>
-        <h2 className={styles.title}>Editar Detalles del Animal</h2>
+        <div className={styles.headerWithBackButton}>
+          <Link href="/admin/animals" className={styles.backButton}>
+            <ArrowLeft size={20} />
+            <span>Volver a la Lista</span>
+          </Link>
+          <h2 className={styles.title}>Editar Detalles del Animal</h2>
+        </div>
 
         {/* Current Image Preview */}
         {formData.image_url && (
