@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import type { Animal } from "@/types/animal";
 import { getAnimalImageUrl } from "@/utils/animalImages";
 import styles from "./adminAnimalsList.module.css";
@@ -301,12 +302,13 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
                     </td>
                     <td>
                       <div className={styles.actionButtons}>
-                        <button
+                        <Link
+                          href={`/admin/editAnimal?id=${animal.aid}`}
                           className={styles.editButton}
                           title="Edit animal"
                         >
                           Edit
-                        </button>
+                        </Link>
                         <button
                           className={styles.deleteButton}
                           title="Delete animal"

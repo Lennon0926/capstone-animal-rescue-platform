@@ -245,7 +245,7 @@ function validateUpdateAnimal(req, res, next) {
 
     if (req.body.species !== undefined) {
       const species = sanitizeString(req.body.species).toLowerCase();
-      const validSpecies = ["dog", "cat"];
+      const validSpecies = ["perro", "gato"];
       if (!validSpecies.includes(species)) {
         throw new ApiError(400, "Invalid species.");
       }
@@ -254,7 +254,7 @@ function validateUpdateAnimal(req, res, next) {
 
     if (req.body.size !== undefined) {
       const size = sanitizeString(req.body.size).toLowerCase();
-      const validSizes = ["small", "medium", "large", "extra_large"];
+      const validSizes = ["pequeño", "mediano", "grande", "muy grande"];
       if (!validSizes.includes(size)) {
         throw new ApiError(400, "Invalid size.");
       }
@@ -263,7 +263,7 @@ function validateUpdateAnimal(req, res, next) {
 
     if (req.body.gender !== undefined) {
       const gender = sanitizeString(req.body.gender).toLowerCase();
-      const validGenders = ["male", "female", "unknown"];
+      const validGenders = ["macho", "hembra", "desconocido"];
       if (!validGenders.includes(gender)) {
         throw new ApiError(400, "Invalid gender.");
       }
@@ -272,7 +272,7 @@ function validateUpdateAnimal(req, res, next) {
 
     if (req.body.status !== undefined) {
       const status = sanitizeString(req.body.status).toLowerCase();
-      const validStatuses = ["available", "adopted", "pending", "fostered", "medical_hold"];
+      const validStatuses = ["disponible", "adoptado", "pendiente", "en hogar temporal", "atención médica"];
       if (!validStatuses.includes(status)) {
         throw new ApiError(400, "Invalid status.");
       }
