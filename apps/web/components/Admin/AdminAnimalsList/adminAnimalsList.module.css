@@ -327,3 +327,101 @@
   font-size: var(--text-xs);
   color: var(--color-text-muted);
 }
+
+/* ================= MODAL ================= */
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background-color: var(--color-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-8);
+  max-width: 400px;
+  width: 90%;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modalTitle {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin: 0 0 var(--space-4) 0;
+}
+
+.modalMessage {
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  margin: 0 0 var(--space-6) 0;
+  line-height: 1.5;
+}
+
+.modalActions {
+  display: flex;
+  gap: var(--space-4);
+  justify-content: flex-end;
+}
+
+.modalCancelButton {
+  padding: var(--space-2) var(--space-6);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.modalCancelButton:hover:not(:disabled) {
+  background-color: var(--color-border);
+}
+
+.modalCancelButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.modalConfirmButton {
+  padding: var(--space-2) var(--space-6);
+  background-color: var(--color-error);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: background-color var(--transition-normal);
+}
+
+.modalConfirmButton:hover:not(:disabled) {
+  background-color: #a83427;
+}
+
+.modalConfirmButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
