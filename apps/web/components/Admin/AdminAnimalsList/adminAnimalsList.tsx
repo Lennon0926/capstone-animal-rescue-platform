@@ -4,6 +4,8 @@ import type { Animal } from "@/types/animal";
 import styles from "./adminAnimalsList.module.css";
 import { ChevronDown } from "lucide-react";
 
+const ITEMS_PER_PAGE = 10;
+
 export default function AdminAnimalsList() {
   const [animals, setAnimals] = useState<Animal[]>([]);
   const [loading, setLoading] = useState(true);
@@ -13,6 +15,7 @@ export default function AdminAnimalsList() {
     direction: "asc" | "desc";
   }>({ key: "name", direction: "asc" });
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const loadAnimals = async () => {
@@ -47,6 +50,15 @@ export default function AdminAnimalsList() {
 
     return a.name.localeCompare(b.name);
   });
+
+  const totalPages = Math.ceil(sortedAnimals.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedAnimals = sortedAnimals.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const handleSort = (key: keyof Animal) => {
     setSortConfig((prev) => ({
@@ -120,6 +132,7 @@ export default function AdminAnimalsList() {
           <h1>Admin Animal Management</h1>
           <p className={styles.subtitle}>
             Total animals: <strong>{animals.length}</strong>
+            {searchTerm && ` • Filtered: ${sortedAnimals.length}`}
           </p>
         </div>
         <div className={styles.actions}>
@@ -137,166 +150,198 @@ export default function AdminAnimalsList() {
         />
       </div>
 
-      {sortedAnimals.length === 0 ? (
+      {paginatedAnimals.length === 0 ? (
         <div className={styles.emptyState}>
-          <p>No animals found.</p>
+          <p>
+            {sortedAnimals.length === 0
+              ? "No animals found."
+              : "No results for this page."}
+          </p>
         </div>
       ) : (
-        <div className={styles.tableWrapper}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th onClick={() => handleSort("aid")}>
-                  <div className={styles.headerCell}>
-                    ID
-                    {sortConfig.key === "aid" && (
-                      <ChevronDown
-                        size={16}
-                        style={{
-                          transform:
-                            sortConfig.direction === "asc"
-                              ? "rotate(180deg)"
-                              : "rotate(0deg)",
-                        }}
-                      />
-                    )}
-                  </div>
-                </th>
-                <th onClick={() => handleSort("name")}>
-                  <div className={styles.headerCell}>
-                    Name
-                    {sortConfig.key === "name" && (
-                      <ChevronDown
-                        size={16}
-                        style={{
-                          transform:
-                            sortConfig.direction === "asc"
-                              ? "rotate(180deg)"
-                              : "rotate(0deg)",
-                        }}
-                      />
-                    )}
-                  </div>
-                </th>
-                <th onClick={() => handleSort("species")}>
-                  <div className={styles.headerCell}>
-                    Species
-                    {sortConfig.key === "species" && (
-                      <ChevronDown
-                        size={16}
-                        style={{
-                          transform:
-                            sortConfig.direction === "asc"
-                              ? "rotate(180deg)"
-                              : "rotate(0deg)",
-                        }}
-                      />
-                    )}
-                  </div>
-                </th>
-                <th onClick={() => handleSort("gender")}>
-                  <div className={styles.headerCell}>
-                    Gender
-                    {sortConfig.key === "gender" && (
-                      <ChevronDown
-                        size={16}
-                        style={{
-                          transform:
-                            sortConfig.direction === "asc"
-                              ? "rotate(180deg)"
-                              : "rotate(0deg)",
-                        }}
-                      />
-                    )}
-                  </div>
-                </th>
-                <th onClick={() => handleSort("size")}>
-                  <div className={styles.headerCell}>
-                    Size
-                    {sortConfig.key === "size" && (
-                      <ChevronDown
-                        size={16}
-                        style={{
-                          transform:
-                            sortConfig.direction === "asc"
-                              ? "rotate(180deg)"
-                              : "rotate(0deg)",
-                        }}
-                      />
-                    )}
-                  </div>
-                </th>
-                <th onClick={() => handleSort("status")}>
-                  <div className={styles.headerCell}>
-                    Status
-                    {sortConfig.key === "status" && (
-                      <ChevronDown
-                        size={16}
-                        style={{
-                          transform:
-                            sortConfig.direction === "asc"
-                              ? "rotate(180deg)"
-                              : "rotate(0deg)",
-                        }}
-                      />
-                    )}
-                  </div>
-                </th>
-                <th>Image</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedAnimals.map((animal) => (
-                <tr key={animal.aid}>
-                  <td>{animal.aid}</td>
-                  <td className={styles.nameCell}>{animal.name}</td>
-                  <td>{animal.species}</td>
-                  <td>{animal.gender}</td>
-                  <td>{animal.size}</td>
-                  <td>
-                    <span
-                      className={styles.statusBadge}
-                      style={getStatusStyle(animal.status)}
-                    >
-                      {animal.status}
-                    </span>
-                  </td>
-                  <td>
-                    {animal.image_url ? (
-                      <img
-                        src={animal.image_url}
-                        alt={animal.name}
-                        className={styles.thumbnail}
-                        onError={(e) => {
-                          e.currentTarget.style.display = "none";
-                        }}
-                      />
-                    ) : (
-                      <span className={styles.noImage}>No image</span>
-                    )}
-                  </td>
-                  <td>
-                    <div className={styles.actionButtons}>
-                      <button
-                        className={styles.editButton}
-                        title="Edit animal"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className={styles.deleteButton}
-                        title="Delete animal"
-                      >
-                        Delete
-                      </button>
+        <>
+          <div className={styles.tableWrapper}>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th onClick={() => handleSort("aid")}>
+                    <div className={styles.headerCell}>
+                      ID
+                      {sortConfig.key === "aid" && (
+                        <ChevronDown
+                          size={16}
+                          style={{
+                            transform:
+                              sortConfig.direction === "asc"
+                                ? "rotate(180deg)"
+                                : "rotate(0deg)",
+                          }}
+                        />
+                      )}
                     </div>
-                  </td>
+                  </th>
+                  <th onClick={() => handleSort("name")}>
+                    <div className={styles.headerCell}>
+                      Name
+                      {sortConfig.key === "name" && (
+                        <ChevronDown
+                          size={16}
+                          style={{
+                            transform:
+                              sortConfig.direction === "asc"
+                                ? "rotate(180deg)"
+                                : "rotate(0deg)",
+                          }}
+                        />
+                      )}
+                    </div>
+                  </th>
+                  <th onClick={() => handleSort("species")}>
+                    <div className={styles.headerCell}>
+                      Species
+                      {sortConfig.key === "species" && (
+                        <ChevronDown
+                          size={16}
+                          style={{
+                            transform:
+                              sortConfig.direction === "asc"
+                                ? "rotate(180deg)"
+                                : "rotate(0deg)",
+                          }}
+                        />
+                      )}
+                    </div>
+                  </th>
+                  <th onClick={() => handleSort("gender")}>
+                    <div className={styles.headerCell}>
+                      Gender
+                      {sortConfig.key === "gender" && (
+                        <ChevronDown
+                          size={16}
+                          style={{
+                            transform:
+                              sortConfig.direction === "asc"
+                                ? "rotate(180deg)"
+                                : "rotate(0deg)",
+                          }}
+                        />
+                      )}
+                    </div>
+                  </th>
+                  <th onClick={() => handleSort("size")}>
+                    <div className={styles.headerCell}>
+                      Size
+                      {sortConfig.key === "size" && (
+                        <ChevronDown
+                          size={16}
+                          style={{
+                            transform:
+                              sortConfig.direction === "asc"
+                                ? "rotate(180deg)"
+                                : "rotate(0deg)",
+                          }}
+                        />
+                      )}
+                    </div>
+                  </th>
+                  <th onClick={() => handleSort("status")}>
+                    <div className={styles.headerCell}>
+                      Status
+                      {sortConfig.key === "status" && (
+                        <ChevronDown
+                          size={16}
+                          style={{
+                            transform:
+                              sortConfig.direction === "asc"
+                                ? "rotate(180deg)"
+                                : "rotate(0deg)",
+                          }}
+                        />
+                      )}
+                    </div>
+                  </th>
+                  <th>Image</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {paginatedAnimals.map((animal) => (
+                  <tr key={animal.aid}>
+                    <td>{animal.aid}</td>
+                    <td className={styles.nameCell}>{animal.name}</td>
+                    <td>{animal.species}</td>
+                    <td>{animal.gender}</td>
+                    <td>{animal.size}</td>
+                    <td>
+                      <span
+                        className={styles.statusBadge}
+                        style={getStatusStyle(animal.status)}
+                      >
+                        {animal.status}
+                      </span>
+                    </td>
+                    <td>
+                      {animal.image_url ? (
+                        <img
+                          src={animal.image_url}
+                          alt={animal.name}
+                          className={styles.thumbnail}
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                          }}
+                        />
+                      ) : (
+                        <span className={styles.noImage}>No image</span>
+                      )}
+                    </td>
+                    <td>
+                      <div className={styles.actionButtons}>
+                        <button
+                          className={styles.editButton}
+                          title="Edit animal"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className={styles.deleteButton}
+                          title="Delete animal"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className={styles.pagination}>
+            <button
+              className={styles.paginationButton}
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              title="Previous page"
+            >
+              ← Previous
+            </button>
+
+            <div className={styles.pageInfo}>
+              <span>
+                Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
+              </span>
+            </div>
+
+            <button
+              className={styles.paginationButton}
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              title="Next page"
+            >
+              Next →
+            </button>
+          </div>
+        </>
       )}
     </div>
   );
