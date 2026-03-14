@@ -110,6 +110,16 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
           backgroundColor: "var(--status-pending-bg)",
           color: "var(--status-pending-text)",
         };
+      case "en hogar temporal":
+        return {
+          backgroundColor: "var(--status-fostered-bg)",
+          color: "var(--status-fostered-text)",
+        };
+      case "atención médica":
+        return {
+          backgroundColor: "var(--status-medical-bg)",
+          color: "var(--status-medical-text)",
+        };
       default:
         return {
           backgroundColor: "var(--color-border)",
