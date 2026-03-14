@@ -70,21 +70,19 @@ function validateAnimalFilters(query) {
     filters.species = sanitizeString(query.species);
   }
 
-  // Validate status filter — default to "available" if not provided
-  const validStatuses = ["available", "adopted", "pending", "fostered", "medical_hold"];
+  // Validate status filter — only filter if explicitly provided
+  const validStatuses = ["disponible", "adoptado", "pendiente", "en hogar temporal", "atención médica"];
   if (query.status) {
     const status = sanitizeString(query.status);
     if (validStatuses.includes(status.toLowerCase())) {
       filters.status = status;
     }
-  } else {
-    filters.status = "available";
   }
 
   // Validate size filter
   if (query.size) {
     const size = sanitizeString(query.size);
-    const validSizes = ["small", "medium", "large", "extra_large"];
+    const validSizes = ["pequeño", "mediano", "grande", "muy grande"];
     if (validSizes.includes(size.toLowerCase())) {
       filters.size = size;
     }
@@ -93,7 +91,7 @@ function validateAnimalFilters(query) {
   // Validate gender filter
   if (query.gender) {
     const gender = sanitizeString(query.gender);
-    const validGenders = ["male", "female", "unknown"];
+    const validGenders = ["macho", "hembra", "desconocido"];
     if (validGenders.includes(gender.toLowerCase())) {
       filters.gender = gender;
     }
@@ -171,10 +169,10 @@ function validateCreateAnimal(req, res, next) {
       ? req.body.image_url.trim().slice(0, 500)
       : "";
 
-    const validSpecies = ["dog", "cat"];
-    const validSizes = ["small", "medium", "large", "extra_large"];
-    const validGenders = ["male", "female", "unknown"];
-    const validStatuses = ["available", "adopted", "pending", "fostered", "medical_hold"];
+    const validSpecies = ["perro", "gato"];
+    const validSizes = ["pequeño", "mediano", "grande", "muy grande"];
+    const validGenders = ["macho", "hembra", "desconocido"];
+    const validStatuses = ["disponible", "adoptado", "pendiente", "en hogar temporal", "atención médica"];
 
     if (!name) {
       throw new ApiError(400, "Name is required.");
@@ -294,6 +292,14 @@ function validateUpdateAnimal(req, res, next) {
 
     if (req.body.record_id !== undefined) {
       updates.record_id = req.body.record_id;
+    }
+
+    if (req.body.tags !== undefined) {
+      if (Array.isArray(req.body.tags)) {
+        updates.tags = req.body.tags;
+      } else {
+        throw new ApiError(400, "Invalid tags format. Tags must be an array.");
+      }
     }
 
     if (Object.keys(updates).length === 0) {

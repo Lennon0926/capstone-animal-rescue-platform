@@ -95,17 +95,17 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
 
   const getStatusStyle = (status: string) => {
     switch (status.toLowerCase()) {
-      case "available":
+      case "disponible":
         return {
           backgroundColor: "var(--status-available-bg)",
           color: "var(--status-available-text)",
         };
-      case "adopted":
+      case "adoptado":
         return {
           backgroundColor: "var(--status-adopted-bg)",
           color: "var(--status-adopted-text)",
         };
-      case "pending":
+      case "pendiente":
         return {
           backgroundColor: "var(--status-pending-bg)",
           color: "var(--status-pending-text)",
@@ -122,10 +122,10 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
     return (
       <div className={styles.container}>
         <div className={styles.header}>
-          <h1>Admin Animal Management</h1>
+          <h1>Gestión de Animales</h1>
         </div>
         <div className={styles.emptyState}>
-          <p>No animals found.</p>
+          <p>No se encontraron animales.</p>
         </div>
       </div>
     );
@@ -135,14 +135,14 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
     <div className={styles.container}>
       <div className={styles.header}>
         <div>
-          <h1>Admin Animal Management</h1>
+          <h1>Gestión de Animales</h1>
           <p className={styles.subtitle}>
-            Total animals: <strong>{initialAnimals.length}</strong>
-            {searchQuery && ` • Filtered: ${sortedAnimals.length}`}
+            Total de animales: <strong>{initialAnimals.length}</strong>
+            {searchQuery && ` • Filtrados: ${sortedAnimals.length}`}
           </p>
         </div>
         <div className={styles.actions}>
-          <button className={styles.createButton}>+ Create New Animal</button>
+          <button className={styles.createButton}>+ Crear Nuevo Animal</button>
         </div>
       </div>
 
@@ -152,7 +152,7 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
           <Search size={20} className={styles.searchIcon} />
           <input
             type="text"
-            placeholder="Search by name, species, size, gender, or status..."
+            placeholder="Buscar por nombre, especie, tamaño, género o estado..."
             value={searchQuery}
             onChange={handleSearchChange}
             className={styles.searchInput}
@@ -164,8 +164,8 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
         <div className={styles.emptyState}>
           <p>
             {sortedAnimals.length === 0
-              ? "No animals found."
-              : "No results for this page."}
+              ? "No se encontraron animales."
+              : "No hay resultados para esta página."}
           </p>
         </div>
       ) : (
@@ -192,7 +192,7 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
                   </th>
                   <th onClick={() => handleSort("name")}>
                     <div className={styles.headerCell}>
-                      Name
+                      Nombre
                       {sortConfig.key === "name" && (
                         <ChevronDown
                           size={16}
@@ -208,7 +208,7 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
                   </th>
                   <th onClick={() => handleSort("species")}>
                     <div className={styles.headerCell}>
-                      Species
+                      Especie
                       {sortConfig.key === "species" && (
                         <ChevronDown
                           size={16}
@@ -224,7 +224,7 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
                   </th>
                   <th onClick={() => handleSort("gender")}>
                     <div className={styles.headerCell}>
-                      Gender
+                      Género
                       {sortConfig.key === "gender" && (
                         <ChevronDown
                           size={16}
@@ -240,7 +240,7 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
                   </th>
                   <th onClick={() => handleSort("size")}>
                     <div className={styles.headerCell}>
-                      Size
+                      Tamaño
                       {sortConfig.key === "size" && (
                         <ChevronDown
                           size={16}
@@ -256,7 +256,7 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
                   </th>
                   <th onClick={() => handleSort("status")}>
                     <div className={styles.headerCell}>
-                      Status
+                      Estado
                       {sortConfig.key === "status" && (
                         <ChevronDown
                           size={16}
@@ -270,8 +270,8 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
                       )}
                     </div>
                   </th>
-                  <th>Image</th>
-                  <th>Actions</th>
+                  <th>Imagen</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -305,15 +305,15 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
                         <Link
                           href={`/admin/editAnimal?id=${animal.aid}`}
                           className={styles.editButton}
-                          title="Edit animal"
+                          title="Editar animal"
                         >
-                          Edit
+                          Editar
                         </Link>
                         <button
                           className={styles.deleteButton}
-                          title="Delete animal"
+                          title="Eliminar animal"
                         >
-                          Delete
+                          Eliminar
                         </button>
                       </div>
                     </td>
@@ -328,14 +328,14 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
               className={styles.paginationButton}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              title="Previous page"
+              title="Página anterior"
             >
-              ← Previous
+              ← Anterior
             </button>
 
             <div className={styles.pageInfo}>
               <span>
-                Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
+                Página <strong>{currentPage}</strong> de <strong>{totalPages}</strong>
               </span>
             </div>
 
@@ -343,9 +343,9 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
               className={styles.paginationButton}
               onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              title="Next page"
+              title="Página siguiente"
             >
-              Next →
+              Siguiente →
             </button>
           </div>
         </>
