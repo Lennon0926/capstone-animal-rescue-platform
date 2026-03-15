@@ -7,11 +7,48 @@ import styles from "./editAnimalForm.module.css";
 import { X, Plus, ArrowLeft } from "lucide-react";
 
 interface EditAnimalFormProps {
-  animal: Animal;
+  animal?: Animal;
   onSave?: (updatedAnimal: Animal) => void;
+  error?: string;
+  notFound?: boolean;
 }
 
-export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) {
+export default function EditAnimalForm({ animal, onSave, error, notFound }: EditAnimalFormProps) {
+  // Handle error state
+  if (error) {
+    return (
+      <main className={styles.mainContainer}>
+        <div className={styles.errorContainer}>
+          <h1>Error</h1>
+          <p>{error}</p>
+        </div>
+      </main>
+    );
+  }
+
+  // Handle not found state
+  if (notFound) {
+    return (
+      <main className={styles.mainContainer}>
+        <div className={styles.notFoundContainer}>
+          <h1>Animal Not Found</h1>
+          <p>The animal you&apos;re trying to edit could not be found.</p>
+        </div>
+      </main>
+    );
+  }
+
+  // Handle missing animal
+  if (!animal) {
+    return (
+      <main className={styles.mainContainer}>
+        <div className={styles.notFoundContainer}>
+          <h1>Loading...</h1>
+          <p>Please wait while we load the animal data.</p>
+        </div>
+      </main>
+    );
+  }
   const [formData, setFormData] = useState<Animal>(animal);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -141,8 +178,9 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.formWrapper}>
+    <main className={styles.mainContainer}>
+      <div className={styles.container}>
+        <div className={styles.formWrapper}>
         <div className={styles.headerWithBackButton}>
           <Link href="/admin/animals" className={styles.backButton}>
             <ArrowLeft size={20} />
@@ -398,5 +436,6 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
         </form>
       </div>
     </div>
+    </main>
   );
 }

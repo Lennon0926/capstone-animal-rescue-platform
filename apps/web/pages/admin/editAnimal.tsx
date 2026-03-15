@@ -18,42 +18,13 @@ export default function EditAnimalPage({ animal, error }: EditAnimalPageProps) {
   return (
     <>
       <HeaderSection />
-      <main
-        style={{
-          minHeight: "100vh",
-          padding: "2rem",
-          maxWidth: "1200px",
-          margin: "0 auto",
-        }}
-      >
-        {error ? (
-          <div
-            style={{
-              padding: "2rem",
-              backgroundColor: "#fee",
-              borderRadius: "8px",
-              color: "#c00",
-            }}
-          >
-            <h1>Error</h1>
-            <p>{error}</p>
-          </div>
-        ) : animal ? (
-          <EditAnimalForm animal={animal} />
-        ) : (
-          <div
-            style={{
-              padding: "2rem",
-              backgroundColor: "#f5f5f5",
-              borderRadius: "8px",
-              textAlign: "center",
-            }}
-          >
-            <h1>Animal Not Found</h1>
-            <p>The animal you&apos;re trying to edit could not be found.</p>
-          </div>
-        )}
-      </main>
+      {error ? (
+        <EditAnimalForm error={error} />
+      ) : animal ? (
+        <EditAnimalForm animal={animal} />
+      ) : (
+        <EditAnimalForm notFound />
+      )}
       <FooterSection />
     </>
   );
