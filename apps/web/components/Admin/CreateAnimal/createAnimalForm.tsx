@@ -1,5 +1,3 @@
-"use client";
-
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -156,12 +154,12 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
   return (
     <main>
       <div className={styles.container}>
-        <div className={styles.formWrapper}>
-        <div className={styles.headerWithBackButton}>
-          <Link href="/admin/animals" className={styles.backButton}>
+        <Link href="/admin/animals" className={styles.backButton}>
             <ArrowLeft size={20} />
             <span>Volver a la Lista</span>
           </Link>
+        <div className={styles.formWrapper}>
+        <div className={styles.headerWithBackButton}>
           <h2 className={styles.title}>Crear Nuevo Animal</h2>
         </div>
 

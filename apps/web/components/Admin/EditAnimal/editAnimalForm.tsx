@@ -180,12 +180,12 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
   return (
     <main>
       <div className={styles.container}>
-        <div className={styles.formWrapper}>
-        <div className={styles.headerWithBackButton}>
-          <Link href="/admin/animals" className={styles.backButton}>
+        <Link href="/admin/animals" className={styles.backButton}>
             <ArrowLeft size={20} />
             <span>Volver a la Lista</span>
-          </Link>
+        </Link>
+        <div className={styles.formWrapper}>
+        <div className={styles.formHeader}>
           <h2 className={styles.title}>Editar Detalles del Animal</h2>
         </div>
 
@@ -201,9 +201,9 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
                 style={{ objectFit: "cover" }}
               />
             </div>
-            <p className={styles.imageNote}>
+            {/* <p className={styles.imageNote}>
               Para cambiar la imagen, usa la página <strong>Subir Foto del Animal</strong>.
-            </p>
+            </p> */}
           </div>
         )}
 
