@@ -42,6 +42,8 @@
   cursor: pointer;
   transition: background-color var(--transition-normal);
   white-space: nowrap;
+  display: inline-block;
+  text-decoration: none;
 }
 
 .createButton:hover {

@@ -246,7 +246,9 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
           </p>
         </div>
         <div className={styles.actions}>
-          <button className={styles.createButton}>+ Crear Nuevo Animal</button>
+          <Link href="/admin/createAnimal" className={styles.createButton}>
+            + Crear Nuevo Animal
+          </Link>
         </div>
       </div>
 

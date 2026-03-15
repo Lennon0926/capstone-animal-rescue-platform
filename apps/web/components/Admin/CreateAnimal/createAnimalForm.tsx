@@ -1,29 +1,34 @@
-import { FormEvent, useState, useEffect } from "react";
-import Image from "next/image";
+"use client";
+
+import { FormEvent, useState } from "react";
 import Link from "next/link";
-import { getAnimalImageUrl } from "@/utils/animalImages";
+import { useRouter } from "next/navigation";
 import type { Animal } from "@/types/animal";
-import styles from "./editAnimalForm.module.css";
+import styles from "./createAnimalForm.module.css";
 import { X, Plus, ArrowLeft } from "lucide-react";
 
-interface EditAnimalFormProps {
-  animal: Animal;
-  onSave?: (updatedAnimal: Animal) => void;
+interface CreateAnimalFormProps {
+  onSave?: (newAnimal: Animal) => void;
 }
 
-export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) {
-  const [formData, setFormData] = useState<Animal>(animal);
+// Default empty animal for creation
+const getEmptyAnimal = (): Partial<Animal> => ({
+  name: "",
+  description: "",
+  species: "",
+  size: "",
+  gender: "",
+  status: "disponible",
+  tags: [],
+});
+
+export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
+  const router = useRouter();
+  const [formData, setFormData] = useState(getEmptyAnimal());
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [tagInput, setTagInput] = useState("");
-
-  // Reset form when animal changes
-  useEffect(() => {
-    setFormData(animal);
-    setErrorMessage("");
-    setSuccessMessage("");
-  }, [animal]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -37,10 +42,11 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
 
   const handleAddTag = () => {
     const trimmedTag = tagInput.trim();
-    if (trimmedTag && !formData.tags.includes(trimmedTag)) {
+    const tags = formData.tags || [];
+    if (trimmedTag && !tags.includes(trimmedTag)) {
       setFormData((prev) => ({
         ...prev,
-        tags: [...prev.tags, trimmedTag],
+        tags: [...(prev.tags || []), trimmedTag],
       }));
       setTagInput("");
     }
@@ -49,7 +55,7 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
   const handleRemoveTag = (indexToRemove: number) => {
     setFormData((prev) => ({
       ...prev,
-      tags: prev.tags.filter((_, index) => index !== indexToRemove),
+      tags: (prev.tags || []).filter((_, index) => index !== indexToRemove),
     }));
   };
 
@@ -65,27 +71,32 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
     setErrorMessage("");
     setSuccessMessage("");
 
-    if (!formData.name.trim()) {
+    if (!formData.name?.trim()) {
       setErrorMessage("El nombre del animal es requerido.");
       return;
     }
 
-    if (!formData.species.trim()) {
+    if (!formData.description?.trim()) {
+      setErrorMessage("La descripción es requerida.");
+      return;
+    }
+
+    if (!formData.species?.trim()) {
       setErrorMessage("La especie es requerida.");
       return;
     }
 
-    if (!formData.size.trim()) {
+    if (!formData.size?.trim()) {
       setErrorMessage("El tamaño es requerido.");
       return;
     }
 
-    if (!formData.gender.trim()) {
+    if (!formData.gender?.trim()) {
       setErrorMessage("El género es requerido.");
       return;
     }
 
-    if (!formData.status.trim()) {
+    if (!formData.status?.trim()) {
       setErrorMessage("El estado es requerido.");
       return;
     }
@@ -94,9 +105,9 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals/${formData.aid}`,
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals`,
         {
-          method: "PATCH",
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
@@ -107,7 +118,7 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
             size: formData.size,
             gender: formData.gender,
             status: formData.status,
-            tags: formData.tags,
+            tags: formData.tags || [],
           }),
         }
       );
@@ -117,20 +128,22 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
         const errorMessage = 
           errorData?.error?.message || 
           errorData?.error || 
-          "Error al actualizar el animal.";
+          "Error al crear el animal.";
         throw new Error(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
       }
 
       const result = await response.json();
-      setSuccessMessage("¡Animal actualizado exitosamente!");
-      
+      setSuccessMessage("¡Animal creado exitosamente!");
+
       // Call onSave callback if provided
       if (onSave) {
-        onSave(result.data || formData);
+        onSave(result.data);
       }
 
-      // Update form with the returned data
-      setFormData(result.data || formData);
+      // Redirect to animal list after a short delay
+      setTimeout(() => {
+        router.push("/admin/animals");
+      }, 1500);
     } catch (error) {
       setErrorMessage(
         error instanceof Error ? error.message : "Error inesperado."
@@ -148,26 +161,8 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
             <ArrowLeft size={20} />
             <span>Volver a la Lista</span>
           </Link>
-          <h2 className={styles.title}>Editar Detalles del Animal</h2>
+          <h2 className={styles.title}>Crear Nuevo Animal</h2>
         </div>
-
-        {/* Current Image Preview */}
-        {formData.image_url && (
-          <div className={styles.imagePreviewSection}>
-            <h3 className={styles.sectionLabel}>Imagen Actual</h3>
-            <div className={styles.imagePreview}>
-              <Image
-                src={getAnimalImageUrl(formData.image_url, formData.species, formData.aid)}
-                alt={formData.name}
-                fill
-                style={{ objectFit: "cover" }}
-              />
-            </div>
-            <p className={styles.imageNote}>
-              Para cambiar la imagen, usa la página <strong>Subir Foto del Animal</strong>.
-            </p>
-          </div>
-        )}
 
         <form onSubmit={onSubmit} className={styles.form}>
           {/* Messages */}
@@ -194,7 +189,7 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
                 id="name"
                 type="text"
                 name="name"
-                value={formData.name}
+                value={formData.name || ""}
                 onChange={handleInputChange}
                 className={styles.input}
                 placeholder="Ingresa el nombre del animal"
@@ -209,7 +204,7 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
               <textarea
                 id="description"
                 name="description"
-                value={formData.description}
+                value={formData.description || ""}
                 onChange={handleInputChange}
                 className={styles.textarea}
                 placeholder="Ingresa una descripción detallada"
@@ -226,7 +221,7 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
                 <select
                   id="species"
                   name="species"
-                  value={formData.species}
+                  value={formData.species || ""}
                   onChange={handleInputChange}
                   className={styles.select}
                   required
@@ -244,7 +239,7 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
                 <select
                   id="size"
                   name="size"
-                  value={formData.size}
+                  value={formData.size || ""}
                   onChange={handleInputChange}
                   className={styles.select}
                   required
@@ -266,7 +261,7 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
                 <select
                   id="gender"
                   name="gender"
-                  value={formData.gender}
+                  value={formData.gender || ""}
                   onChange={handleInputChange}
                   className={styles.select}
                   required
@@ -285,7 +280,7 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
                 <select
                   id="status"
                   name="status"
-                  value={formData.status}
+                  value={formData.status || "disponible"}
                   onChange={handleInputChange}
                   className={styles.select}
                   required
@@ -303,7 +298,7 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
 
           {/* Tags Section */}
           <fieldset className={styles.fieldset}>
-            <legend className={styles.legend}>Etiquetas</legend>
+            <legend className={styles.legend}>Etiquetas (Opcional)</legend>
 
             <div className={styles.formGroup}>
               <label htmlFor="tagInput" className={styles.label}>
@@ -333,9 +328,9 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
               </p>
             </div>
 
-            {formData.tags.length > 0 && (
+            {(formData.tags || []).length > 0 && (
               <div className={styles.tagsDisplay}>
-                {formData.tags.map((tag, index) => (
+                {(formData.tags || []).map((tag, index) => (
                   <div key={index} className={styles.tag}>
                     <span>{tag}</span>
                     <button
@@ -352,39 +347,6 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
             )}
           </fieldset>
 
-          {/* Additional Information */}
-          <fieldset className={styles.fieldset}>
-            <legend className={styles.legend}>Información Adicional</legend>
-
-            <div className={styles.formGroup}>
-              <label htmlFor="aid" className={styles.label}>
-                ID del Animal
-              </label>
-              <input
-                id="aid"
-                type="number"
-                value={formData.aid}
-                disabled
-                className={styles.inputDisabled}
-              />
-              <p className={styles.helpText}>Campo de solo lectura</p>
-            </div>
-
-            <div className={styles.formGroup}>
-              <label htmlFor="created_at" className={styles.label}>
-                Creado en
-              </label>
-              <input
-                id="created_at"
-                type="text"
-                value={new Date(formData.created_at).toLocaleString('es-MX')}
-                disabled
-                className={styles.inputDisabled}
-              />
-              <p className={styles.helpText}>Campo de solo lectura</p>
-            </div>
-          </fieldset>
-
           {/* Form Actions */}
           <div className={styles.formActions}>
             <button
@@ -392,7 +354,7 @@ export default function EditAnimalForm({ animal, onSave }: EditAnimalFormProps) 
               disabled={isLoading}
               className={styles.submitButton}
             >
-              {isLoading ? "Guardando..." : "Guardar Cambios"}
+              {isLoading ? "Creando..." : "Crear Animal"}
             </button>
           </div>
         </form>
