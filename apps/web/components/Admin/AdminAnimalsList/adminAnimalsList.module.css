@@ -33,7 +33,7 @@
 
 .createButton {
   padding: var(--space-3) var(--space-5);
-  background-color: var(--color-secondary);
+  background-color: var(--color-primary);
   color: var(--color-text-inverse);
   border: none;
   border-radius: var(--radius-md);
@@ -47,7 +47,8 @@
 }
 
 .createButton:hover {
-  background-color: var(--color-secondary-hover);
+  background-color: var(--color-primary-hover);
+  color: var(--color-primary-soft);
 }
 
 .filterSection {
