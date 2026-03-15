@@ -17,7 +17,7 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
   // Handle error state
   if (error) {
     return (
-      <main className={styles.mainContainer}>
+      <main>
         <div className={styles.errorContainer}>
           <h1>Error</h1>
           <p>{error}</p>
@@ -29,7 +29,7 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
   // Handle not found state
   if (notFound) {
     return (
-      <main className={styles.mainContainer}>
+      <main>
         <div className={styles.notFoundContainer}>
           <h1>Animal Not Found</h1>
           <p>The animal you&apos;re trying to edit could not be found.</p>
@@ -41,7 +41,7 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
   // Handle missing animal
   if (!animal) {
     return (
-      <main className={styles.mainContainer}>
+      <main>
         <div className={styles.notFoundContainer}>
           <h1>Loading...</h1>
           <p>Please wait while we load the animal data.</p>
@@ -178,7 +178,7 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
   };
 
   return (
-    <main className={styles.mainContainer}>
+    <main>
       <div className={styles.container}>
         <div className={styles.formWrapper}>
         <div className={styles.headerWithBackButton}>

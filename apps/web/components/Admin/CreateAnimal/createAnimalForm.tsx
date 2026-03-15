@@ -154,7 +154,7 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
   };
 
   return (
-    <main className={styles.mainContainer}>
+    <main>
       <div className={styles.container}>
         <div className={styles.formWrapper}>
         <div className={styles.headerWithBackButton}>

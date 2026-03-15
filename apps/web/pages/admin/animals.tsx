@@ -24,16 +24,7 @@ export default function AdminAnimalsPage({ animals }: AdminAnimalsPageProps) {
   return (
     <>
       <HeaderSection />
-      <main
-        style={{
-          minHeight: "100vh",
-          padding: "2rem",
-          maxWidth: "1200px",
-          margin: "0 auto",
-        }}
-      >
-        <AdminAnimalsList initialAnimals={animals} />
-      </main>
+      <AdminAnimalsList initialAnimals={animals} />
       <FooterSection />
     </>
   );

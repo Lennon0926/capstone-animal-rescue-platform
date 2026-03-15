@@ -236,7 +236,8 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
   }
 
   return (
-    <div className={styles.container}>
+    <main>
+      <div className={styles.container}>
       <div className={styles.header}>
         <div>
           <h1>Gestión de Animales</h1>
@@ -377,7 +378,7 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
                     </div>
                   </th>
                   <th>Imagen</th>
-                  <th>Acciones</th>
+                  <th className={styles.actionsHeader}></th>
                 </tr>
               </thead>
               <tbody>
@@ -472,5 +473,6 @@ export default function AdminAnimalsList({ initialAnimals }: AdminAnimalsListPro
         isDeleting={isDeleting}
       />
     </div>
+    </main>
   );
 }
