@@ -186,13 +186,9 @@
   justify-content: center;
 }
 
-.table td:first-child {
-  text-align: left;
-}
-
 .nameCell {
   font-weight: var(--font-weight-semibold);
-  text-align: left;
+  text-align: center;
 }
 
 .statusBadge {

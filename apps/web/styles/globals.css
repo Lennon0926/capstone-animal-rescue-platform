@@ -270,12 +270,3 @@ select {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
-
-
-/* Main Container for all pages */
-main {
-  min-height: 100vh;
-  padding: 2rem;
-  max-width: 100%;
-  margin: 0 auto;
-}
