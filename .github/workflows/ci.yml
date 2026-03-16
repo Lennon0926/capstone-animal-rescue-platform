@@ -20,9 +20,9 @@ jobs:
       run:
         working-directory: apps/web
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: npm
@@ -43,9 +43,9 @@ jobs:
       run:
         working-directory: apps/server
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: npm
@@ -66,9 +66,9 @@ jobs:
       run:
         working-directory: apps/web
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: npm
@@ -86,3 +86,113 @@ jobs:
         with:
           name: playwright-report
           path: apps/web/playwright-report/
+
+  deploy-staging:
+    name: Deploy – Staging
+    needs: [web, server]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    environment:
+      name: staging
+      url: ${{ steps.deploy-web.outputs.url }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Deploy server → Vercel preview
+        id: deploy-server
+        working-directory: apps/server
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_SERVER_PROJECT_ID }}
+        run: |
+          vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
+          vercel build --token="$VERCEL_TOKEN"
+          DEPLOY_URL=$(vercel deploy --prebuilt --token="$VERCEL_TOKEN" | tail -1)
+          echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy web → Vercel preview
+        id: deploy-web
+        working-directory: apps/web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WEB_PROJECT_ID }}
+        run: |
+          vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
+          vercel build --token="$VERCEL_TOKEN"
+          DEPLOY_URL=$(vercel deploy --prebuilt --token="$VERCEL_TOKEN" | tail -1)
+          echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke test – server /health
+        run: |
+          curl --fail --retry 5 --retry-delay 5 --retry-connrefused \
+            "${{ steps.deploy-server.outputs.url }}/health"
+
+      - name: Smoke test – server /ready
+        run: |
+          curl --fail --retry 5 --retry-delay 5 --retry-connrefused \
+            "${{ steps.deploy-server.outputs.url }}/ready"
+
+      - name: Smoke test – web root
+        run: |
+          curl --fail --retry 5 --retry-delay 5 --retry-connrefused \
+            "${{ steps.deploy-web.outputs.url }}"
+
+  deploy-production:
+    name: Deploy – Production
+    needs: [web, server]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: production
+      url: ${{ steps.deploy-web.outputs.url }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Deploy server → Vercel production
+        id: deploy-server
+        working-directory: apps/server
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_SERVER_PROJECT_ID }}
+        run: |
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          vercel build --token="$VERCEL_TOKEN"
+          DEPLOY_URL=$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN" | tail -1)
+          echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy web → Vercel production
+        id: deploy-web
+        working-directory: apps/web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WEB_PROJECT_ID }}
+        run: |
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          vercel build --token="$VERCEL_TOKEN"
+          DEPLOY_URL=$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN" | tail -1)
+          echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke test – server /health
+        run: |
+          curl --fail --retry 5 --retry-delay 5 --retry-connrefused \
+            "${{ steps.deploy-server.outputs.url }}/health"
+
+      - name: Smoke test – server /ready
+        run: |
+          curl --fail --retry 5 --retry-delay 5 --retry-connrefused \
+            "${{ steps.deploy-server.outputs.url }}/ready"
+
+      - name: Smoke test – web root
+        run: |
+          curl --fail --retry 5 --retry-delay 5 --retry-connrefused \
+            "${{ steps.deploy-web.outputs.url }}"
