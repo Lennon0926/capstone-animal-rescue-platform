@@ -105,7 +105,7 @@ const formUrl = buildAdoptionFormUrl(animal.aid, animal.name);
 
 | Parameter | Field in form | Example |
 |-----------|--------------|---------|
-| `entry.1580902172` | "Animal interested in" | `entry.1580902172=Max` |
+| `entry.765999001` | "Animal al que desea adoptar" | `entry.765999001=Max` |
 
 The animal's name is passed to the "Animal interested in" field so staff can immediately see which animal the applicant wants to adopt without having to ask.
 
