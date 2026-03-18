@@ -14,10 +14,13 @@ export function buildAdoptionFormUrl(
   const base = process.env.NEXT_PUBLIC_GOOGLE_FORM_URL;
   if (!base) return null;
 
+  // Strip the base URL to just the viewform path (remove any ?usp=... Google appends to sharing links)
+  const viewformUrl = base.split("?")[0];
+
   const params = new URLSearchParams({
     "entry.ANIMAL_ID_ENTRY": String(animalId),
     "entry.ANIMAL_NAME_ENTRY": animalName,
   });
 
-  return `${base}?${params.toString()}`;
+  return `${viewformUrl}?${params.toString()}`;
 }
