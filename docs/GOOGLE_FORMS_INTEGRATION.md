@@ -78,31 +78,7 @@ function onFormSubmit(e) {
 }
 ```
 
-### 4. Find Your Form's Entry IDs (for pre-filling)
-
-The "Iniciar Proceso de Adopción" button pre-fills the animal's ID and name into the form via URL parameters. To enable this you need the `entry.*` IDs for the two hidden fields.
-
-**Steps:**
-1. Open your form in a browser and click the **⋮ menu** → **Get pre-filled link**
-2. Fill in placeholder values for the "Animal ID" and "Animal Name" fields
-3. Click **Get link** — Google generates a URL like:
-   ```
-   https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform?entry.123456789=test-id&entry.987654321=test-name
-   ```
-4. The numbers after `entry.` are your field IDs
-5. Open `apps/web/hooks/useAdoptionFormUrl.ts` and replace the placeholder strings:
-
-```ts
-// Replace these:
-"entry.ANIMAL_ID_ENTRY": String(animalId),
-"entry.ANIMAL_NAME_ENTRY": animalName,
-
-// With the real IDs, e.g.:
-"entry.123456789": String(animalId),
-"entry.987654321": animalName,
-```
-
-### 5. Add Form URL to Environment
+### 4. Add Form URL to Environment
 
 **`apps/web/.env.local`:**
 ```env
@@ -127,12 +103,11 @@ const formUrl = buildAdoptionFormUrl(animal.aid, animal.name);
 
 ### Pre-filled URL Format
 
-| Parameter | Value | Example |
-|-----------|-------|---------|
-| `entry.ANIMAL_ID_ENTRY` | Animal's numeric ID | `entry.123456789=42` |
-| `entry.ANIMAL_NAME_ENTRY` | Animal's name | `entry.987654321=Max` |
+| Parameter | Field in form | Example |
+|-----------|--------------|---------|
+| `entry.1580902172` | "Animal interested in" | `entry.1580902172=Max` |
 
-Replace the placeholder strings with the real entry IDs from your form (see step 4 above).
+The animal's name is passed to the "Animal interested in" field so staff can immediately see which animal the applicant wants to adopt without having to ask.
 
 ### Where the button appears
 
