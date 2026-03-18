@@ -14,6 +14,8 @@ const VALID_FILTERS = {
   size: ["eq"],
   gender: ["eq"],
   name: ["ilike"],
+  tags: ["cs"],
+  search: ["or"], // Combined search for name + tags
 };
 
 /**
@@ -53,9 +55,15 @@ async function getAnimals(options = {}) {
     for (const [field, value] of Object.entries(filters)) {
       if (!value || !VALID_FILTERS[field]) continue;
 
-      if (VALID_FILTERS[field].includes("ilike") && field === "name") {
+      if (field === "search") {
+        // Combined search: match name OR any tag (case-insensitive)
+        query = query.or(`name.ilike.%${value}%,tags.cs.{${value.toLowerCase()}}`);
+      } else if (VALID_FILTERS[field].includes("ilike") && field === "name") {
         // Partial name match (case-insensitive)
         query = query.ilike(field, `%${value}%`);
+      } else if (field === "tags") {
+        // Search within tags array (contains)
+        query = query.contains(field, [value.toLowerCase()]);
       } else if (VALID_FILTERS[field].includes("ilike") && field === "species") {
         // Species can be exact or partial match
         query = query.ilike(field, `%${value}%`);

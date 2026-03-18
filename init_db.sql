@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS public.animals (
     gender VARCHAR(20) CHECK (gender IN ('male', 'female', 'unknown')),
     status VARCHAR(20) DEFAULT 'available' CHECK (status IN ('available', 'adopted', 'pending', 'fostered', 'medical_hold')),
     image_url TEXT,
+    tags TEXT[] DEFAULT '{}',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     record_id INTEGER
 );
@@ -28,6 +29,7 @@ CREATE TABLE IF NOT EXISTS public.animals (
 -- Index for common queries
 CREATE INDEX IF NOT EXISTS idx_animals_status ON public.animals(status);
 CREATE INDEX IF NOT EXISTS idx_animals_species ON public.animals(species);
+CREATE INDEX IF NOT EXISTS idx_animals_tags ON public.animals USING GIN(tags);
 
 COMMENT ON TABLE public.animals IS 'Animal catalog with adoption status and attributes';
 
