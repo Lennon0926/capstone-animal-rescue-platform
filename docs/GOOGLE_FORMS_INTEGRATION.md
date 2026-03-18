@@ -78,47 +78,66 @@ function onFormSubmit(e) {
 }
 ```
 
-### 4. Add Form Link to Frontend
+### 4. Find Your Form's Entry IDs (for pre-filling)
 
-Configure the form URL in the frontend environment:
+The "Iniciar Proceso de Adopción" button pre-fills the animal's ID and name into the form via URL parameters. To enable this you need the `entry.*` IDs for the two hidden fields.
+
+**Steps:**
+1. Open your form in a browser and click the **⋮ menu** → **Get pre-filled link**
+2. Fill in placeholder values for the "Animal ID" and "Animal Name" fields
+3. Click **Get link** — Google generates a URL like:
+   ```
+   https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform?entry.123456789=test-id&entry.987654321=test-name
+   ```
+4. The numbers after `entry.` are your field IDs
+5. Open `apps/web/hooks/useAdoptionFormUrl.ts` and replace the placeholder strings:
+
+```ts
+// Replace these:
+"entry.ANIMAL_ID_ENTRY": String(animalId),
+"entry.ANIMAL_NAME_ENTRY": animalName,
+
+// With the real IDs, e.g.:
+"entry.123456789": String(animalId),
+"entry.987654321": animalName,
+```
+
+### 5. Add Form URL to Environment
 
 **`apps/web/.env.local`:**
 ```env
 NEXT_PUBLIC_GOOGLE_FORM_URL=https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform
 ```
 
+Replace `YOUR_FORM_ID` with the ID from your form's share URL.
+
 ## Frontend Integration
 
-Example "Apply to Adopt" button component:
+### URL Builder (`apps/web/hooks/useAdoptionFormUrl.ts`)
 
-```tsx
-// components/AdoptButton.tsx
-import React from 'react';
+Centralizes URL construction so any component can build a pre-filled form link:
 
-interface AdoptButtonProps {
-  animalName?: string;
-}
+```ts
+import { buildAdoptionFormUrl } from "@/hooks/useAdoptionFormUrl";
 
-export function AdoptButton({ animalName }: AdoptButtonProps) {
-  const baseUrl = process.env.NEXT_PUBLIC_GOOGLE_FORM_URL;
-  
-  // Pre-fill animal name if provided (replace with your entry ID)
-  const url = animalName 
-    ? `${baseUrl}?entry.YOUR_ENTRY_ID=${encodeURIComponent(animalName)}`
-    : baseUrl;
-
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
-    >
-      Apply to Adopt
-    </a>
-  );
-}
+const formUrl = buildAdoptionFormUrl(animal.aid, animal.name);
+// → "https://docs.google.com/forms/d/e/.../viewform?entry.123456789=1&entry.987654321=Max"
+// → null if NEXT_PUBLIC_GOOGLE_FORM_URL is not set
 ```
+
+### Pre-filled URL Format
+
+| Parameter | Value | Example |
+|-----------|-------|---------|
+| `entry.ANIMAL_ID_ENTRY` | Animal's numeric ID | `entry.123456789=42` |
+| `entry.ANIMAL_NAME_ENTRY` | Animal's name | `entry.987654321=Max` |
+
+Replace the placeholder strings with the real entry IDs from your form (see step 4 above).
+
+### Where the button appears
+
+- **Animal detail page** (`AnimalInfoPage`): shown when `animal.status === "available"`. If the env var is not set, a fallback message is displayed instead.
+- **Landing page animal cards** (`AnimalsSection`): an "Adoptar" secondary button appears beside "Conoce Más" for available animals. Hidden when env var is not configured.
 
 ## Staff Workflow
 

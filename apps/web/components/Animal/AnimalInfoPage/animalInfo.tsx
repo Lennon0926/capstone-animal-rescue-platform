@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getAnimalImageUrl } from "@/utils/animalImages";
 import type { Animal } from "@/types/animal";
+import { buildAdoptionFormUrl } from "@/hooks/useAdoptionFormUrl";
 
 type AnimalInfoProps = {
   animal: Animal;
@@ -24,6 +25,7 @@ function formatStatus(status: string) {
 }
 
 export default function AnimalInfo({ animal }: AnimalInfoProps) {
+  const formUrl = buildAdoptionFormUrl(animal.aid, animal.name);
 
   return (
     <section className={styles.section}>
@@ -90,9 +92,23 @@ export default function AnimalInfo({ animal }: AnimalInfoProps) {
             )}
 
             <div className={styles.actions}>
-              <Link href="/adopt" className={styles.adoptButton}>
-                Iniciar Proceso de Adopción
-              </Link>
+              {animal.status === "available" ? (
+                formUrl ? (
+                  <a
+                    href={formUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.adoptButton}
+                  >
+                    Iniciar Proceso de Adopción
+                  </a>
+                ) : (
+                  <p className={styles.formUnavailable}>
+                    El formulario de adopción no está disponible en este momento.
+                    Contáctanos para más información.
+                  </p>
+                )
+              ) : null}
             </div>
           </div>
         </div>

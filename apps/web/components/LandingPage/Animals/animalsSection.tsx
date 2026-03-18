@@ -1,6 +1,7 @@
 import styles from "./animalsSection.module.css";
 import Link from "next/link";
 import Image from "next/image";
+import { buildAdoptionFormUrl } from "@/hooks/useAdoptionFormUrl";
 
 const mockAnimals = [
   {
@@ -69,12 +70,27 @@ export default function AnimalsSection() {
                   {animal.breed} • {animal.age}
                 </p>
 
-                <Link
-                href={`/animalInfo/${animal.id}`}
-                className={styles.learnMore}
-              >
-                Conoce Más
-              </Link>
+                <div className={styles.cardActions}>
+                  <Link
+                    href={`/animalInfo/${animal.id}`}
+                    className={styles.learnMore}
+                  >
+                    Conoce Más
+                  </Link>
+                  {animal.status === "Available" && (() => {
+                    const formUrl = buildAdoptionFormUrl(animal.id, animal.name);
+                    return formUrl ? (
+                      <a
+                        href={formUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.adoptButton}
+                      >
+                        Adoptar
+                      </a>
+                    ) : null;
+                  })()}
+                </div>
               </div>
             </div>
           ))}
