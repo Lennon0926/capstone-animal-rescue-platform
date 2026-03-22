@@ -2,6 +2,7 @@ import { FormEvent, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getAnimalImageUrl } from "@/utils/animalImages";
+import { uploadAnimalImage } from "@/services/animalImageUploadService";
 import type { Animal } from "@/types/animal";
 import styles from "./editAnimalForm.module.css";
 import { X, Plus, ArrowLeft } from "lucide-react";
@@ -54,13 +55,27 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [tagInput, setTagInput] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   // Reset form when animal changes
   useEffect(() => {
     setFormData(animal);
     setErrorMessage("");
     setSuccessMessage("");
+    setSelectedFile(null);
   }, [animal]);
+
+  // Create preview URL when file is selected
+  useEffect(() => {
+    if (selectedFile) {
+      const url = URL.createObjectURL(selectedFile);
+      setPreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setPreviewUrl(null);
+    }
+  }, [selectedFile]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -130,6 +145,22 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
     setIsLoading(true);
 
     try {
+      let updateBody: any = {
+        name: formData.name,
+        description: formData.description,
+        species: formData.species,
+        size: formData.size,
+        gender: formData.gender,
+        status: formData.status,
+        tags: formData.tags,
+      };
+
+      // If a new image was selected, upload it first
+      if (selectedFile) {
+        const uploadResult = await uploadAnimalImage(String(formData.aid), selectedFile);
+        updateBody.image_url = uploadResult.url;
+      }
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals/${formData.aid}`,
         {
@@ -137,15 +168,7 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            name: formData.name,
-            description: formData.description,
-            species: formData.species,
-            size: formData.size,
-            gender: formData.gender,
-            status: formData.status,
-            tags: formData.tags,
-          }),
+          body: JSON.stringify(updateBody),
         }
       );
 
@@ -160,6 +183,7 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
 
       const result = await response.json();
       setSuccessMessage("¡Animal actualizado exitosamente!");
+      setSelectedFile(null);
       
       // Call onSave callback if provided
       if (onSave) {
@@ -179,6 +203,18 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
 
   return (
     <main>
+      {/* Success Popup Modal */}
+      {successMessage && (
+        <>
+          <div className={styles.overlay} />
+          <div className={styles.successPopup} role="status">
+            <div className={styles.successPopupIcon}>✓</div>
+            <p className={styles.successPopupText}>¡Éxito!</p>
+            <p className={styles.successPopupSubtext}>{successMessage}</p>
+          </div>
+        </>
+      )}
+
       <div className={styles.container}>
         <Link href="/admin/animals" className={styles.backButton}>
             <ArrowLeft size={20} />
@@ -212,11 +248,6 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
           {errorMessage && (
             <div className={styles.errorMessage} role="alert">
               {errorMessage}
-            </div>
-          )}
-          {successMessage && (
-            <div className={styles.successMessage} role="status">
-              {successMessage}
             </div>
           )}
 
@@ -339,6 +370,48 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
             </div>
           </fieldset>
 
+          {/* Image Upload Section */}
+          <fieldset className={styles.fieldset}>
+            <legend className={styles.legend}>Actualizar Foto del Animal</legend>
+            
+            <div className={styles.formGroup}>
+              <label htmlFor="image" className={styles.label}>
+                Selecciona una nueva imagen (Opcional)
+              </label>
+              <p className={styles.helpText}>
+                Formatos permitidos: JPEG, PNG, WEBP. Tamaño máximo: 5 MB.
+              </p>
+              <input
+                id="image"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(event) => setSelectedFile(event.target.files?.[0] || null)}
+                className={styles.input}
+              />
+            </div>
+
+            {previewUrl && (
+              <div className={styles.formGroup}>
+                <p className={styles.label}>Vista previa de la nueva imagen:</p>
+                <div style={{
+                  width: "150px",
+                  height: "150px",
+                  position: "relative",
+                  borderRadius: "8px",
+                  overflow: "hidden",
+                  border: "2px solid #4CAF50",
+                }}>
+                  <Image
+                    src={previewUrl}
+                    alt="Vista previa"
+                    fill
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
+              </div>
+            )}
+          </fieldset>
+
           {/* Tags Section */}
           <fieldset className={styles.fieldset}>
             <legend className={styles.legend}>Etiquetas</legend>
@@ -430,7 +503,7 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
               disabled={isLoading}
               className={styles.submitButton}
             >
-              {isLoading ? "Guardando..." : "Guardar Cambios"}
+              {isLoading ? "Guardando cambios..." : "Guardar Cambios"}
             </button>
           </div>
         </form>
