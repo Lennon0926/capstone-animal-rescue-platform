@@ -1,6 +1,7 @@
 import { FormEvent, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { getAnimalImageUrl } from "@/utils/animalImages";
 import { uploadAnimalImage } from "@/services/animalImageUploadService";
 import type { Animal } from "@/types/animal";
@@ -50,6 +51,7 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
       </main>
     );
   }
+  const router = useRouter();
   const [formData, setFormData] = useState<Animal>(animal);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -76,6 +78,17 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
       setPreviewUrl(null);
     }
   }, [selectedFile]);
+
+  // Auto-close success message and redirect after 2 seconds
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage("");
+        router.push("/admin/animals");
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage, router]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
