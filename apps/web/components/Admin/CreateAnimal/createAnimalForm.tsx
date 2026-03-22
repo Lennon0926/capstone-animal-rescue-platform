@@ -179,6 +179,18 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
 
   return (
     <main>
+      {/* Success Popup Modal */}
+      {successMessage && (
+        <>
+          <div className={styles.overlay} />
+          <div className={styles.successPopup} role="status">
+            <div className={styles.successPopupIcon}>✓</div>
+            <p className={styles.successPopupText}>¡Éxito!</p>
+            <p className={styles.successPopupSubtext}>{successMessage}</p>
+          </div>
+        </>
+      )}
+
       <div className={styles.container}>
         <Link href="/admin/animals" className={styles.backButton}>
             <ArrowLeft size={20} />
@@ -194,11 +206,6 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
           {errorMessage && (
             <div className={styles.errorMessage} role="alert">
               {errorMessage}
-            </div>
-          )}
-          {successMessage && (
-            <div className={styles.successMessage} role="status">
-              {successMessage}
             </div>
           )}
 
