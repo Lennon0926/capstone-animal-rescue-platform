@@ -1,9 +1,11 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Animal } from "@/types/animal";
 import styles from "./createAnimalForm.module.css";
 import { X, Plus, ArrowLeft } from "lucide-react";
+import { uploadAnimalImage } from "@/services/animalImageUploadService";
 
 interface CreateAnimalFormProps {
   onSave?: (newAnimal: Animal) => void;
@@ -27,6 +29,8 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [tagInput, setTagInput] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -64,6 +68,16 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
     }
   };
 
+  useEffect(() => {
+    if (selectedFile) {
+      const url = URL.createObjectURL(selectedFile);
+      setPreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setPreviewUrl(null);
+    }
+  }, [selectedFile]);
+
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrorMessage("");
@@ -99,10 +113,19 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
       return;
     }
 
+    if (!selectedFile) {
+      setErrorMessage("La imagen es requerida.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const response = await fetch(
+      // Step 1: Upload image to Cloudflare R2 first
+      const uploadResult = await uploadAnimalImage("temp", selectedFile);
+      
+      // Step 2: Create animal record with image URL
+      const createResponse = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals`,
         {
           method: "POST",
@@ -117,12 +140,13 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
             gender: formData.gender,
             status: formData.status,
             tags: formData.tags || [],
+            image_url: uploadResult.url,
           }),
         }
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!createResponse.ok) {
+        const errorData = await createResponse.json();
         const errorMessage = 
           errorData?.error?.message || 
           errorData?.error || 
@@ -130,12 +154,14 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
         throw new Error(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
       }
 
-      const result = await response.json();
-      setSuccessMessage("¡Animal creado exitosamente!");
+      const createResult = await createResponse.json();
+      const newAnimal = createResult.data;
+
+      setSuccessMessage("¡Animal creado exitosamente con imagen!");
 
       // Call onSave callback if provided
       if (onSave) {
-        onSave(result.data);
+        onSave(newAnimal);
       }
 
       // Redirect to animal list after a short delay
@@ -295,6 +321,50 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
             </div>
           </fieldset>
 
+          {/* Image Upload Section */}
+          <fieldset className={styles.fieldset}>
+            <legend className={styles.legend}>Foto del Animal</legend>
+            
+            <div className={styles.formGroup}>
+              <label htmlFor="image" className={styles.label}>
+                Selecciona una imagen
+                <span className={styles.required}>*</span>
+              </label>
+              <p className={styles.helpText}>
+                Formatos permitidos: JPEG, PNG, WEBP. Tamaño máximo: 5 MB.
+              </p>
+              <input
+                id="image"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(event) => setSelectedFile(event.target.files?.[0] || null)}
+                className={styles.input}
+                required
+              />
+            </div>
+
+            {previewUrl && (
+              <div className={styles.formGroup}>
+                <p className={styles.label}>Vista previa de la imagen:</p>
+                <div style={{
+                  width: "150px",
+                  height: "150px",
+                  position: "relative",
+                  borderRadius: "8px",
+                  overflow: "hidden",
+                  border: "2px solid #4CAF50",
+                }}>
+                  <Image
+                    src={previewUrl}
+                    alt="Vista previa"
+                    fill
+                    style={{ objectFit: "cover" }}
+                  />
+                </div>
+              </div>
+            )}
+          </fieldset>
+
           {/* Tags Section */}
           <fieldset className={styles.fieldset}>
             <legend className={styles.legend}>Etiquetas (Opcional)</legend>
@@ -353,7 +423,7 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
               disabled={isLoading}
               className={styles.submitButton}
             >
-              {isLoading ? "Creando..." : "Crear Animal"}
+              {isLoading ? "Creando y subiendo imagen..." : "Crear Animal"}
             </button>
           </div>
         </form>
