@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import type { Animal } from "@/types/animal";
 import { getAnimalImageUrl } from "@/utils/animalImages";
 import styles from "./adminAnimalsList.module.css";
@@ -386,7 +387,7 @@ export default function AdminAnimalsList({
                         </span>
                       </td>
                       <td>
-                        <img
+                        <Image
                           src={getAnimalImageUrl(
                             animal.image_url,
                             animal.species,
@@ -394,6 +395,8 @@ export default function AdminAnimalsList({
                           )}
                           alt={animal.name}
                           className={styles.thumbnail}
+                          width={60}
+                          height={60}
                           onError={(e) => {
                             e.currentTarget.style.display = "none";
                           }}

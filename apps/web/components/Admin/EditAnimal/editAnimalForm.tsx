@@ -16,6 +16,47 @@ interface EditAnimalFormProps {
 }
 
 export default function EditAnimalForm({ animal, onSave, error, notFound }: EditAnimalFormProps) {
+  const router = useRouter();
+  const [formData, setFormData] = useState<Animal>(animal || {} as Animal);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [tagInput, setTagInput] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  // Reset form when animal changes
+  useEffect(() => {
+    if (animal) {
+      setFormData(animal);
+      setErrorMessage("");
+      setSuccessMessage("");
+      setSelectedFile(null);
+    }
+  }, [animal]);
+
+  // Create preview URL when file is selected
+  useEffect(() => {
+    if (selectedFile) {
+      const url = URL.createObjectURL(selectedFile);
+      setPreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
+    } else {
+      setPreviewUrl(null);
+    }
+  }, [selectedFile]);
+
+  // Auto-close success message and redirect after 2 seconds
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage("");
+        router.push("/admin/animals");
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage, router]);
+
   // Handle error state
   if (error) {
     return (
@@ -51,44 +92,6 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
       </main>
     );
   }
-  const router = useRouter();
-  const [formData, setFormData] = useState<Animal>(animal);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const [tagInput, setTagInput] = useState("");
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-  // Reset form when animal changes
-  useEffect(() => {
-    setFormData(animal);
-    setErrorMessage("");
-    setSuccessMessage("");
-    setSelectedFile(null);
-  }, [animal]);
-
-  // Create preview URL when file is selected
-  useEffect(() => {
-    if (selectedFile) {
-      const url = URL.createObjectURL(selectedFile);
-      setPreviewUrl(url);
-      return () => URL.revokeObjectURL(url);
-    } else {
-      setPreviewUrl(null);
-    }
-  }, [selectedFile]);
-
-  // Auto-close success message and redirect after 2 seconds
-  useEffect(() => {
-    if (successMessage) {
-      const timer = setTimeout(() => {
-        setSuccessMessage("");
-        router.push("/admin/animals");
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [successMessage, router]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -158,7 +161,7 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
     setIsLoading(true);
 
     try {
-      let updateBody: any = {
+      const updateBody: Partial<Animal> = {
         name: formData.name,
         description: formData.description,
         species: formData.species,
@@ -250,9 +253,6 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
                 style={{ objectFit: "cover" }}
               />
             </div>
-            {/* <p className={styles.imageNote}>
-              Para cambiar la imagen, usa la página <strong>Subir Foto del Animal</strong>.
-            </p> */}
           </div>
         )}
 
