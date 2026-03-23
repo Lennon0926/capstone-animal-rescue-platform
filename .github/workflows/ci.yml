@@ -126,24 +126,21 @@ jobs:
           echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
 
       - name: Smoke test – server /health
-        continue-on-error: true
         run: |
           curl --fail --retry 5 --retry-delay 5 --retry-connrefused \
-            -H "x-vercel-protection-bypass: ${{ secrets.VERCEL_BYPASS_SECRET }}" \
+            -H "x-vercel-protection-bypass: ${{ secrets.VERCEL_SERVER_BYPASS_SECRET }}" \
             "${{ steps.deploy-server.outputs.url }}/health"
 
       - name: Smoke test – server /ready
-        continue-on-error: true
         run: |
           curl --fail --retry 5 --retry-delay 5 --retry-connrefused \
-            -H "x-vercel-protection-bypass: ${{ secrets.VERCEL_BYPASS_SECRET }}" \
+            -H "x-vercel-protection-bypass: ${{ secrets.VERCEL_SERVER_BYPASS_SECRET }}" \
             "${{ steps.deploy-server.outputs.url }}/ready"
 
       - name: Smoke test – web root
-        continue-on-error: true
         run: |
           curl --fail --retry 5 --retry-delay 5 --retry-connrefused \
-            -H "x-vercel-protection-bypass: ${{ secrets.VERCEL_BYPASS_SECRET }}" \
+            -H "x-vercel-protection-bypass: ${{ secrets.VERCEL_WEB_BYPASS_SECRET }}" \
             "${{ steps.deploy-web.outputs.url }}"
 
   deploy-production:
@@ -185,22 +182,19 @@ jobs:
           echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
 
       - name: Smoke test – server /health
-        continue-on-error: true
         run: |
           curl --fail --retry 5 --retry-delay 5 --retry-connrefused \
-            -H "x-vercel-protection-bypass: ${{ secrets.VERCEL_BYPASS_SECRET }}" \
+            -H "x-vercel-protection-bypass: ${{ secrets.VERCEL_SERVER_BYPASS_SECRET }}" \
             "${{ steps.deploy-server.outputs.url }}/health"
 
       - name: Smoke test – server /ready
-        continue-on-error: true
         run: |
           curl --fail --retry 5 --retry-delay 5 --retry-connrefused \
-            -H "x-vercel-protection-bypass: ${{ secrets.VERCEL_BYPASS_SECRET }}" \
+            -H "x-vercel-protection-bypass: ${{ secrets.VERCEL_SERVER_BYPASS_SECRET }}" \
             "${{ steps.deploy-server.outputs.url }}/ready"
 
       - name: Smoke test – web root
-        continue-on-error: true
         run: |
           curl --fail --retry 5 --retry-delay 5 --retry-connrefused \
-            -H "x-vercel-protection-bypass: ${{ secrets.VERCEL_BYPASS_SECRET }}" \
+            -H "x-vercel-protection-bypass: ${{ secrets.VERCEL_WEB_BYPASS_SECRET }}" \
             "${{ steps.deploy-web.outputs.url }}"
