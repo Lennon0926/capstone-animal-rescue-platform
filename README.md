@@ -65,22 +65,52 @@ cp apps/web/.env.example apps/web/.env.local
 **Server** (`apps/server/.env.local`):
 
 ```env
+# Server
 PORT=4000
+
+# Supabase Configuration (Required)
+# Get these from: Supabase Dashboard > Project Settings > API
 SUPABASE_URL=https://your-project-ref.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
+
+# Note: SUPABASE_ANON_KEY is optional for the backend but required if you
+# need client-level RLS queries from the server.
+SUPABASE_ANON_KEY=your_anon_key_here
+
+# Cloudflare R2 Storage (Required)
+# Get these from: Cloudflare Dashboard > R2 > Manage R2 API Tokens
 R2_ACCOUNT_ID=your_cloudflare_account_id
 R2_ACCESS_KEY_ID=your_r2_access_key_id
 R2_SECRET_ACCESS_KEY=your_r2_secret_access_key
 R2_BUCKET_NAME=your_bucket_name
+
+# Optional: Public base URL for uploaded files (e.g., custom domain via Cloudflare)
+# Example: https://cdn.your-domain.com
+R2_PUBLIC_BASE_URL=
+
+# Optional: Override upload size limit in bytes (default: 5 MB)
+R2_MAX_IMAGE_SIZE_BYTES=5242880
+
+# Optional: Signed URL TTL in seconds when R2_PUBLIC_BASE_URL is not set (default: 1 hour)
+R2_SIGNED_READ_URL_TTL_SECONDS=3600
 ```
 
 **Web** (`apps/web/.env.local`):
 
 ```env
+# Backend API URL
+# Development: http://localhost:4000
+# Production: set to your deployed backend URL (e.g., Railway)
 NEXT_PUBLIC_API_BASE_URL=http://localhost:4000
-NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
-NEXT_PUBLIC_GOOGLE_FORM_URL=https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform
+
+# Supabase Configuration (for client-side access)
+# Get these from: Supabase Dashboard > Project Settings > API
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+
+# Google Forms Integration
+# URL for the adoption application form
+NEXT_PUBLIC_GOOGLE_FORM_URL=your-google-form-url
 ```
 
 > See [docs/SECRETS_MANAGEMENT.md](docs/SECRETS_MANAGEMENT.md) for the full variable reference, optional vars, and secret rotation procedures.
@@ -165,14 +195,17 @@ The `/ready` endpoint also returns `503` if any required variable is absent — 
 ## Testing
 
 ```bash
-# Server tests
+# Server unit tests
 cd apps/server && npm test
 
-# Web tests
+# Web unit tests
 cd apps/web && npm test
+
+# Web E2E tests (Playwright — requires no running dev server)
+cd apps/web && npm run test:e2e
 ```
 
-CI runs lint, build, and tests for both apps on every push and pull request to `main` and `develop`. Required GitHub Secrets are validated before any job runs.
+CI runs lint, build, unit tests, and E2E tests for every push and pull request to `main` and `develop`.
 
 ## Documentation
 
