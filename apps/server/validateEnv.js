@@ -1,4 +1,4 @@
-const REQUIRED_ENV_VARS = ["PORT"];
+const REQUIRED_ENV_VARS = ["SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"];
 
 function validateEnv() {
   const missing = REQUIRED_ENV_VARS.filter((key) => !process.env[key]);

@@ -1,167 +1,26 @@
 const path = require("path");
-const {
-  S3Client,
-  PutObjectCommand,
-  GetObjectCommand,
-} = require("@aws-sdk/client-s3");
-const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const express = require("express");
-const multer = require("multer");
 
 dotenv.config({ path: path.resolve(__dirname, ".env.local") });
-const { validateEnv, REQUIRED_ENV_VARS } = require("./validateEnv");
+const { validateEnv } = require("./validateEnv");
 
 validateEnv();
 
-// Import custom modules
-const { verifyConnection } = require("./lib/supabase");
+const healthRouter = require("./routes/health");
 const animalsRouter = require("./routes/animals");
+const uploadsRouter = require("./routes/uploads");
 const { errorHandler, notFoundHandler } = require("./middleware/errorHandler");
 
 const app = express();
 const port = Number(process.env.PORT) || 4000;
-const startedAt = new Date().toISOString();
-
-const ALLOWED_MIME_TYPES = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-]);
-const DEFAULT_MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
-const DEFAULT_SIGNED_READ_URL_TTL_SECONDS = 60 * 60;
-const ANIMAL_ID_PATTERN = /^[a-zA-Z0-9_-]{1,64}$/;
-const MIME_TYPE_EXTENSION_MAP = {
-  "image/jpeg": "jpg",
-  "image/png": "png",
-  "image/webp": "webp",
-};
-
-const parsePositiveInteger = (rawValue, fallback) => {
-  const parsedValue = Number(rawValue);
-  if (!Number.isFinite(parsedValue) || parsedValue <= 0) {
-    return fallback;
-  }
-
-  return Math.floor(parsedValue);
-};
-
-const maxImageSizeBytes = parsePositiveInteger(
-  process.env.R2_MAX_IMAGE_SIZE_BYTES,
-  DEFAULT_MAX_IMAGE_SIZE_BYTES
-);
-const signedReadUrlTtlSeconds = parsePositiveInteger(
-  process.env.R2_SIGNED_READ_URL_TTL_SECONDS,
-  DEFAULT_SIGNED_READ_URL_TTL_SECONDS
-);
-
-const r2Config = {
-  accountId: process.env.R2_ACCOUNT_ID,
-  accessKeyId: process.env.R2_ACCESS_KEY_ID,
-  secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
-  bucketName: process.env.R2_BUCKET_NAME,
-  publicBaseUrl: process.env.R2_PUBLIC_BASE_URL,
-};
-
-const missingR2EnvVars = Object.entries({
-  R2_ACCOUNT_ID: r2Config.accountId,
-  R2_ACCESS_KEY_ID: r2Config.accessKeyId,
-  R2_SECRET_ACCESS_KEY: r2Config.secretAccessKey,
-  R2_BUCKET_NAME: r2Config.bucketName,
-})
-  .filter(([, value]) => !value)
-  .map(([key]) => key);
-
-const isR2Configured = missingR2EnvVars.length === 0;
-const r2Client = isR2Configured
-  ? new S3Client({
-      region: "auto",
-      endpoint: `https://${r2Config.accountId}.r2.cloudflarestorage.com`,
-      credentials: {
-        accessKeyId: r2Config.accessKeyId,
-        secretAccessKey: r2Config.secretAccessKey,
-      },
-    })
-  : null;
-
-if (!isR2Configured) {
-  console.warn(
-    `[r2] Upload endpoint disabled. Missing environment variables: ${missingR2EnvVars.join(
-      ", "
-    )}`
-  );
-}
-
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: maxImageSizeBytes,
-    files: 1,
-  },
-});
-
-const getErrorPayload = (code, message, details) => ({
-  error: {
-    code,
-    message,
-    ...(details ? { details } : {}),
-  },
-});
-
-const sanitizeFilename = (rawFilename, mimeType) => {
-  const sourceFilename =
-    typeof rawFilename === "string" && rawFilename.trim()
-      ? rawFilename.trim()
-      : "image";
-  const sourceExtension = path
-    .extname(sourceFilename)
-    .toLowerCase()
-    .replace(/[^a-z0-9.]/g, "");
-  const baseName = path.basename(sourceFilename, path.extname(sourceFilename));
-
-  const safeBaseName =
-    baseName
-      .toLowerCase()
-      .replace(/[^a-z0-9-_]/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/^-|-$/g, "")
-      .slice(0, 80) || "image";
-
-  const fallbackExtension = MIME_TYPE_EXTENSION_MAP[mimeType] || "bin";
-  const safeExtension = sourceExtension || `.${fallbackExtension}`;
-
-  return `${safeBaseName}${safeExtension}`;
-};
-
-const getObjectUrl = async (objectKey, client) => {
-  const encodedObjectKey = objectKey
-    .split("/")
-    .map((part) => encodeURIComponent(part))
-    .join("/");
-
-  if (r2Config.publicBaseUrl) {
-    const baseUrlWithoutTrailingSlash = r2Config.publicBaseUrl.replace(
-      /\/+$/,
-      ""
-    );
-    return `${baseUrlWithoutTrailingSlash}/${encodedObjectKey}`;
-  }
-
-  return getSignedUrl(
-    client,
-    new GetObjectCommand({
-      Bucket: r2Config.bucketName,
-      Key: objectKey,
-    }),
-    { expiresIn: signedReadUrlTtlSeconds }
-  );
-};
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
+<<<<<<< HEAD
 // Swagger UI - only enabled in non-production environments
 if (process.env.NODE_ENV !== "production") {
   const swaggerUi = require("swagger-ui-express");
@@ -533,36 +392,39 @@ app.use((error, req, res, next) => {
     );
 });
 
-// API Routes
+// Routes
 app.use("/api/animals", animalsRouter);
+app.use("/api/uploads", uploadsRouter);
+app.use("/", healthRouter);
 
 // Error handling
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-// Start server
-const server = app.listen(port, () => {
-  console.log(`Server started on port ${port}`);
-  console.log(`Health check: http://localhost:${port}/api/health`);
-  console.log(`Animals API: http://localhost:${port}/api/animals`);
-  if (process.env.NODE_ENV !== "production") {
-    console.log(`API Documentation: http://localhost:${port}/api-docs`);
-  }
-});
-
-// Graceful shutdown handling
-const shutdown = (signal) => {
-  console.log(`\n${signal} received, shutting down gracefully...`);
-  server.close(() => {
-    console.log("Server closed");
-    process.exit(0);
+if (require.main === module) {
+  const server = app.listen(port, () => {
+    console.log(`Server started on port ${port}`);
+    console.log(`Health check: http://localhost:${port}/api/health`);
+    console.log(`Animals API: http://localhost:${port}/api/animals`);
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`API Documentation: http://localhost:${port}/api-docs`);
+    }
   });
-  // Force exit after 5 seconds if server doesn't close
-  setTimeout(() => {
-    console.error("Forcing shutdown after timeout");
-    process.exit(1);
-  }, 5000);
-};
 
-process.on("SIGTERM", () => shutdown("SIGTERM"));
-process.on("SIGINT", () => shutdown("SIGINT"));
+  const shutdown = (signal) => {
+    console.log(`\n${signal} received, shutting down gracefully...`);
+    server.close(() => {
+      console.log("Server closed");
+      process.exit(0);
+    });
+    setTimeout(() => {
+      console.error("Forcing shutdown after timeout");
+      process.exit(1);
+    }, 5000);
+  };
+
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+  process.on("SIGINT", () => shutdown("SIGINT"));
+}
+
+module.exports = app;

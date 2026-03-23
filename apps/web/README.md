@@ -1,40 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# Web — Next.js Frontend
 
-## Getting Started
+The animal rescue platform frontend, built with Next.js (Pages Router), React, TypeScript, and Tailwind CSS.
 
-First, run the development server:
+## Pages
+
+| Route | Description |
+|-------|-------------|
+| `/home` | Landing page — hero, mission, animal cards, adoption steps, donation banner |
+| `/adopt` | Animal listing with search, species/tag filters, and pagination |
+| `/adopt/[id]` | Animal detail page |
+| `/about` | Organization info — mission, history, values, team, contact |
+| `/blog` | Blog |
+| `/donation` | Donation page |
+
+## Development
 
 ```bash
+# Install dependencies
+npm install
+
+# Start dev server (http://localhost:3000)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Lint
+npm run lint
+
+# Production build
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Requires `NEXT_PUBLIC_API_BASE_URL` pointing to the backend (default: `http://localhost:4000`).
+Copy `.env.example` → `.env.local` and fill in values.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## Testing
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+```bash
+# Unit tests (Jest + React Testing Library)
+npm test
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+# E2E tests (Playwright — Desktop Chrome)
+npm run test:e2e
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+E2E tests live in `e2e/` and use a lightweight mock API server (port 4001) so no real backend is needed. The mock server starts automatically via `globalSetup`.
 
-## Learn More
+### E2E test files
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+| File | Page covered |
+|------|-------------|
+| `e2e/home.spec.ts` | `/home` |
+| `e2e/about.spec.ts` | `/about` |
+| `e2e/adopt.spec.ts` | `/adopt` |
+| `e2e/adopt-detail.spec.ts` | `/adopt/[id]` |
+| `e2e/blog.spec.ts` | `/blog` |
+| `e2e/donation.spec.ts` | `/donation` |

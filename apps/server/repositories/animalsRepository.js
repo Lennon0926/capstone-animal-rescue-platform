@@ -14,6 +14,8 @@ const VALID_FILTERS = {
   size: ["eq"],
   gender: ["eq"],
   name: ["ilike"],
+  tags: ["cs"],
+  search: ["or"], // Combined search for name + tags
 };
 
 /**
@@ -53,9 +55,15 @@ async function getAnimals(options = {}) {
     for (const [field, value] of Object.entries(filters)) {
       if (!value || !VALID_FILTERS[field]) continue;
 
-      if (VALID_FILTERS[field].includes("ilike") && field === "name") {
+      if (field === "search") {
+        // Combined search: match name OR any tag (case-insensitive)
+        query = query.or(`name.ilike.%${value}%,tags.cs.{${value.toLowerCase()}}`);
+      } else if (VALID_FILTERS[field].includes("ilike") && field === "name") {
         // Partial name match (case-insensitive)
         query = query.ilike(field, `%${value}%`);
+      } else if (field === "tags") {
+        // Search within tags array (contains)
+        query = query.contains(field, [value.toLowerCase()]);
       } else if (VALID_FILTERS[field].includes("ilike") && field === "species") {
         // Species can be exact or partial match
         query = query.ilike(field, `%${value}%`);
@@ -147,10 +155,99 @@ async function getDistinctValues(field) {
   }
 }
 
+/**
+ * Inserts a new animal record into the database.
+ * 
+ * @param {*} animalData 
+ * @returns 
+ */
+async function createAnimal(animalData) {
+  try {
+    const client = getSupabaseClient();
+
+    const { data, error } = await client
+      .from("animals")
+      .insert(animalData)
+      .select("*")
+      .single();
+
+    if (error) {
+      return { data: null, error: error.message };
+    }
+
+    return { data, error: null };
+  } catch (err) {
+    return { data: null, error: err.message };
+  }
+}
+
+/**
+ * Deletes an animal record by ID.
+ * 
+ * @param {number} aid 
+ * @returns 
+ */
+async function deleteAnimal(aid) {
+  try {
+    const client = getSupabaseClient();
+    const { data, error } = await client
+      .from("animals")
+      .delete()
+      .eq("aid", aid)
+      .select("*")
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") {
+        return { data: null, error: "Animal not found" };
+      }
+      return { data: null, error: error.message };
+    }
+
+    return { data, error: null };
+  } catch (err) {
+    return { data: null, error: err.message };  
+  }
+}
+
+/**
+ * Updates an animal by ID.
+ *
+ * @param {number} aid - Animal ID
+ * @param {Object} updates - Fields to update
+ * @returns {Promise<{data: Object|null, error?: string}>}
+ */
+async function updateAnimalById(aid, updates) {
+  try {
+    const client = getSupabaseClient();
+
+    const { data, error } = await client
+      .from("animals")
+      .update(updates)
+      .eq("aid", aid)
+      .select("*")
+      .single();
+
+    if (error) {
+      if (error.code === "PGRST116") {
+        return { data: null, error: "Animal not found" };
+      }
+      return { data: null, error: error.message };
+    }
+
+    return { data, error: null };
+  } catch (err) {
+    return { data: null, error: err.message };
+  }
+}
+
 module.exports = {
   getAnimals,
   getAnimalById,
   getDistinctValues,
+  createAnimal,
+  deleteAnimal,
+  updateAnimalById,
   VALID_FILTERS,
   VALID_SORT_FIELDS,
 };

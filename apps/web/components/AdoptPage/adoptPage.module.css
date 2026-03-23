@@ -1,0 +1,393 @@
+/* Minimalist YouTube-style Adopt Page */
+
+.page {
+  min-height: 100vh;
+  background-color: var(--color-bg);
+  padding: var(--space-4);
+}
+
+/* Search Bar - YouTube style */
+.searchBar {
+  display: flex;
+  align-items: center;
+  max-width: 600px;
+  margin: 0 auto var(--space-6);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 40px;
+  padding: var(--space-2) var(--space-4);
+  transition: box-shadow var(--transition-fast);
+}
+
+.searchBar:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.searchIcon {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-base);
+  color: var(--color-text);
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-muted);
+}
+
+/* Filter Tags - YouTube chip style with multi-select */
+.tagsContainer {
+  max-width: 1000px;
+  margin: 0 auto var(--space-6);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.tag {
+  flex-shrink: 0;
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--color-primary-soft);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.tag:hover {
+  background-color: var(--color-border);
+}
+
+.tagActive {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.tagActive:hover {
+  background-color: var(--color-primary-hover);
+}
+
+
+
+/* Animals Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+/* Flip Card */
+.cardContainer {
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  transform-style: preserve-3d;
+  transition: transform 0.5s ease;
+}
+
+.cardFlipped {
+  transform: rotateY(180deg);
+}
+
+.cardFace {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* Front */
+.cardFront {
+  background-color: var(--color-primary-soft);
+}
+
+.imageWrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.imageWrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cardOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-4);
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  color: var(--color-text-inverse);
+}
+
+.cardName {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 2px;
+}
+
+.cardSpecies {
+  font-size: var(--text-sm);
+  opacity: 0.85;
+}
+
+.flipHint {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  color: var(--color-text);
+}
+
+/* Back */
+.cardBack {
+  background-color: var(--color-surface);
+  transform: rotateY(180deg);
+  padding: var(--space-5);
+}
+
+.cardBackContent {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: var(--space-2);
+  overflow-y: auto;
+}
+
+.cardBackHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cardBackName {
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.status {
+  font-size: var(--text-xs);
+  padding: 4px 10px;
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-weight-medium);
+}
+
+.statusAvailable {
+  background-color: var(--status-available-bg);
+  color: var(--status-available-text);
+}
+
+.statusPending {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.statusAdopted {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.statusFostered {
+  background-color: #ede9fe;
+  color: #5b21b6;
+}
+
+.statusMedical_hold {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.cardDetails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.detailItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.detailIcon {
+  color: var(--color-primary);
+}
+
+.cardDescription {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  flex: 1;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.learnMore {
+  margin-top: auto;
+  padding: var(--space-3);
+  text-align: center;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--color-text-inverse);
+  background-color: var(--color-primary);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  transition: background-color var(--transition-fast);
+}
+
+.learnMore:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* Card Tags */
+.cardTags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-1);
+}
+
+.tagIcon {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.cardTag {
+  display: inline-block;
+  padding: 2px 8px;
+  background-color: var(--color-primary-soft);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  color: var(--color-text);
+}
+
+/* Empty State */
+.empty {
+  text-align: center;
+  padding: var(--space-16) 0;
+  color: var(--color-text-muted);
+}
+
+/* Results Count */
+.resultsCount {
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+}
+
+/* Load More */
+.loadMoreWrapper {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-8) 0;
+}
+
+.loadMoreBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-6);
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.loadMoreBtn:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+  }
+
+  .card {
+    aspect-ratio: 2 / 3.5;
+  }
+
+  .cardBack {
+    padding: var(--space-3);
+  }
+
+  .cardBackName {
+    font-size: var(--text-base);
+  }
+
+  .status {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+
+  .detailItem {
+    font-size: var(--text-xs);
+  }
+
+  .cardDescription {
+    font-size: var(--text-xs);
+    -webkit-line-clamp: 2;
+  }
+
+  .learnMore {
+    padding: var(--space-2);
+    font-size: var(--text-xs);
+  }
+
+  .cardTag {
+    font-size: 10px;
+    padding: 1px 5px;
+  }
+
+  .searchBar {
+    margin-bottom: var(--space-4);
+  }
+
+  .tags {
+    margin-bottom: var(--space-4);
+  }
+}

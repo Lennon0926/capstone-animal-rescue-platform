@@ -7,12 +7,14 @@
   "type": "commonjs",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --verbose",
     "start": "node server",
     "dev": "nodemon server",
     "seed": "node scripts/seed.js",
     "seed:force": "node scripts/seed.js --force",
-    "seed:append": "node scripts/seed.js --append"
+    "seed:append": "node scripts/seed.js --append",
+    "migrate:image-urls": "node scripts/migrateImageUrls.js",
+    "migrate:image-urls:apply": "node scripts/migrateImageUrls.js --apply"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.998.0",
@@ -24,7 +26,9 @@
     "multer": "^2.0.2"
   },
   "devDependencies": {
+    "jest": "^30.2.0",
     "nodemon": "^3.1.11",
+    "supertest": "^7.2.2",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   },

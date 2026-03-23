@@ -4,6 +4,7 @@
 # GitHub Copilot skills
 .github/*
 !.github/workflows/
+!.github/dependabot.yml
 
 # Python local env/cache artifacts
 venv/

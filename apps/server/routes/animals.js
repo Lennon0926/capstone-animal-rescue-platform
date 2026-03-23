@@ -10,8 +10,11 @@ const {
   getAnimals,
   getAnimalById,
   getDistinctValues,
+  createAnimal,
+  deleteAnimal,
+  updateAnimalById
 } = require("../repositories/animalsRepository");
-const { validateAnimalsQuery, validateAnimalId } = require("../middleware/validation");
+const { validateAnimalsQuery, validateAnimalId, validateCreateAnimal, validateUpdateAnimal } = require("../middleware/validation");
 const { asyncHandler, ApiError } = require("../middleware/errorHandler");
 
 /**
@@ -163,6 +166,14 @@ router.get(
       getDistinctValues("gender"),
     ]);
 
+    const errors = [speciesResult, statusResult, sizeResult, genderResult]
+      .filter((r) => r.error)
+      .map((r) => r.error);
+
+    if (errors.length > 0) {
+      throw new ApiError(500, "Failed to fetch filter options", errors.join("; "));
+    }
+
     res.json({
       success: true,
       data: {
@@ -227,6 +238,78 @@ router.get(
 
     if (result.error) {
       throw new ApiError(500, "Failed to fetch animal", result.error);
+    }
+
+    res.json({
+      success: true,
+      data: result.data,
+    });
+  })
+);
+
+/**
+ * POST /api/animals
+ * Creates a new animal.
+ */
+router.post(
+  "/",
+  validateCreateAnimal,
+  asyncHandler(async (req, res) => {
+    const result = await createAnimal(req.validatedBody);
+
+    if (result.error) {
+      throw new ApiError(500, "Failed to create animal", result.error);
+    }
+
+    res.status(201).json({
+      success: true,
+      data: result.data,
+    });
+  })
+);
+
+/**
+ * DELETE /api/animals/:aid
+ * Deletes an animal by ID.
+ */
+router.delete(
+  "/:aid",
+  validateAnimalId,
+  asyncHandler(async (req, res) => {
+    const result = await deleteAnimal(req.params.aid);
+
+    if (result.error === "Animal not found") {
+      throw new ApiError(404, `Animal with ID ${req.params.aid} not found`);
+    }
+
+    if (result.error) {
+      throw new ApiError(500, "Failed to delete animal", result.error);
+    }
+
+    res.json({
+      success: true,
+      data: result.data,
+    });
+  })
+);
+
+/**
+ * PATCH /api/animals/:aid
+ * Updates an animal by ID.
+ */
+router.patch(
+  "/:aid",
+  validateAnimalId,
+  validateUpdateAnimal,
+  asyncHandler(async (req, res) => {
+    const result = await updateAnimalById(req.params.aid, req.validatedBody);
+
+    if (result.error === "Animal not found") {
+      throw new ApiError(404, `Animal with ID ${req.params.aid} not found`);
+    }
+
+    if (result.error) {
+      throw new ApiError(500, "Failed to update animal", result.error);
     }
 
     res.json({
