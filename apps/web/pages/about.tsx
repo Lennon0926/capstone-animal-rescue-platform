@@ -1,11 +1,12 @@
 import HeaderSection from "@/components/Header/headerSection";
 import FooterSection from "@/components/Footer/footerSection";
+import AboutPage from "@/components/AboutPage/aboutPage";
 
 export const About = () => {
   return (
     <div>
       <HeaderSection />
-      <h1>About Us</h1>
+      <AboutPage />
       <FooterSection />
     </div>
   );

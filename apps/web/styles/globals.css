@@ -38,6 +38,9 @@
   --status-adopted-bg: #fde2e1;
   --status-adopted-text: #b42318;
 
+  --status-pending-bg: #fff4e5;
+  --status-pending-text: #b45309;
+
   /* ================= TYPOGRAPHY ================= */
 
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI",

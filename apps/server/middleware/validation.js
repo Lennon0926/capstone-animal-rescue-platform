@@ -70,13 +70,15 @@ function validateAnimalFilters(query) {
     filters.species = sanitizeString(query.species);
   }
 
-  // Validate status filter
+  // Validate status filter — default to "available" if not provided
+  const validStatuses = ["available", "adopted", "pending", "fostered", "medical_hold"];
   if (query.status) {
     const status = sanitizeString(query.status);
-    const validStatuses = ["available", "adopted", "pending", "fostered", "medical_hold"];
     if (validStatuses.includes(status.toLowerCase())) {
       filters.status = status;
     }
+  } else {
+    filters.status = "available";
   }
 
   // Validate size filter
@@ -100,6 +102,24 @@ function validateAnimalFilters(query) {
   // Validate name search
   if (query.name) {
     filters.name = sanitizeString(query.name);
+  }
+
+  // Validate tags filter (single tag)
+  if (query.tags) {
+    const cleanedTag = sanitizeString(query.tags).toLowerCase();
+    if (/^[\w\s\-]+$/.test(cleanedTag)) {
+      filters.tags = cleanedTag;
+    }
+  }
+
+  // Validate combined search (name + tags)
+  // Only allow alphanumeric, spaces, hyphens, and underscores to prevent
+  // PostgREST filter injection via special characters like { } , %
+  if (query.search) {
+    const cleaned = sanitizeString(query.search);
+    if (/^[\w\s\-]+$/.test(cleaned)) {
+      filters.search = cleaned;
+    }
   }
 
   return filters;
