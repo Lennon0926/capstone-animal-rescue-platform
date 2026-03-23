@@ -195,14 +195,17 @@ The `/ready` endpoint also returns `503` if any required variable is absent — 
 ## Testing
 
 ```bash
-# Server tests
+# Server unit tests
 cd apps/server && npm test
 
-# Web tests
+# Web unit tests
 cd apps/web && npm test
+
+# Web E2E tests (Playwright — requires no running dev server)
+cd apps/web && npm run test:e2e
 ```
 
-CI runs lint, build, and tests for both apps on every push and pull request to `main` and `develop`. Required GitHub Secrets are validated before any job runs.
+CI runs lint, build, unit tests, and E2E tests for every push and pull request to `main` and `develop`.
 
 ## Documentation
 
