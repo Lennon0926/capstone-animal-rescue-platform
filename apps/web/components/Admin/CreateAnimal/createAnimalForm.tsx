@@ -121,10 +121,6 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
     setIsLoading(true);
 
     try {
-      // Step 1: Upload image to Cloudflare R2 first
-      const uploadResult = await uploadAnimalImage("temp", selectedFile);
-      
-      // Step 2: Create animal record with image URL
       const createResponse = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals`,
         {
@@ -140,7 +136,6 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
             gender: formData.gender,
             status: formData.status,
             tags: formData.tags || [],
-            image_url: uploadResult.url,
           }),
         }
       );
@@ -157,11 +152,34 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
       const createResult = await createResponse.json();
       const newAnimal = createResult.data;
 
+      const uploadResult = await uploadAnimalImage(newAnimal.aid.toString(), selectedFile);
+      
+      const updateResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals/${newAnimal.aid}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            image_url: uploadResult.url,
+          }),
+        }
+      );
+
+      if (!updateResponse.ok) {
+        // Animal was created but image update failed
+        console.error("Failed to update animal with image URL");
+      }
+
+      const updatedResult = await updateResponse.json();
+      const finalAnimal = updatedResult.data;
+
       setSuccessMessage("¡Animal creado exitosamente con imagen!");
 
       // Call onSave callback if provided
       if (onSave) {
-        onSave(newAnimal);
+        onSave(finalAnimal);
       }
 
       // Redirect to animal list after a short delay

@@ -165,9 +165,7 @@ function validateCreateAnimal(req, res, next) {
     const size = sanitizeString(req.body.size).toLowerCase();
     const gender = sanitizeString(req.body.gender).toLowerCase();
     const status = sanitizeString(req.body.status).toLowerCase();
-    const image_url = typeof req.body.image_url === "string"
-      ? req.body.image_url.trim().slice(0, 500)
-      : "";
+    let image_url = "";
 
     const validSpecies = ["perro", "gato"];
     const validSizes = ["pequeño", "mediano", "grande", "muy grande"];
@@ -198,8 +196,15 @@ function validateCreateAnimal(req, res, next) {
       throw new ApiError(400, "Invalid status.");
     }
 
-    if (!image_url) {
-      throw new ApiError(400, "Image URL is required.");
+    // Image URL is optional on creation (can be added later via PATCH)
+    // but if provided, it must not be empty
+    if (req.body.image_url !== undefined && req.body.image_url !== null && typeof req.body.image_url === "string") {
+      const trimmed = req.body.image_url.trim();
+      if (trimmed.length > 0 && trimmed.length <= 500) {
+        image_url = trimmed;
+      } else if (trimmed.length > 500) {
+        throw new ApiError(400, "Image URL is too long (max 500 characters).");
+      }
     }
 
     req.validatedBody = {
@@ -209,8 +214,17 @@ function validateCreateAnimal(req, res, next) {
       size,
       gender,
       status,
-      image_url,
     };
+
+    // Only add image_url if it was provided and valid
+    if (image_url) {
+      req.validatedBody.image_url = image_url;
+    }
+
+    // Handle tags if provided
+    if (req.body.tags !== undefined && Array.isArray(req.body.tags)) {
+      req.validatedBody.tags = req.body.tags;
+    }
 
     next();
   } catch (err) {
