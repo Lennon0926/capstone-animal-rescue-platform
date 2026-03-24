@@ -70,7 +70,7 @@ export default function AnimalsSection() {
                 </p>
 
                 <Link
-                href="/adopt"
+                href="/adopt/{animal.id}"
                 className={styles.learnMore}
               >
                 Conoce Más
