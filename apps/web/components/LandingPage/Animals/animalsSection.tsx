@@ -23,7 +23,7 @@ export default function AnimalsSection() {
     async function fetchAnimals() {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals?status=available&limit=3&sortBy=created_at&sortOrder=asc`
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals?status=disponible&limit=3&sortBy=created_at&sortOrder=asc`
         );
 
         if (!response.ok) {
