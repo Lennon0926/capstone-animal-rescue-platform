@@ -211,23 +211,23 @@
 }
 
 .statusPending {
-  background-color: #fef3c7;
-  color: #92400e;
+  background-color: var(--status-pending-bg);
+  color: var(--status-pending-text);
 }
 
 .statusAdopted {
-  background-color: #dbeafe;
-  color: #1e40af;
+  background-color: var(--status-adopted-bg);
+  color: var(--status-adopted-text);
 }
 
 .statusFostered {
-  background-color: #ede9fe;
-  color: #5b21b6;
+  background-color: var(--status-fostered-bg);
+  color: var(--status-fostered-text);
 }
 
 .statusMedical_hold {
-  background-color: #fee2e2;
-  color: #991b1b;
+  background-color: var(--status-medical-bg);
+  color: var(--status-medical-text);
 }
 
 .cardDetails {
