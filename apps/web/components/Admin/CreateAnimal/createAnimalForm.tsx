@@ -371,14 +371,7 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
             {previewUrl && (
               <div className={styles.formGroup}>
                 <p className={styles.label}>Vista previa de la imagen:</p>
-                <div style={{
-                  width: "150px",
-                  height: "150px",
-                  position: "relative",
-                  borderRadius: "8px",
-                  overflow: "hidden",
-                  border: "2px solid #4CAF50",
-                }}>
+                <div className={styles.imagePreviewContainer}>
                   <Image
                     src={previewUrl}
                     alt="Vista previa"
