@@ -124,7 +124,6 @@ function FlipCard({ animal }: { animal: Animal }) {
             />
             <div className={styles.cardOverlay}>
               <h3 className={styles.cardName}>{animal.name}</h3>
-              <p className={styles.cardSpecies}>{capitalize(animal.species)}</p>
             </div>
             <div className={styles.flipHint}>
               <RotateCcw size={12} />
