@@ -23,7 +23,7 @@ export const MOCK_ANIMALS = Array.from({ length: 13 }, (_, i) => ({
   species: i % 2 === 0 ? "dog" : "cat",
   size: "medium",
   gender: "male",
-  status: "available",
+  status: "disponible",
   image_url: "",
   tags: i === 0 ? ["vaccinated", "friendly"] : [],
   created_at: "2024-01-01T00:00:00Z",
