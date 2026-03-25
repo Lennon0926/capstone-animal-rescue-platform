@@ -149,7 +149,7 @@ export default function Blog() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/facebook-posts?limit=12");
+      const res = await fetch("/api/facebook-posts?limit=100");
       if (!res.ok) {
         const json = await res.json();
         throw new Error(json.error ?? "Error al cargar publicaciones");
