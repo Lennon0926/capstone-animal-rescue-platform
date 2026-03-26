@@ -41,6 +41,12 @@
   --status-pending-bg: #fff4e5;
   --status-pending-text: #b45309;
 
+  --status-fostered-bg: #dbeafe;
+  --status-fostered-text: #0c4a6e;
+
+  --status-medical-bg: #fce7f3;
+  --status-medical-text: #831843;
+
   /* ================= TYPOGRAPHY ================= */
 
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -149,6 +155,13 @@ body {
 
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+main {
+  min-height: 100vh;
+  padding: 2rem;
+  max-width: 100%;
+  margin: 0 auto;
 }
 
 /* =========================
