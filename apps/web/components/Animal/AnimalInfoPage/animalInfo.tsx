@@ -16,12 +16,31 @@ function capitalize(text: string) {
 
 function formatStatus(status: string) {
   const map: Record<string, string> = {
-    available: "Disponible",
-    adopted: "Adoptado",
-    pending: "Pendiente",
+    disponible: "Disponible",
+    adoptado: "Adoptado",
+    pendiente: "Pendiente",
+    'atención médica': "Atención Médica",
+    'en hogar temporal': "En Hogar Temporal",
   };
 
   return map[status?.toLowerCase()] || status;
+}
+
+function getStatusClass(status: string) {
+  switch (status.toLowerCase()) {
+    case "disponible":
+      return styles.available;
+    case "adoptado":
+      return styles.adopted;
+    case "pendiente":
+      return styles.pending;
+    case "en hogar temporal":
+      return styles.fostered;
+    case "atención médica":
+      return styles.medical;
+    default:
+      return "";
+  }
 }
 
 export default function AnimalInfo({ animal }: AnimalInfoProps) {
@@ -52,13 +71,7 @@ export default function AnimalInfo({ animal }: AnimalInfoProps) {
 
             <div className={styles.metaHeader}>
               <span
-                className={`${styles.status} ${
-                  animal.status === "available"
-                    ? styles.available
-                    : animal.status === "pending"
-                    ? styles.pending
-                    : styles.adopted
-                }`}
+                className={`${styles.status} ${getStatusClass(animal.status)}`}
               >
                 {formatStatus(animal.status)}
               </span>

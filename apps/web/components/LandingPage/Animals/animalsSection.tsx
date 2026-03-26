@@ -1,39 +1,78 @@
 import styles from "./animalsSection.module.css";
 import Link from "next/link";
 import Image from "next/image";
-import { buildAdoptionFormUrl } from "@/hooks/useAdoptionFormUrl";
+import { useEffect, useState } from "react";
 
-const mockAnimals = [
-  {
-    id: 1,
-    name: "Max",
-    species: "Dog",
-    breed: "Mixed Breed",
-    age: "3 years",
-    image: "/Animals/dog1.jpeg",
-    status: "Available",
-  },
-  {
-    id: 2,
-    name: "Luna",
-    species: "Cat",
-    breed: "Domestic Shorthair",
-    age: "2 years",
-    image: "/Animals/cat1.jpeg",
-    status: "Available",
-  },
-  {
-    id: 3,
-    name: "Charlie",
-    species: "Dog",
-    breed: "Golden Retriever",
-    age: "5 years",
-    image: "/Animals/dog2.jpeg",
-    status: "Available",
-  },
-];
+interface Animal {
+  aid: number;
+  name: string;
+  species: string;
+  breed: string;
+  age_years?: number;
+  age_months?: number;
+  primary_image_url?: string;
+  status: string;
+}
 
 export default function AnimalsSection() {
+  const [animals, setAnimals] = useState<Animal[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchAnimals() {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals?status=disponible&limit=3&sortBy=created_at&sortOrder=asc`
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch animals");
+        }
+
+        const result = await response.json();
+        setAnimals(result.data || []);
+      } catch (err) {
+        console.error("Error fetching animals:", err);
+        setError("No se pudieron cargar los animales");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchAnimals();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className={styles.section}>
+        <div className={styles.inner}>
+          <div className={styles.header}>
+            <div className={styles.headerContainer}>
+              <h2 className={styles.title}>Conoce a Nuestros Animales</h2>
+              <p className={styles.subtitle}>Cargando...</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className={styles.section}>
+        <div className={styles.inner}>
+          <div className={styles.header}>
+            <div className={styles.headerContainer}>
+              <h2 className={styles.title}>Conoce a Nuestros Animales</h2>
+              <p className={styles.subtitle}>{error}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
@@ -48,11 +87,11 @@ export default function AnimalsSection() {
         </div>
 
         <div className={styles.grid}>
-          {mockAnimals.map((animal) => (
-            <div key={animal.id} className={styles.card}>
+          {animals.map((animal) => (
+            <div key={animal.aid} className={styles.card}>
               <div className={styles.imageWrapper}>
                 <Image
-                  src={animal.image}
+                  src={animal.primary_image_url || "/Animals/placeholder.jpeg"}
                   alt={animal.name}
                   width={400}
                   height={300}
@@ -63,34 +102,15 @@ export default function AnimalsSection() {
               <div className={styles.cardContent}>
                 <div className={styles.cardHeader}>
                   <h3>{animal.name}</h3>
-                  <span className={styles.status}>{animal.status}</span>
+                  <span className={styles.status}>Disponible</span>
                 </div>
 
-                <p className={styles.meta}>
-                  {animal.breed} • {animal.age}
-                </p>
-
-                <div className={styles.cardActions}>
-                  <Link
-                    href={`/animalInfo/${animal.id}`}
-                    className={styles.learnMore}
-                  >
-                    Conoce Más
-                  </Link>
-                  {animal.status === "Available" && (() => {
-                    const formUrl = buildAdoptionFormUrl(animal.id, animal.name);
-                    return formUrl ? (
-                      <a
-                        href={formUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.adoptButton}
-                      >
-                        Adoptar
-                      </a>
-                    ) : null;
-                  })()}
-                </div>
+                <Link
+                  href={`/adopt/${animal.aid}`}
+                  className={styles.learnMore}
+                >
+                  Conoce Más
+                </Link>
               </div>
             </div>
           ))}

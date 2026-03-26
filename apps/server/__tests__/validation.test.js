@@ -72,42 +72,38 @@ describe("validateSort", () => {
 });
 
 describe("validateAnimalFilters", () => {
-  it("defaults status to available for empty query", () => {
-    expect(validateAnimalFilters({})).toEqual({ status: "available" });
+  it("returns empty filters for empty query", () => {
+    expect(validateAnimalFilters({})).toEqual({});
   });
 
   it("accepts valid status values", () => {
-    expect(validateAnimalFilters({ status: "available" })).toEqual({
-      status: "available",
+    expect(validateAnimalFilters({ status: "disponible" })).toEqual({
+      status: "disponible",
     });
   });
 
-  it("ignores invalid status values without applying default", () => {
-    expect(validateAnimalFilters({ status: "flying" })).toEqual({});
+  it("ignores invalid status values", () => {
+    expect(validateAnimalFilters({ status: "available" })).toEqual({});
   });
 
   it("accepts valid size values", () => {
-    expect(validateAnimalFilters({ size: "large" })).toEqual({
-      size: "large",
-      status: "available",
+    expect(validateAnimalFilters({ size: "grande" })).toEqual({
+      size: "grande",
     });
   });
 
   it("ignores invalid size values", () => {
-    expect(validateAnimalFilters({ size: "gigantic" })).toEqual({
-      status: "available",
-    });
+    expect(validateAnimalFilters({ size: "gigantic" })).toEqual({});
   });
 
   it("accepts valid gender values", () => {
-    expect(validateAnimalFilters({ gender: "female" })).toEqual({
-      gender: "female",
-      status: "available",
+    expect(validateAnimalFilters({ gender: "hembra" })).toEqual({
+      gender: "hembra",
     });
   });
 
   it("accepts species and name as free-text search", () => {
-    const result = validateAnimalFilters({ species: "Dog", name: "Buddy" });
-    expect(result).toEqual({ species: "Dog", name: "Buddy", status: "available" });
+    const result = validateAnimalFilters({ species: "Perro", name: "Buddy" });
+    expect(result).toEqual({ species: "Perro", name: "Buddy" });
   });
 });

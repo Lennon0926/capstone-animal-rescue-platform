@@ -63,8 +63,7 @@
   font-size: var(--text-sm);
   padding: 6px 14px;
   border-radius: var(--radius-lg);
-  background: var(--status-available-bg);
-  color: var(--status-available-text);
+  font-weight: var(--font-weight-semibold);
 }
 
 .available {
@@ -80,6 +79,16 @@
 .pending {
   background: var(--status-pending-bg);
   color: var(--status-pending-text);
+}
+
+.fostered {
+  background: var(--status-fostered-bg);
+  color: var(--status-fostered-text);
+}
+
+.medical {
+  background: var(--status-medical-bg);
+  color: var(--status-medical-text);
 }
 
 .meta {
