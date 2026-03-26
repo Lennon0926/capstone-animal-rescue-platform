@@ -1,8 +1,8 @@
 /** Viewport width below which the mobile hamburger menu is used. */
 export const MOBILE_BREAKPOINT = 768;
 
-/** Hardcoded animal cards on the landing page AnimalsSection (not from API). */
-export const LANDING_PAGE_ANIMALS = ["Max", "Luna", "Charlie"] as const;
+/** Animal names expected on the landing page AnimalsSection (fetched from mock API). */
+export const LANDING_PAGE_ANIMALS = ["Fluffy", "Max"] as const;
 
 /** Step titles in the HowItWorks section. */
 export const ADOPTION_STEPS = [
