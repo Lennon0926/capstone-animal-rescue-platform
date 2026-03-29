@@ -17,6 +17,14 @@ describe("getAnimalImageUrl", () => {
     ).toBe("https://pub-test-bucket.r2.dev/animals/1/test%20image.jpg");
   });
 
+  it("uses image_object_key even when image_url is empty", async () => {
+    const { getAnimalImageUrl } = await import("@/utils/animalImages");
+
+    expect(getAnimalImageUrl("", "dog", 1, "/animals/1/test image.jpg")).toBe(
+      "https://pub-test-bucket.r2.dev/animals/1/test%20image.jpg",
+    );
+  });
+
   it("returns external absolute URLs unchanged", async () => {
     const { getAnimalImageUrl } = await import("@/utils/animalImages");
 
