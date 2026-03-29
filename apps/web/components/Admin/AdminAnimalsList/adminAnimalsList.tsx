@@ -398,6 +398,7 @@ export default function AdminAnimalsList({
                           className={styles.thumbnail}
                           width={60}
                           height={60}
+                          sizes="60px"
                           onError={(e) => {
                             e.currentTarget.style.display = "none";
                           }}

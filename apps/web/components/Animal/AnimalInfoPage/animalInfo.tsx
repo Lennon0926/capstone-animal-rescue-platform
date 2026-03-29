@@ -64,6 +64,8 @@ export default function AnimalInfo({ animal }: AnimalInfoProps) {
               width={600}
               height={600}
               className={styles.image}
+              priority
+              sizes="(max-width: 900px) 100vw, 50vw"
             />
           </div>
 
