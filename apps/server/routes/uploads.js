@@ -15,6 +15,8 @@ const {
   missingR2EnvVars,
   isPublicObjectUrlConfigured,
   missingPublicObjectUrlEnvVars,
+  checkR2Health,
+  isR2DependencyError,
   uploadAnimalImage,
 } = require("../services/r2Service");
 
@@ -40,17 +42,24 @@ const getErrorPayload = (code, message, details) => ({
  * GET /api/uploads/config
  * Returns current R2 upload configuration status.
  */
-router.get("/config", (req, res) => {
-  res.json({
-    data: {
-      r2Configured: isR2Configured,
-      missingEnvVars: isR2Configured ? [] : missingR2EnvVars,
-      publicObjectUrlConfigured: isPublicObjectUrlConfigured,
-      missingPublicObjectUrlEnvVars,
-      allowedMimeTypes: ALLOWED_MIME_TYPES_ARRAY,
-      maxImageSizeBytes,
-    },
-  });
+router.get("/config", async (req, res, next) => {
+  try {
+    const health = await checkR2Health();
+
+    res.json({
+      data: {
+        r2Configured: isR2Configured,
+        missingEnvVars: isR2Configured ? [] : missingR2EnvVars,
+        publicObjectUrlConfigured: isPublicObjectUrlConfigured,
+        missingPublicObjectUrlEnvVars,
+        allowedMimeTypes: ALLOWED_MIME_TYPES_ARRAY,
+        maxImageSizeBytes,
+        health,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
 });
 
 /**
@@ -130,6 +139,12 @@ router.post(
 
       return res.status(201).json({ data: result });
     } catch (error) {
+      if (isR2DependencyError(error)) {
+        return res
+          .status(error.statusCode)
+          .json(getErrorPayload(error.code, error.message));
+      }
+
       return next(error);
     }
   }

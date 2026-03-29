@@ -4,7 +4,11 @@ import Image from "next/image";
 import {
   AnimalImageUploadResult,
   Animal,
+  fetchUploadConfig,
   fetchAnimals,
+  getUploadStorageUnavailableMessage,
+  isUploadStorageAvailable,
+  type UploadConfig,
   uploadAndUpdateAnimalImage,
 } from "@/services/animalImageUploadService";
 import { getAnimalImageUrl } from "@/utils/animalImages";
@@ -16,6 +20,8 @@ const AnimalImageUploadForm = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadConfig, setUploadConfig] = useState<UploadConfig | null>(null);
+  const [uploadConfigError, setUploadConfigError] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [uploadResult, setUploadResult] =
@@ -25,12 +31,19 @@ const AnimalImageUploadForm = () => {
   useEffect(() => {
     const loadAnimals = async () => {
       try {
-        const animalsData = await fetchAnimals();
+        const [animalsData, nextUploadConfig] = await Promise.all([
+          fetchAnimals(),
+          fetchUploadConfig(),
+        ]);
         setAnimals(animalsData);
+        setUploadConfig(nextUploadConfig);
+        setUploadConfigError("");
       } catch (error) {
-        setErrorMessage(
-          error instanceof Error ? error.message : "Failed to load animals."
-        );
+        const message =
+          error instanceof Error ? error.message : "Failed to load animals.";
+        setUploadConfig(null);
+        setUploadConfigError(message);
+        setErrorMessage(message);
       } finally {
         setIsLoading(false);
       }
@@ -51,6 +64,10 @@ const AnimalImageUploadForm = () => {
   }, [selectedFile]);
 
   const selectedAnimal = animals.find((a) => a.aid === selectedAnimalId);
+  const storageUnavailableMessage = uploadConfigError
+    ? uploadConfigError
+    : getUploadStorageUnavailableMessage(uploadConfig, "");
+  const isStorageHealthy = isUploadStorageAvailable(uploadConfig);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -65,6 +82,14 @@ const AnimalImageUploadForm = () => {
 
     if (!selectedFile) {
       setErrorMessage("Please select an image file.");
+      return;
+    }
+
+    if (!isStorageHealthy) {
+      setErrorMessage(
+        storageUnavailableMessage ||
+          "Image storage is currently unavailable. Try again after R2 is healthy."
+      );
       return;
     }
 
@@ -110,8 +135,45 @@ const AnimalImageUploadForm = () => {
         Upload a photo directly to Cloudflare R2 storage and update the
         animal&apos;s profile.
       </p>
+      {storageUnavailableMessage && (
+        <p
+          style={{
+            marginTop: "0.75rem",
+            padding: "0.75rem 1rem",
+            borderRadius: "8px",
+            backgroundColor: "#fff1f2",
+            border: "1px solid #fecdd3",
+            color: "#b91c1c",
+          }}
+        >
+          {storageUnavailableMessage}
+        </p>
+      )}
+      {!storageUnavailableMessage && uploadConfig?.health && (
+        <p
+          style={{
+            marginTop: "0.75rem",
+            padding: "0.75rem 1rem",
+            borderRadius: "8px",
+            backgroundColor: "#ecfdf5",
+            border: "1px solid #bbf7d0",
+            color: "#166534",
+          }}
+        >
+          Image storage is available. Last checked:{" "}
+          {new Date(uploadConfig.health.checkedAt).toLocaleString("en-US")}
+        </p>
+      )}
       <p style={{ fontSize: "0.875rem", color: "#666" }}>
-        Allowed formats: JPEG, PNG, WEBP. Max size: 5 MB.
+        Allowed formats:{" "}
+        {uploadConfig?.allowedMimeTypes?.length
+          ? uploadConfig.allowedMimeTypes.join(", ")
+          : "image/jpeg, image/png, image/webp"}
+        . Max size:{" "}
+        {uploadConfig?.maxImageSizeBytes
+          ? `${(uploadConfig.maxImageSizeBytes / (1024 * 1024)).toFixed(0)} MB`
+          : "5 MB"}
+        .
       </p>
 
       <form
@@ -215,23 +277,35 @@ const AnimalImageUploadForm = () => {
               setSelectedFile(event.target.files?.[0] || null)
             }
             style={{ display: "block", width: "100%" }}
+            disabled={!isStorageHealthy}
           />
         </label>
 
         <button
           type="submit"
-          disabled={isUploading || !selectedAnimalId || !selectedFile}
+          disabled={
+            isUploading ||
+            !selectedAnimalId ||
+            !selectedFile ||
+            !isStorageHealthy
+          }
           style={{
             padding: "0.75rem 1.5rem",
-            backgroundColor: isUploading ? "#ccc" : "#4CAF50",
+            backgroundColor:
+              isUploading || !isStorageHealthy ? "#ccc" : "#4CAF50",
             color: "white",
             border: "none",
             borderRadius: "4px",
-            cursor: isUploading ? "not-allowed" : "pointer",
+            cursor:
+              isUploading || !isStorageHealthy ? "not-allowed" : "pointer",
             fontWeight: 500,
           }}
         >
-          {isUploading ? "Uploading to Cloudflare R2..." : "Upload Image"}
+          {isUploading
+            ? "Uploading to Cloudflare R2..."
+            : !isStorageHealthy
+              ? "Image Storage Unavailable"
+              : "Upload Image"}
         </button>
       </form>
 

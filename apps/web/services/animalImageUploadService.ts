@@ -1,3 +1,5 @@
+import type { Animal } from "@/types/animal";
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export type AnimalImageUploadResult = {
@@ -8,15 +10,38 @@ export type AnimalImageUploadResult = {
   size: number;
 };
 
-export type { Animal } from "@/types/animal";
-import type { Animal } from "@/types/animal";
+export type UploadHealthStatus = {
+  ok: boolean;
+  code: string;
+  message: string;
+  checkedAt: string;
+};
+
+export type UploadConfig = {
+  r2Configured: boolean;
+  missingEnvVars: string[];
+  publicObjectUrlConfigured: boolean;
+  missingPublicObjectUrlEnvVars: string[];
+  allowedMimeTypes: string[];
+  maxImageSizeBytes: number;
+  health: UploadHealthStatus;
+};
+
+export type { Animal };
+
+type UploadApiErrorShape = {
+  code?: string;
+  message?: string;
+};
 
 type UploadApiResponse = {
   data?: AnimalImageUploadResult;
-  error?: {
-    code?: string;
-    message?: string;
-  };
+  error?: UploadApiErrorShape;
+};
+
+type UploadConfigApiResponse = {
+  data?: UploadConfig;
+  error?: UploadApiErrorShape;
 };
 
 type AnimalApiResponse = {
@@ -36,6 +61,16 @@ type AnimalsListResponse = {
   };
 };
 
+export class UploadApiError extends Error {
+  code?: string;
+
+  constructor(message: string, code?: string) {
+    super(message);
+    this.name = "UploadApiError";
+    this.code = code;
+  }
+}
+
 const getApiBaseUrl = () => {
   if (!API_BASE_URL) {
     throw new Error(
@@ -46,16 +81,106 @@ const getApiBaseUrl = () => {
   return API_BASE_URL;
 };
 
+const parseJsonSafely = async <T>(
+  response: Response,
+  scope: string
+): Promise<T | null> => {
+  return (await response.json().catch((err: unknown) => {
+    console.error(`[${scope}] Failed to parse response JSON:`, err);
+    return null;
+  })) as T | null;
+};
+
+const buildUploadApiError = (
+  error: UploadApiErrorShape | undefined,
+  fallbackMessage: string
+) => {
+  return new UploadApiError(error?.message || fallbackMessage, error?.code);
+};
+
+export const isUploadStorageAvailable = (
+  config: UploadConfig | null | undefined
+): config is UploadConfig => {
+  return Boolean(
+    config?.r2Configured &&
+      config?.publicObjectUrlConfigured &&
+      config?.health?.ok
+  );
+};
+
+export const getUploadStorageUnavailableMessage = (
+  config: UploadConfig | null | undefined,
+  fallbackMessage = "El almacenamiento de imágenes no está disponible en este momento."
+) => {
+  if (!config) {
+    return fallbackMessage;
+  }
+
+  if (!config.r2Configured) {
+    return config.missingEnvVars.length > 0
+      ? `El almacenamiento de imágenes no está configurado. Variables faltantes: ${config.missingEnvVars.join(", ")}.`
+      : "El almacenamiento de imágenes no está configurado en el servidor.";
+  }
+
+  if (!config.publicObjectUrlConfigured) {
+    return config.missingPublicObjectUrlEnvVars.length > 0
+      ? `Falta configurar la URL pública del almacenamiento. Variables faltantes: ${config.missingPublicObjectUrlEnvVars.join(", ")}.`
+      : "Falta configurar la URL pública del almacenamiento de imágenes.";
+  }
+
+  if (config.health.ok) {
+    return "";
+  }
+
+  switch (config.health.code) {
+    case "R2_UNAUTHORIZED":
+      return "El almacenamiento de imágenes no está disponible porque Cloudflare R2 rechazó las credenciales configuradas en el servidor.";
+    case "R2_UNAVAILABLE":
+      return "El almacenamiento de imágenes no está disponible porque Cloudflare R2 no pudo procesar la solicitud.";
+    case "R2_NOT_CONFIGURED":
+      return "El almacenamiento de imágenes no está configurado en el servidor.";
+    case "R2_PUBLIC_URL_NOT_CONFIGURED":
+      return "La URL pública de Cloudflare R2 no está configurada en el servidor.";
+    default:
+      return config.health.message || fallbackMessage;
+  }
+};
+
 /**
- * Fetches all animals from the API
+ * Fetches the current upload configuration and storage health.
+ */
+export const fetchUploadConfig = async (): Promise<UploadConfig> => {
+  const response = await fetch(`${getApiBaseUrl()}/api/uploads/config`);
+  const payload = await parseJsonSafely<UploadConfigApiResponse>(
+    response,
+    "fetchUploadConfig"
+  );
+
+  if (!response.ok) {
+    throw buildUploadApiError(
+      payload?.error,
+      "No se pudo verificar la configuración del almacenamiento."
+    );
+  }
+
+  if (!payload?.data?.health) {
+    throw new Error(
+      "La verificación del almacenamiento respondió con un formato inválido."
+    );
+  }
+
+  return payload.data;
+};
+
+/**
+ * Fetches all animals from the API.
  */
 export const fetchAnimals = async (): Promise<Animal[]> => {
   const response = await fetch(`${getApiBaseUrl()}/api/animals?limit=100`);
-  
-  const payload = (await response.json().catch((err: unknown) => {
-    console.error("[fetchAnimals] Failed to parse response JSON:", err);
-    return null;
-  })) as AnimalsListResponse | null;
+  const payload = await parseJsonSafely<AnimalsListResponse>(
+    response,
+    "fetchAnimals"
+  );
 
   if (!response.ok || !payload?.success) {
     throw new Error("Failed to fetch animals.");
@@ -65,7 +190,7 @@ export const fetchAnimals = async (): Promise<Animal[]> => {
 };
 
 /**
- * Uploads an image to Cloudflare R2
+ * Uploads an image to Cloudflare R2.
  */
 export const uploadAnimalImage = async (
   animalId: string,
@@ -89,15 +214,13 @@ export const uploadAnimalImage = async (
     }
   );
 
-  const payload = (await response.json().catch((err: unknown) => {
-    console.error("[uploadAnimalImage] Failed to parse response JSON:", err);
-    return null;
-  })) as
-    | UploadApiResponse
-    | null;
+  const payload = await parseJsonSafely<UploadApiResponse>(
+    response,
+    "uploadAnimalImage"
+  );
 
   if (!response.ok) {
-    throw new Error(payload?.error?.message || "Image upload failed.");
+    throw buildUploadApiError(payload?.error, "Image upload failed.");
   }
 
   if (!payload?.data) {
@@ -114,21 +237,18 @@ export const updateAnimalImageObjectKey = async (
   animalId: number,
   imageObjectKey: string
 ): Promise<Animal> => {
-  const response = await fetch(
-    `${getApiBaseUrl()}/api/animals/${animalId}`,
-    {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ image_object_key: imageObjectKey }),
-    }
-  );
+  const response = await fetch(`${getApiBaseUrl()}/api/animals/${animalId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ image_object_key: imageObjectKey }),
+  });
 
-  const payload = (await response.json().catch((err: unknown) => {
-    console.error("[updateAnimalImageObjectKey] Failed to parse response JSON:", err);
-    return null;
-  })) as AnimalApiResponse | null;
+  const payload = await parseJsonSafely<AnimalApiResponse>(
+    response,
+    "updateAnimalImageObjectKey"
+  );
 
   if (!response.ok) {
     throw new Error(payload?.error || "Failed to update animal image.");
@@ -140,17 +260,15 @@ export const updateAnimalImageObjectKey = async (
 
   return payload.data;
 };
+
 /**
- * Complete flow: Upload image to R2 and update animal record
+ * Complete flow: upload image to R2 and update animal record.
  */
 export const uploadAndUpdateAnimalImage = async (
   animalId: number,
   file: File
 ): Promise<{ uploadResult: AnimalImageUploadResult; animal: Animal }> => {
-  // Step 1: Upload image to Cloudflare R2
   const uploadResult = await uploadAnimalImage(String(animalId), file);
-
-  // Step 2: Update animal record with new image object key
   const animal = await updateAnimalImageObjectKey(animalId, uploadResult.objectKey);
 
   return { uploadResult, animal };
