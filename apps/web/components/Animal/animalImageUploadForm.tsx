@@ -165,7 +165,8 @@ const AnimalImageUploadForm = () => {
                   src={getAnimalImageUrl(
                     selectedAnimal.image_url,
                     selectedAnimal.species,
-                    selectedAnimal.aid
+                    selectedAnimal.aid,
+                    selectedAnimal.image_object_key,
                   )}
                   alt={selectedAnimal.name}
                   fill

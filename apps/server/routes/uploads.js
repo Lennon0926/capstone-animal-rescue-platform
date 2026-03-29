@@ -11,9 +11,10 @@ const {
   ALLOWED_MIME_TYPES,
   ANIMAL_ID_PATTERN,
   maxImageSizeBytes,
-  signedReadUrlTtlSeconds,
   isR2Configured,
   missingR2EnvVars,
+  isPublicObjectUrlConfigured,
+  missingPublicObjectUrlEnvVars,
   uploadAnimalImage,
 } = require("../services/r2Service");
 
@@ -44,9 +45,10 @@ router.get("/config", (req, res) => {
     data: {
       r2Configured: isR2Configured,
       missingEnvVars: isR2Configured ? [] : missingR2EnvVars,
+      publicObjectUrlConfigured: isPublicObjectUrlConfigured,
+      missingPublicObjectUrlEnvVars,
       allowedMimeTypes: ALLOWED_MIME_TYPES_ARRAY,
       maxImageSizeBytes,
-      signedReadUrlTtlSeconds,
     },
   });
 });
@@ -102,6 +104,18 @@ router.post(
             "R2_NOT_CONFIGURED",
             "Cloudflare R2 is not configured on the server.",
             { missingEnvVars: missingR2EnvVars }
+          )
+        );
+    }
+
+    if (!isPublicObjectUrlConfigured) {
+      return res
+        .status(500)
+        .json(
+          getErrorPayload(
+            "R2_PUBLIC_URL_NOT_CONFIGURED",
+            "R2_PUBLIC_BASE_URL must be configured for persistent animal image uploads.",
+            { missingEnvVars: missingPublicObjectUrlEnvVars }
           )
         );
     }

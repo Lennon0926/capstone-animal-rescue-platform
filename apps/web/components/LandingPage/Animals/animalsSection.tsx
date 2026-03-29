@@ -2,15 +2,14 @@ import styles from "./animalsSection.module.css";
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { getAnimalImageUrl } from "@/utils/animalImages";
 
 interface Animal {
   aid: number;
   name: string;
   species: string;
-  breed: string;
-  age_years?: number;
-  age_months?: number;
-  primary_image_url?: string;
+  image_url?: string | null;
+  image_object_key?: string | null;
   status: string;
 }
 
@@ -91,7 +90,12 @@ export default function AnimalsSection() {
             <div key={animal.aid} className={styles.card}>
               <div className={styles.imageWrapper}>
                 <Image
-                  src={animal.primary_image_url || "/Animals/placeholder.jpeg"}
+                  src={getAnimalImageUrl(
+                    animal.image_url,
+                    animal.species,
+                    animal.aid,
+                    animal.image_object_key,
+                  )}
                   alt={animal.name}
                   width={400}
                   height={300}

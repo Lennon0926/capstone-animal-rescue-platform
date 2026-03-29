@@ -29,27 +29,11 @@ export function getPlaceholderImage(species?: string, index: number = 0): string
 
 const R2_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_R2_PUBLIC_BASE_URL?.replace(/\/+$/, "");
 
-/**
- * Extracts the R2 object key from various URL formats:
- * - Plain objectKey: "animals/14/file.png"
- * - Signed R2 URL:   "https://account.r2.cloudflarestorage.com/animals/2/file.jpeg?X-Amz-..."
- */
-function extractR2ObjectKey(imageUrl: string): string | null {
-  // Signed R2 URL (contains X-Amz params)
-  if (imageUrl.includes("r2.cloudflarestorage.com") && imageUrl.includes("X-Amz-")) {
-    try {
-      const url = new URL(imageUrl);
-      // pathname is like "/animals/2/file.jpeg"
-      return url.pathname.replace(/^\//, "");
-    } catch {
-      return null;
-    }
-  }
-  // Plain objectKey (no protocol)
-  if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
-    return imageUrl.replace(/^\//, "");
-  }
-  return null;
+function encodeObjectKey(objectKey: string): string {
+  return objectKey
+    .split("/")
+    .map((part) => encodeURIComponent(part))
+    .join("/");
 }
 
 /**
@@ -58,17 +42,15 @@ function extractR2ObjectKey(imageUrl: string): string | null {
 export function getAnimalImageUrl(
   imageUrl: string | null | undefined,
   species?: string,
-  animalId?: number
+  animalId?: number,
+  imageObjectKey?: string | null
 ): string {
+  const normalizedObjectKey = imageObjectKey?.trim().replace(/^\/+/, "");
+  if (normalizedObjectKey && R2_PUBLIC_BASE_URL) {
+    return `${R2_PUBLIC_BASE_URL}/${encodeObjectKey(normalizedObjectKey)}`;
+  }
+
   if (imageUrl && imageUrl.trim() !== "") {
-    const objectKey = extractR2ObjectKey(imageUrl);
-
-    // If we extracted an objectKey and have a public base URL, reconstruct the full URL
-    if (objectKey && R2_PUBLIC_BASE_URL) {
-      return `${R2_PUBLIC_BASE_URL}/${objectKey}`;
-    }
-
-    // Already a valid absolute URL (public R2, unsplash, etc.)
     if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
       return imageUrl;
     }

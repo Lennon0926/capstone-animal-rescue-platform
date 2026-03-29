@@ -90,9 +90,6 @@ R2_PUBLIC_BASE_URL=
 
 # Optional: Override upload size limit in bytes (default: 5 MB)
 R2_MAX_IMAGE_SIZE_BYTES=5242880
-
-# Optional: Signed URL TTL in seconds when R2_PUBLIC_BASE_URL is not set (default: 1 hour)
-R2_SIGNED_READ_URL_TTL_SECONDS=3600
 ```
 
 **Web** (`apps/web/.env.local`):

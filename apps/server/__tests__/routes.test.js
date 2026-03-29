@@ -1,7 +1,15 @@
 const request = require("supertest");
 
 beforeAll(() => {
+  jest.spyOn(console, "error").mockImplementation(() => {});
+});
+
+beforeAll(() => {
   process.env.PORT = "4000";
+});
+
+afterAll(() => {
+  console.error.mockRestore();
 });
 
 const getApp = () => require("../server");
@@ -39,6 +47,8 @@ describe("GET /api/uploads/config", () => {
     expect(res.status).toBe(200);
     expect(res.body.data).toHaveProperty("allowedMimeTypes");
     expect(res.body.data).toHaveProperty("maxImageSizeBytes");
+    expect(res.body.data.publicObjectUrlConfigured).toBe(true);
+    expect(res.body.data).not.toHaveProperty("signedReadUrlTtlSeconds");
     expect(res.body.data.allowedMimeTypes).toEqual(
       expect.arrayContaining(["image/jpeg", "image/png", "image/webp"])
     );

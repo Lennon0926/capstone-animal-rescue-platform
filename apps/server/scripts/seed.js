@@ -7,7 +7,10 @@
 
 const path = require("path");
 // Load environment variables from the server root .env.local
-require("dotenv").config({ path: path.resolve(__dirname, "..", ".env.local") });
+require("dotenv").config({
+  path: path.resolve(__dirname, "..", ".env.local"),
+  quiet: true,
+});
 
 const { getSupabaseClient } = require("../lib/supabase");
 

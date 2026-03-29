@@ -174,7 +174,7 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
       // If a new image was selected, upload it first
       if (selectedFile) {
         const uploadResult = await uploadAnimalImage(String(formData.aid), selectedFile);
-        updateBody.image_url = uploadResult.url;
+        updateBody.image_object_key = uploadResult.objectKey;
       }
 
       const response = await fetch(
@@ -242,12 +242,17 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
         </div>
 
         {/* Current Image Preview */}
-        {formData.image_url && (
+        {(formData.image_url || formData.image_object_key) && (
           <div className={styles.imagePreviewSection}>
             <h3 className={styles.sectionLabel}>Imagen Actual</h3>
             <div className={styles.imagePreview}>
               <Image
-                src={getAnimalImageUrl(formData.image_url, formData.species, formData.aid)}
+                src={getAnimalImageUrl(
+                  formData.image_url,
+                  formData.species,
+                  formData.aid,
+                  formData.image_object_key,
+                )}
                 alt={formData.name}
                 fill
                 style={{ objectFit: "cover" }}

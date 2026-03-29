@@ -3,7 +3,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 export type AnimalImageUploadResult = {
   objectKey: string;
   url: string;
-  urlType: "public" | "signed-read";
+  urlType: "public";
   contentType: string;
   size: number;
 };
@@ -108,11 +108,11 @@ export const uploadAnimalImage = async (
 };
 
 /**
- * Updates an animal's image_url in the database
+ * Updates an animal's persisted image object key in the database.
  */
-export const updateAnimalImageUrl = async (
+export const updateAnimalImageObjectKey = async (
   animalId: number,
-  imageUrl: string
+  imageObjectKey: string
 ): Promise<Animal> => {
   const response = await fetch(
     `${getApiBaseUrl()}/api/animals/${animalId}`,
@@ -121,12 +121,12 @@ export const updateAnimalImageUrl = async (
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ image_url: imageUrl }),
+      body: JSON.stringify({ image_object_key: imageObjectKey }),
     }
   );
 
   const payload = (await response.json().catch((err: unknown) => {
-    console.error("[updateAnimalImageUrl] Failed to parse response JSON:", err);
+    console.error("[updateAnimalImageObjectKey] Failed to parse response JSON:", err);
     return null;
   })) as AnimalApiResponse | null;
 
@@ -140,7 +140,6 @@ export const updateAnimalImageUrl = async (
 
   return payload.data;
 };
-
 /**
  * Complete flow: Upload image to R2 and update animal record
  */
@@ -151,8 +150,8 @@ export const uploadAndUpdateAnimalImage = async (
   // Step 1: Upload image to Cloudflare R2
   const uploadResult = await uploadAnimalImage(String(animalId), file);
 
-  // Step 2: Update animal record with new image URL
-  const animal = await updateAnimalImageUrl(animalId, uploadResult.url);
+  // Step 2: Update animal record with new image object key
+  const animal = await updateAnimalImageObjectKey(animalId, uploadResult.objectKey);
 
   return { uploadResult, animal };
 };

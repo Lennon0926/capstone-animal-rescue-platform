@@ -392,6 +392,7 @@ export default function AdminAnimalsList({
                             animal.image_url,
                             animal.species,
                             animal.aid,
+                            animal.image_object_key,
                           )}
                           alt={animal.name}
                           className={styles.thumbnail}

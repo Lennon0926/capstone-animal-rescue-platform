@@ -162,7 +162,7 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            image_url: uploadResult.url,
+            image_object_key: uploadResult.objectKey,
           }),
         }
       );

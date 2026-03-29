@@ -1,8 +1,11 @@
 const {
   sanitizeString,
+  sanitizeImageObjectKey,
   validatePagination,
   validateSort,
   validateAnimalFilters,
+  validateCreateAnimal,
+  validateUpdateAnimal,
 } = require("../middleware/validation");
 
 describe("sanitizeString", () => {
@@ -105,5 +108,99 @@ describe("validateAnimalFilters", () => {
   it("accepts species and name as free-text search", () => {
     const result = validateAnimalFilters({ species: "Perro", name: "Buddy" });
     expect(result).toEqual({ species: "Perro", name: "Buddy" });
+  });
+});
+
+describe("sanitizeImageObjectKey", () => {
+  it("accepts valid R2 object keys", () => {
+    expect(sanitizeImageObjectKey("animals/12/123-photo.jpg")).toBe(
+      "animals/12/123-photo.jpg"
+    );
+  });
+
+  it("rejects invalid object keys", () => {
+    expect(sanitizeImageObjectKey("../animals/12")).toBe("");
+    expect(sanitizeImageObjectKey("animals/12/my photo.jpg")).toBe("");
+  });
+});
+
+describe("image object key middleware validation", () => {
+  it("rejects image_url on create", () => {
+    const req = {
+      body: {
+        name: "Luna",
+        description: "Friendly dog",
+        species: "Perro",
+        size: "Grande",
+        gender: "Hembra",
+        status: "Disponible",
+        image_url: "https://pub-test-bucket.r2.dev/animals/12/123-photo.jpg",
+      },
+    };
+    const next = jest.fn();
+
+    validateCreateAnimal(req, {}, next);
+
+    expect(next.mock.calls[0][0].message).toMatch(/image_url is read-only/i);
+  });
+
+  it("accepts image_object_key on create", () => {
+    const req = {
+      body: {
+        name: "Luna",
+        description: "Friendly dog",
+        species: "Perro",
+        size: "Grande",
+        gender: "Hembra",
+        status: "Disponible",
+        image_object_key: "animals/12/123-photo.jpg",
+      },
+    };
+    const next = jest.fn();
+
+    validateCreateAnimal(req, {}, next);
+
+    expect(next).toHaveBeenCalledWith();
+    expect(req.validatedBody.image_object_key).toBe("animals/12/123-photo.jpg");
+  });
+
+  it("accepts image_object_key on update", () => {
+    const req = {
+      body: {
+        image_object_key: "animals/12/123-photo.jpg",
+      },
+    };
+    const next = jest.fn();
+
+    validateUpdateAnimal(req, {}, next);
+
+    expect(next).toHaveBeenCalledWith();
+    expect(req.validatedBody.image_object_key).toBe("animals/12/123-photo.jpg");
+  });
+
+  it("rejects invalid image_object_key on update", () => {
+    const req = {
+      body: {
+        image_object_key: "animals/12/my photo.jpg",
+      },
+    };
+    const next = jest.fn();
+
+    validateUpdateAnimal(req, {}, next);
+
+    expect(next.mock.calls[0][0].message).toMatch(/invalid image_object_key/i);
+  });
+
+  it("rejects image_url on update", () => {
+    const req = {
+      body: {
+        image_url: "https://pub-test-bucket.r2.dev/animals/12/123-photo.jpg",
+      },
+    };
+    const next = jest.fn();
+
+    validateUpdateAnimal(req, {}, next);
+
+    expect(next.mock.calls[0][0].message).toMatch(/image_url is read-only/i);
   });
 });

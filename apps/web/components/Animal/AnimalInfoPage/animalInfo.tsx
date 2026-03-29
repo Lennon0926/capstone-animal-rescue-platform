@@ -54,7 +54,12 @@ export default function AnimalInfo({ animal }: AnimalInfoProps) {
         <div className={styles.container}>
           <div className={styles.imageWrapper}>
             <Image
-              src={getAnimalImageUrl(animal.image_url, animal.species, animal.aid)}
+              src={getAnimalImageUrl(
+                animal.image_url,
+                animal.species,
+                animal.aid,
+                animal.image_object_key,
+              )}
               alt={animal.name}
               width={600}
               height={600}
