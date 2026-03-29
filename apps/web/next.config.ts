@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   turbopack: {
-    root: path.join(__dirname, "../.."),
+    root: path.join(__dirname),
   },
   images: {
     deviceSizes: [640, 750, 828, 1080, 1200],

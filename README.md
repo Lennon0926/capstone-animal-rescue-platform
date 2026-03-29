@@ -137,6 +137,14 @@ cd apps/server && npm run dev
 cd apps/web && npm run dev
 ```
 
+Optional experimental frontend command:
+
+```bash
+cd apps/web && npm run dev:turbo
+```
+
+`npm run dev` uses webpack as the stable default for local development. `npm run dev:turbo` keeps Turbopack available as an opt-in path for troubleshooting or comparison.
+
 - API: `http://localhost:4000`
 - Frontend: `http://localhost:3000`
 
