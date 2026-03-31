@@ -99,7 +99,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Install Vercel CLI
-        run: npm install --global vercel@50.35.0
+        run: npm install --global vercel@latest
 
       - name: Deploy server → Vercel preview
         id: deploy-server
@@ -155,7 +155,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Install Vercel CLI
-        run: npm install --global vercel@50.35.0
+        run: npm install --global vercel@latest
 
       - name: Deploy server → Vercel production
         id: deploy-server
