@@ -8,6 +8,7 @@ const MOCK_ANIMALS = [
     status: "available",
     size: "medium",
     gender: "male",
+    image_object_key: "animals/1/123-photo.jpg",
     created_at: "2025-01-01T00:00:00Z",
   },
   {
@@ -31,7 +32,12 @@ jest.mock("../lib/supabase", () => ({
 }));
 
 beforeAll(() => {
+  jest.spyOn(console, "error").mockImplementation(() => {});
   process.env.PORT = "4000";
+});
+
+afterAll(() => {
+  console.error.mockRestore();
 });
 
 const getApp = () => require("../server");
@@ -63,6 +69,10 @@ describe("GET /api/animals", () => {
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data).toHaveLength(2);
+    expect(res.body.data[0].image_object_key).toBe("animals/1/123-photo.jpg");
+    expect(res.body.data[0].image_url).toBe(
+      "https://pub-test-bucket.r2.dev/animals/1/123-photo.jpg"
+    );
     expect(res.body.pagination).toMatchObject({
       total: 2,
       limit: 50,

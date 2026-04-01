@@ -12,6 +12,7 @@ const config = {
   },
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
+    "^.+\\.(css|sass|scss)$": "<rootDir>/__mocks__/styleMock.js",
   },
 };
 

@@ -5,7 +5,14 @@ import { useRouter } from "next/navigation";
 import type { Animal } from "@/types/animal";
 import styles from "./createAnimalForm.module.css";
 import { X, Plus, ArrowLeft } from "lucide-react";
-import { uploadAnimalImage } from "@/services/animalImageUploadService";
+import {
+  fetchUploadConfig,
+  getUploadStorageUnavailableMessage,
+  isUploadStorageAvailable,
+  type UploadConfig,
+  updateAnimalImageObjectKey,
+  uploadAnimalImage,
+} from "@/services/animalImageUploadService";
 
 interface CreateAnimalFormProps {
   onSave?: (newAnimal: Animal) => void;
@@ -26,6 +33,9 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
   const router = useRouter();
   const [formData, setFormData] = useState(getEmptyAnimal());
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploadConfigLoading, setIsUploadConfigLoading] = useState(true);
+  const [uploadConfig, setUploadConfig] = useState<UploadConfig | null>(null);
+  const [uploadConfigError, setUploadConfigError] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [tagInput, setTagInput] = useState("");
@@ -78,6 +88,74 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
     }
   }, [selectedFile]);
 
+  const refreshUploadConfig = async (): Promise<{
+    config: UploadConfig | null;
+    error: string | null;
+  }> => {
+    setIsUploadConfigLoading(true);
+
+    try {
+      const nextUploadConfig = await fetchUploadConfig();
+      setUploadConfig(nextUploadConfig);
+      setUploadConfigError("");
+      return { config: nextUploadConfig, error: null };
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "No se pudo verificar el almacenamiento de imágenes.";
+      setUploadConfig(null);
+      setUploadConfigError(message);
+      return { config: null, error: message };
+    } finally {
+      setIsUploadConfigLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadUploadConfig = async () => {
+      setIsUploadConfigLoading(true);
+
+      try {
+        const nextUploadConfig = await fetchUploadConfig();
+        if (!isMounted) {
+          return;
+        }
+
+        setUploadConfig(nextUploadConfig);
+        setUploadConfigError("");
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        setUploadConfig(null);
+        setUploadConfigError(
+          error instanceof Error
+            ? error.message
+            : "No se pudo verificar el almacenamiento de imágenes."
+        );
+      } finally {
+        if (isMounted) {
+          setIsUploadConfigLoading(false);
+        }
+      }
+    };
+
+    loadUploadConfig();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const storageUnavailableMessage = uploadConfigError
+    ? uploadConfigError
+    : getUploadStorageUnavailableMessage(uploadConfig);
+  const isStorageHealthy = isUploadStorageAvailable(uploadConfig);
+
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrorMessage("");
@@ -121,6 +199,17 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
     setIsLoading(true);
 
     try {
+      const { config: latestUploadConfig, error: latestUploadError } =
+        await refreshUploadConfig();
+
+      if (!isUploadStorageAvailable(latestUploadConfig)) {
+        setErrorMessage(
+          latestUploadError ||
+            getUploadStorageUnavailableMessage(latestUploadConfig)
+        );
+        return;
+      }
+
       const createResponse = await fetch(
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals`,
         {
@@ -152,28 +241,14 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
       const createResult = await createResponse.json();
       const newAnimal = createResult.data;
 
-      const uploadResult = await uploadAnimalImage(newAnimal.aid.toString(), selectedFile);
-      
-      const updateResponse = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals/${newAnimal.aid}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            image_url: uploadResult.url,
-          }),
-        }
+      const uploadResult = await uploadAnimalImage(
+        newAnimal.aid.toString(),
+        selectedFile
       );
-
-      if (!updateResponse.ok) {
-        // Animal was created but image update failed
-        console.error("Failed to update animal with image URL");
-      }
-
-      const updatedResult = await updateResponse.json();
-      const finalAnimal = updatedResult.data;
+      const finalAnimal = await updateAnimalImageObjectKey(
+        newAnimal.aid,
+        uploadResult.objectKey
+      );
 
       setSuccessMessage("¡Animal creado exitosamente con imagen!");
 
@@ -224,6 +299,25 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
           {errorMessage && (
             <div className={styles.errorMessage} role="alert">
               {errorMessage}
+            </div>
+          )}
+
+          {isUploadConfigLoading && (
+            <p className={styles.helpText} role="status">
+              Verificando disponibilidad del almacenamiento de imágenes...
+            </p>
+          )}
+
+          {!isUploadConfigLoading && storageUnavailableMessage && (
+            <div className={styles.errorMessage} role="alert">
+              {storageUnavailableMessage}
+            </div>
+          )}
+
+          {!isUploadConfigLoading && isStorageHealthy && uploadConfig?.health && (
+            <div className={styles.successMessage} role="status">
+              Almacenamiento de imágenes disponible. Última verificación:{" "}
+              {new Date(uploadConfig.health.checkedAt).toLocaleString("es-MX")}
             </div>
           )}
 
@@ -441,7 +535,9 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
               disabled={isLoading}
               className={styles.submitButton}
             >
-              {isLoading ? "Creando y subiendo imagen..." : "Crear Animal"}
+              {isLoading
+                ? "Creando y subiendo imagen..."
+                : "Crear Animal"}
             </button>
           </div>
         </form>

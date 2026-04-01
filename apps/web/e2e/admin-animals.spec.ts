@@ -273,8 +273,11 @@ test.describe("Admin Create Animal (/admin/createAnimal)", () => {
   // --- Validation ---
   test("submitting empty form shows validation error", async ({ page }) => {
     await page.locator("#name").fill("");
+    await page.evaluate(() => {
+      (document.querySelector("form") as HTMLFormElement).noValidate = true;
+    });
     await page.getByRole("button", { name: /Crear Animal/i }).click();
-    await expect(page.getByRole("alert")).toBeVisible();
+    await expect(page.getByRole("alert").filter({ hasText: /nombre/i })).toBeVisible();
   });
 
   test("validation error shown when name is missing", async ({ page }) => {

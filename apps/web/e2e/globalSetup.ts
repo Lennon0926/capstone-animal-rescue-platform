@@ -2,8 +2,11 @@ import http from "http";
 import type { IncomingMessage, ServerResponse } from "http";
 import { MOCK_ANIMALS } from "./fixtures/testData";
 
-// Mutable copy — CRUD tests mutate this; call POST /test/reset to restore.
-let ANIMALS = MOCK_ANIMALS.map((a) => ({ ...a }));
+// Baseline catalog used by read endpoints. Keep this stable so parallel tests do not
+// interfere with each other when create/update/delete flows run in other suites.
+const BASE_ANIMALS = MOCK_ANIMALS.map((a) => ({ ...a }));
+let ANIMALS = BASE_ANIMALS.map((a) => ({ ...a }));
+let CREATED_ANIMALS = new Map<number, (typeof MOCK_ANIMALS)[number]>();
 
 function readBody(req: IncomingMessage): Promise<string> {
   return new Promise((resolve) => {
@@ -30,9 +33,34 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse) {
 
   // Reset endpoint for test isolation: POST /test/reset
   if (method === "POST" && url === "/test/reset") {
-    ANIMALS = MOCK_ANIMALS.map((a) => ({ ...a }));
+    ANIMALS = BASE_ANIMALS.map((a) => ({ ...a }));
+    CREATED_ANIMALS = new Map();
     res.writeHead(200);
     res.end(JSON.stringify({ success: true }));
+    return;
+  }
+
+  // Upload config health: GET /api/uploads/config
+  if (method === "GET" && url === "/api/uploads/config") {
+    res.writeHead(200);
+    res.end(
+      JSON.stringify({
+        data: {
+          r2Configured: true,
+          missingEnvVars: [],
+          publicObjectUrlConfigured: true,
+          missingPublicObjectUrlEnvVars: [],
+          allowedMimeTypes: ["image/jpeg", "image/png", "image/webp"],
+          maxImageSizeBytes: 5 * 1024 * 1024,
+          health: {
+            ok: true,
+            code: "OK",
+            message: "Mock upload storage is healthy.",
+            checkedAt: "2024-01-01T00:00:00.000Z",
+          },
+        },
+      })
+    );
     return;
   }
 
@@ -58,9 +86,11 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse) {
   const singleMatch = url.match(/^\/api\/animals\/(\d+)$/);
   if (singleMatch) {
     const id = parseInt(singleMatch[1], 10);
+    const baselineAnimal = ANIMALS.find((a) => a.aid === id);
+    const createdAnimal = CREATED_ANIMALS.get(id);
+    const animal = createdAnimal ?? baselineAnimal;
 
     if (method === "GET") {
-      const animal = ANIMALS.find((a) => a.aid === id);
       if (animal) {
         res.writeHead(200);
         res.end(JSON.stringify({ success: true, data: animal }));
@@ -74,26 +104,33 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse) {
     if (method === "PATCH") {
       const body = await readBody(req);
       const updates = JSON.parse(body);
-      const idx = ANIMALS.findIndex((a) => a.aid === id);
-      if (idx === -1) {
+      if (!animal) {
         res.writeHead(404);
         res.end(JSON.stringify({ success: false, error: "Not found" }));
         return;
       }
-      ANIMALS[idx] = { ...ANIMALS[idx], ...updates };
+
+      const updatedAnimal = { ...animal, ...updates };
+      if (createdAnimal) {
+        CREATED_ANIMALS.set(id, updatedAnimal);
+      }
+
       res.writeHead(200);
-      res.end(JSON.stringify({ success: true, data: ANIMALS[idx] }));
+      res.end(JSON.stringify({ success: true, data: updatedAnimal }));
       return;
     }
 
     if (method === "DELETE") {
-      const idx = ANIMALS.findIndex((a) => a.aid === id);
-      if (idx === -1) {
+      if (!animal) {
         res.writeHead(404);
         res.end(JSON.stringify({ success: false, error: "Not found" }));
         return;
       }
-      ANIMALS.splice(idx, 1);
+
+      if (createdAnimal) {
+        CREATED_ANIMALS.delete(id);
+      }
+
       res.writeHead(200);
       res.end(JSON.stringify({ success: true }));
       return;
@@ -105,14 +142,20 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse) {
     if (method === "POST") {
       const body = await readBody(req);
       const data = JSON.parse(body);
+      const nextAid =
+        Math.max(
+          ...ANIMALS.map((a) => a.aid),
+          ...Array.from(CREATED_ANIMALS.keys()),
+          0
+        ) + 1;
       const newAnimal = {
-        aid: Math.max(...ANIMALS.map((a) => a.aid), 0) + 1,
+        aid: nextAid,
         ...data,
         tags: data.tags || [],
         created_at: new Date().toISOString(),
         record_id: null as number | null,
       };
-      ANIMALS.push(newAnimal);
+      CREATED_ANIMALS.set(newAnimal.aid, newAnimal);
       res.writeHead(201);
       res.end(JSON.stringify({ success: true, data: newAnimal }));
       return;

@@ -3,7 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getAnimalImageUrl } from "@/utils/animalImages";
-import { uploadAnimalImage } from "@/services/animalImageUploadService";
+import {
+  fetchUploadConfig,
+  getUploadStorageUnavailableMessage,
+  isUploadStorageAvailable,
+  type UploadConfig,
+  uploadAnimalImage,
+} from "@/services/animalImageUploadService";
 import type { Animal } from "@/types/animal";
 import styles from "./editAnimalForm.module.css";
 import { X, Plus, ArrowLeft } from "lucide-react";
@@ -19,6 +25,9 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
   const router = useRouter();
   const [formData, setFormData] = useState<Animal>(animal || {} as Animal);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploadConfigLoading, setIsUploadConfigLoading] = useState(true);
+  const [uploadConfig, setUploadConfig] = useState<UploadConfig | null>(null);
+  const [uploadConfigError, setUploadConfigError] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [tagInput, setTagInput] = useState("");
@@ -45,6 +54,74 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
       setPreviewUrl(null);
     }
   }, [selectedFile]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadUploadConfig = async () => {
+      setIsUploadConfigLoading(true);
+
+      try {
+        const nextUploadConfig = await fetchUploadConfig();
+        if (!isMounted) {
+          return;
+        }
+
+        setUploadConfig(nextUploadConfig);
+        setUploadConfigError("");
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        setUploadConfig(null);
+        setUploadConfigError(
+          error instanceof Error
+            ? error.message
+            : "No se pudo verificar el almacenamiento de imágenes."
+        );
+      } finally {
+        if (isMounted) {
+          setIsUploadConfigLoading(false);
+        }
+      }
+    };
+
+    loadUploadConfig();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const refreshUploadConfig = async (): Promise<{
+    config: UploadConfig | null;
+    error: string | null;
+  }> => {
+    setIsUploadConfigLoading(true);
+
+    try {
+      const nextUploadConfig = await fetchUploadConfig();
+      setUploadConfig(nextUploadConfig);
+      setUploadConfigError("");
+      return { config: nextUploadConfig, error: null };
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "No se pudo verificar el almacenamiento de imágenes.";
+      setUploadConfig(null);
+      setUploadConfigError(message);
+      return { config: null, error: message };
+    } finally {
+      setIsUploadConfigLoading(false);
+    }
+  };
+
+  const storageUnavailableMessage = uploadConfigError
+    ? uploadConfigError
+    : getUploadStorageUnavailableMessage(uploadConfig);
+  const isStorageHealthy = isUploadStorageAvailable(uploadConfig);
 
   // Auto-close success message and redirect after 2 seconds
   useEffect(() => {
@@ -173,8 +250,18 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
 
       // If a new image was selected, upload it first
       if (selectedFile) {
+        const { config: latestUploadConfig, error: latestUploadError } =
+          await refreshUploadConfig();
+
+        if (!isUploadStorageAvailable(latestUploadConfig)) {
+          throw new Error(
+            latestUploadError ||
+              getUploadStorageUnavailableMessage(latestUploadConfig)
+          );
+        }
+
         const uploadResult = await uploadAnimalImage(String(formData.aid), selectedFile);
-        updateBody.image_url = uploadResult.url;
+        updateBody.image_object_key = uploadResult.objectKey;
       }
 
       const response = await fetch(
@@ -242,12 +329,17 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
         </div>
 
         {/* Current Image Preview */}
-        {formData.image_url && (
+        {(formData.image_url || formData.image_object_key) && (
           <div className={styles.imagePreviewSection}>
             <h3 className={styles.sectionLabel}>Imagen Actual</h3>
             <div className={styles.imagePreview}>
               <Image
-                src={getAnimalImageUrl(formData.image_url, formData.species, formData.aid)}
+                src={getAnimalImageUrl(
+                  formData.image_url,
+                  formData.species,
+                  formData.aid,
+                  formData.image_object_key,
+                )}
                 alt={formData.name}
                 fill
                 style={{ objectFit: "cover" }}
@@ -261,6 +353,25 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
           {errorMessage && (
             <div className={styles.errorMessage} role="alert">
               {errorMessage}
+            </div>
+          )}
+
+          {isUploadConfigLoading && (
+            <p className={styles.helpText} role="status">
+              Verificando disponibilidad del almacenamiento de imágenes...
+            </p>
+          )}
+
+          {!isUploadConfigLoading && storageUnavailableMessage && (
+            <div className={styles.errorMessage} role="alert">
+              {storageUnavailableMessage}
+            </div>
+          )}
+
+          {!isUploadConfigLoading && isStorageHealthy && uploadConfig?.health && (
+            <div className={styles.successMessage} role="status">
+              Almacenamiento de imágenes disponible. Última verificación:{" "}
+              {new Date(uploadConfig.health.checkedAt).toLocaleString("es-MX")}
             </div>
           )}
 
@@ -400,6 +511,7 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
                 accept="image/jpeg,image/png,image/webp"
                 onChange={(event) => setSelectedFile(event.target.files?.[0] || null)}
                 className={styles.input}
+                disabled={isUploadConfigLoading || !isStorageHealthy}
               />
             </div>
 

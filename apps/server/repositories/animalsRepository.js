@@ -4,6 +4,7 @@
  */
 
 const { getSupabaseClient } = require("../lib/supabase");
+const { getPublicObjectUrl, normalizeObjectKey } = require("../services/r2Service");
 
 /**
  * Valid filter fields and their allowed operators
@@ -22,6 +23,85 @@ const VALID_FILTERS = {
  * Valid sort fields
  */
 const VALID_SORT_FIELDS = ["aid", "name", "species", "status", "created_at"];
+
+function normalizeImageUrlValue(value) {
+  if (typeof value !== "string") {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  return trimmed ? trimmed : null;
+}
+
+function isExternalImageUrl(imageUrl) {
+  if (!imageUrl || !/^https?:\/\//i.test(imageUrl)) {
+    return false;
+  }
+
+  try {
+    const parsedUrl = new URL(imageUrl);
+    const hostname = parsedUrl.hostname.toLowerCase();
+
+    if (
+      hostname.endsWith(".r2.cloudflarestorage.com") ||
+      hostname.endsWith(".r2.dev")
+    ) {
+      return false;
+    }
+
+    const configuredBaseUrl = process.env.R2_PUBLIC_BASE_URL;
+    if (configuredBaseUrl) {
+      const configuredOrigin = new URL(configuredBaseUrl).origin;
+      if (parsedUrl.origin === configuredOrigin) {
+        return false;
+      }
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function serializeAnimalRecord(animal) {
+  if (!animal) {
+    return animal;
+  }
+
+  const legacyImageUrl = normalizeImageUrlValue(animal.image_url);
+  const imageObjectKey = normalizeObjectKey(animal.image_object_key);
+  const derivedImageUrl = imageObjectKey
+    ? getPublicObjectUrl(imageObjectKey)
+    : isExternalImageUrl(legacyImageUrl)
+      ? legacyImageUrl
+      : null;
+
+  return {
+    ...animal,
+    image_object_key: imageObjectKey,
+    image_url: derivedImageUrl,
+  };
+}
+
+function normalizeAnimalImageFields(animalData = {}) {
+  const normalizedAnimalData = { ...animalData };
+  const legacyImageUrl = normalizeImageUrlValue(animalData.image_url);
+  const explicitObjectKey = normalizeObjectKey(animalData.image_object_key);
+
+  if (explicitObjectKey) {
+    normalizedAnimalData.image_object_key = explicitObjectKey;
+    normalizedAnimalData.image_url = getPublicObjectUrl(explicitObjectKey);
+    return normalizedAnimalData;
+  }
+
+  if (isExternalImageUrl(legacyImageUrl)) {
+    normalizedAnimalData.image_url = legacyImageUrl;
+  } else {
+    delete normalizedAnimalData.image_url;
+  }
+
+  return normalizedAnimalData;
+}
 
 /**
  * Fetches animals with optional filters, sorting, and pagination.
@@ -89,7 +169,11 @@ async function getAnimals(options = {}) {
       return { data: [], count: 0, error: error.message };
     }
 
-    return { data: data || [], count: count || 0, error: null };
+    return {
+      data: (data || []).map(serializeAnimalRecord),
+      count: count || 0,
+      error: null,
+    };
   } catch (err) {
     return { data: [], count: 0, error: err.message };
   }
@@ -118,7 +202,7 @@ async function getAnimalById(aid) {
       return { data: null, error: error.message };
     }
 
-    return { data, error: null };
+    return { data: serializeAnimalRecord(data), error: null };
   } catch (err) {
     return { data: null, error: err.message };
   }
@@ -164,10 +248,11 @@ async function getDistinctValues(field) {
 async function createAnimal(animalData) {
   try {
     const client = getSupabaseClient();
+    const normalizedAnimalData = normalizeAnimalImageFields(animalData);
 
     const { data, error } = await client
       .from("animals")
-      .insert(animalData)
+      .insert(normalizedAnimalData)
       .select("*")
       .single();
 
@@ -175,7 +260,7 @@ async function createAnimal(animalData) {
       return { data: null, error: error.message };
     }
 
-    return { data, error: null };
+    return { data: serializeAnimalRecord(data), error: null };
   } catch (err) {
     return { data: null, error: err.message };
   }
@@ -204,7 +289,7 @@ async function deleteAnimal(aid) {
       return { data: null, error: error.message };
     }
 
-    return { data, error: null };
+    return { data: serializeAnimalRecord(data), error: null };
   } catch (err) {
     return { data: null, error: err.message };  
   }
@@ -220,10 +305,11 @@ async function deleteAnimal(aid) {
 async function updateAnimalById(aid, updates) {
   try {
     const client = getSupabaseClient();
+    const normalizedUpdates = normalizeAnimalImageFields(updates);
 
     const { data, error } = await client
       .from("animals")
-      .update(updates)
+      .update(normalizedUpdates)
       .eq("aid", aid)
       .select("*")
       .single();
@@ -235,7 +321,7 @@ async function updateAnimalById(aid, updates) {
       return { data: null, error: error.message };
     }
 
-    return { data, error: null };
+    return { data: serializeAnimalRecord(data), error: null };
   } catch (err) {
     return { data: null, error: err.message };
   }
@@ -250,4 +336,6 @@ module.exports = {
   updateAnimalById,
   VALID_FILTERS,
   VALID_SORT_FIELDS,
+  serializeAnimalRecord,
+  normalizeAnimalImageFields,
 };

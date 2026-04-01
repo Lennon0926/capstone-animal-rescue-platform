@@ -2,10 +2,13 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./e2e",
-  fullyParallel: true,
+  // The mock API server in globalSetup keeps mutable in-memory state.
+  // Running browser projects in parallel makes create/delete flows nondeterministic.
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? "github" : "html",
+  workers: 1,
   globalSetup: "./e2e/globalSetup.ts",
   use: {
     baseURL: "http://localhost:3000",
