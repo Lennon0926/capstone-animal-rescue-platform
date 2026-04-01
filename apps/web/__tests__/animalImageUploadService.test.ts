@@ -184,12 +184,60 @@ describe("updateAnimalImageObjectKey", () => {
   it("throws on failed update", async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,
+      status: 404,
       json: () => Promise.resolve({ error: "Animal not found" }),
     });
 
     await expect(
       updateAnimalImageObjectKey(999, "animals/999/missing.jpg")
     ).rejects.toThrow("Animal not found");
+
+    const errorLogs = (console.error as jest.Mock).mock.calls.map(([entry]) =>
+      String(entry)
+    );
+    expect(
+      errorLogs.some(
+        (entry) =>
+          entry.includes('"event":"animal_image_update_failed"') &&
+          entry.includes('"animalId":999') &&
+          entry.includes('"errorMessage":"Animal not found"')
+      )
+    ).toBe(true);
+  });
+
+  it("uses the server message from structured error objects", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 400,
+      json: () =>
+        Promise.resolve({
+          error: {
+            code: 400,
+            message: "Invalid image_object_key.",
+            details: { traceId: "trace-123" },
+          },
+        }),
+    });
+
+    await expect(
+      updateAnimalImageObjectKey(1, "animals/1/bad key.jpg")
+    ).rejects.toMatchObject({
+      name: "UploadApiError",
+      message: "Invalid image_object_key.",
+      code: "400",
+    });
+
+    const errorLogs = (console.error as jest.Mock).mock.calls.map(([entry]) =>
+      String(entry)
+    );
+    expect(
+      errorLogs.some(
+        (entry) =>
+          entry.includes('"event":"animal_image_update_failed"') &&
+          entry.includes('"errorCode":"400"') &&
+          entry.includes('"errorMessage":"Invalid image_object_key."')
+      )
+    ).toBe(true);
   });
 });
 

@@ -29,9 +29,12 @@ export type UploadConfig = {
 
 export type { Animal };
 
+type ApiErrorCode = string | number;
+
 type UploadApiErrorShape = {
-  code?: string;
+  code?: ApiErrorCode;
   message?: string;
+  details?: unknown;
 };
 
 type UploadApiResponse = {
@@ -47,7 +50,7 @@ type UploadConfigApiResponse = {
 type AnimalApiResponse = {
   success: boolean;
   data?: Animal;
-  error?: string;
+  error?: UploadApiErrorShape | string;
 };
 
 type AnimalsListResponse = {
@@ -71,6 +74,8 @@ export class UploadApiError extends Error {
   }
 }
 
+type UploadLogLevel = "error" | "info";
+
 const getApiBaseUrl = () => {
   if (!API_BASE_URL) {
     throw new Error(
@@ -81,21 +86,81 @@ const getApiBaseUrl = () => {
   return API_BASE_URL;
 };
 
+const logUploadEvent = (
+  level: UploadLogLevel,
+  event: string,
+  metadata: Record<string, unknown>
+) => {
+  const logger = level === "error" ? console.error : console.info;
+
+  logger(
+    JSON.stringify({
+      ts: new Date().toISOString(),
+      app: "animal-rescue-web",
+      area: "animal-image-upload",
+      level,
+      event,
+      ...metadata,
+    })
+  );
+};
+
+const normalizeApiError = (
+  error: UploadApiErrorShape | string | undefined,
+  fallbackMessage: string
+) => {
+  if (typeof error === "string") {
+    return {
+      message: error || fallbackMessage,
+      code: undefined,
+      details: undefined,
+    };
+  }
+
+  return {
+    message: error?.message || fallbackMessage,
+    code:
+      error?.code === undefined || error?.code === null
+        ? undefined
+        : String(error.code),
+    details: error?.details,
+  };
+};
+
 const parseJsonSafely = async <T>(
   response: Response,
   scope: string
 ): Promise<T | null> => {
   return (await response.json().catch((err: unknown) => {
-    console.error(`[${scope}] Failed to parse response JSON:`, err);
+    logUploadEvent("error", "api_response_json_parse_failed", {
+      scope,
+      httpStatus: response.status,
+      errorMessage: err instanceof Error ? err.message : String(err),
+    });
     return null;
   })) as T | null;
 };
 
 const buildUploadApiError = (
-  error: UploadApiErrorShape | undefined,
-  fallbackMessage: string
+  error: UploadApiErrorShape | string | undefined,
+  fallbackMessage: string,
+  logContext?: {
+    event: string;
+    metadata: Record<string, unknown>;
+  }
 ) => {
-  return new UploadApiError(error?.message || fallbackMessage, error?.code);
+  const normalizedError = normalizeApiError(error, fallbackMessage);
+
+  if (logContext) {
+    logUploadEvent("error", logContext.event, {
+      ...logContext.metadata,
+      errorCode: normalizedError.code ?? null,
+      errorMessage: normalizedError.message,
+      errorDetails: normalizedError.details ?? null,
+    });
+  }
+
+  return new UploadApiError(normalizedError.message, normalizedError.code);
 };
 
 export const isUploadStorageAvailable = (
@@ -159,7 +224,14 @@ export const fetchUploadConfig = async (): Promise<UploadConfig> => {
   if (!response.ok) {
     throw buildUploadApiError(
       payload?.error,
-      "No se pudo verificar la configuración del almacenamiento."
+      "No se pudo verificar la configuración del almacenamiento.",
+      {
+        event: "upload_config_fetch_failed",
+        metadata: {
+          route: "GET /api/uploads/config",
+          httpStatus: response.status,
+        },
+      }
     );
   }
 
@@ -220,10 +292,22 @@ export const uploadAnimalImage = async (
   );
 
   if (!response.ok) {
-    throw buildUploadApiError(payload?.error, "Image upload failed.");
+    throw buildUploadApiError(payload?.error, "Image upload failed.", {
+      event: "animal_image_upload_failed",
+      metadata: {
+        route: "POST /api/uploads/animals/:animalId/image",
+        animalId: cleanedAnimalId,
+        httpStatus: response.status,
+      },
+    });
   }
 
   if (!payload?.data) {
+    logUploadEvent("error", "animal_image_upload_invalid_payload", {
+      route: "POST /api/uploads/animals/:animalId/image",
+      animalId: cleanedAnimalId,
+      httpStatus: response.status,
+    });
     throw new Error("Upload succeeded, but response payload was invalid.");
   }
 
@@ -251,10 +335,28 @@ export const updateAnimalImageObjectKey = async (
   );
 
   if (!response.ok) {
-    throw new Error(payload?.error || "Failed to update animal image.");
+    throw buildUploadApiError(
+      payload?.error,
+      "Failed to update animal image.",
+      {
+        event: "animal_image_update_failed",
+        metadata: {
+          route: "PATCH /api/animals/:aid",
+          animalId,
+          imageObjectKey,
+          httpStatus: response.status,
+        },
+      }
+    );
   }
 
   if (!payload?.data) {
+    logUploadEvent("error", "animal_image_update_invalid_payload", {
+      route: "PATCH /api/animals/:aid",
+      animalId,
+      imageObjectKey,
+      httpStatus: response.status,
+    });
     throw new Error("Update succeeded, but response payload was invalid.");
   }
 
