@@ -173,7 +173,7 @@ describe("admin image flow gating", () => {
     const imageInput = await screen.findByLabelText(
       /Selecciona una nueva imagen/i
     );
-    expect(imageInput).toBeDisabled();
+    expect((imageInput as HTMLInputElement).disabled).toBe(true);
 
     fireEvent.change(screen.getByLabelText(/Nombre/i), {
       target: { value: "Luna Actualizada" },
@@ -196,10 +196,14 @@ describe("admin image flow gating", () => {
     render(<AnimalImageUploadForm />);
 
     const imageInput = await screen.findByLabelText(/Image File/i);
-    expect(imageInput).toBeDisabled();
+    expect((imageInput as HTMLInputElement).disabled).toBe(true);
 
     expect(
-      screen.getByRole("button", { name: /Image Storage Unavailable/i })
-    ).toBeDisabled();
+      (
+        screen.getByRole("button", {
+          name: /Image Storage Unavailable/i,
+        }) as HTMLButtonElement
+      ).disabled
+    ).toBe(true);
   });
 });
