@@ -6,7 +6,7 @@ import { Facebook, ExternalLink, Calendar, RefreshCw, MessageCircle, ChevronDown
 import type { FacebookPost, FacebookComment } from "@/pages/api/facebook-posts";
 import styles from "./blog.module.css";
 
-const TRUNCATE_LENGTH = 280;
+const AUTHOR_NAME = "Ciudadanos Pro Albergue";
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("es-PR", {
@@ -14,6 +14,63 @@ function formatDate(iso: string): string {
     month: "long",
     day: "numeric",
   });
+}
+
+/** Collect all image URLs from a post: subattachments first, then full_picture fallback. */
+function getImages(post: FacebookPost): string[] {
+  const attachment = post.attachments?.data[0];
+  if (attachment?.subattachments?.data.length) {
+    return attachment.subattachments.data
+      .map((s) => s.media?.image?.src)
+      .filter((src): src is string => Boolean(src));
+  }
+  if (post.full_picture) return [post.full_picture];
+  return [];
+}
+
+const GRID_CLASS: Record<number, string> = {
+  2: styles.cardImageGrid2,
+  3: styles.cardImageGrid3,
+  4: styles.cardImageGrid4,
+};
+
+function ImageGrid({ images }: { images: string[] }) {
+  if (images.length === 0) return null;
+  if (images.length === 1) {
+    return (
+      <div className={styles.cardImage}>
+        <Image
+          src={images[0]}
+          alt="Publicación de Facebook"
+          fill
+          style={{ objectFit: "cover" }}
+          sizes="(max-width: 740px) 100vw, 740px"
+          unoptimized
+        />
+      </div>
+    );
+  }
+  const count = Math.min(images.length, 4);
+  const gridClass = GRID_CLASS[count] ?? styles.cardImageGrid4;
+  return (
+    <div className={`${styles.cardImageGrid} ${gridClass}`}>
+      {images.slice(0, 4).map((src, i) => (
+        <div key={i} className={styles.cardImageGridItem}>
+          {i === 3 && images.length > 4 && (
+            <div className={styles.cardImageMore}>+{images.length - 4}</div>
+          )}
+          <Image
+            src={src}
+            alt={`Foto ${i + 1}`}
+            fill
+            style={{ objectFit: "cover" }}
+            sizes="(max-width: 740px) 50vw, 370px"
+            unoptimized
+          />
+        </div>
+      ))}
+    </div>
+  );
 }
 
 function Comment({ comment }: { comment: FacebookComment }) {
@@ -31,79 +88,112 @@ function Comment({ comment }: { comment: FacebookComment }) {
   );
 }
 
+function extractTitle(text: string): string {
+  const line = text.split("\n")[0].trim();
+  return line.length > 90 ? line.slice(0, 90) + "…" : line;
+}
+
 function PostCard({ post }: { post: FacebookPost }) {
   const [expanded, setExpanded] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const text = post.message ?? post.story ?? "";
-  const isTruncated = text.length > TRUNCATE_LENGTH;
-  const displayText =
-    expanded || !isTruncated ? text : text.slice(0, TRUNCATE_LENGTH) + "…";
   const comments = post.comments?.data ?? [];
+  const images = getImages(post);
+
+  const title = extractTitle(text);
 
   return (
     <article className={styles.card}>
-      {post.full_picture && (
-        <div className={styles.cardImage}>
-          <Image
-            src={post.full_picture}
-            alt="Publicación de Facebook"
-            fill
-            style={{ objectFit: "cover" }}
-            sizes="(max-width: 720px) 100vw, 680px"
-            unoptimized
-          />
+      {/* Author row — clicking toggles expanded */}
+      <button
+        className={styles.cardAuthor}
+        onClick={() => setExpanded((e) => !e)}
+        aria-expanded={expanded}
+      >
+        <div className={styles.cardAuthorAvatar}>C</div>
+        <span className={styles.cardAuthorName}>{AUTHOR_NAME}</span>
+        <span className={styles.cardAuthorChevron}>
+          {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+        </span>
+      </button>
+
+      {/* Collapsed: Medium-style horizontal card */}
+      {!expanded && (
+        <button
+          className={styles.cardCollapsed}
+          onClick={() => setExpanded(true)}
+          aria-expanded={false}
+        >
+          <p className={styles.cardTitle}>{title}</p>
+          {images[0] && (
+            <div className={styles.cardThumb}>
+              <Image
+                src={images[0]}
+                alt="Publicación de Facebook"
+                fill
+                style={{ objectFit: "cover" }}
+                sizes="112px"
+                unoptimized
+              />
+            </div>
+          )}
+        </button>
+      )}
+
+      {/* Expanded: title + body + full image grid */}
+      {expanded && (
+        <div className={styles.cardExpanded}>
+          {text && <p className={styles.cardText}>{text}</p>}
+          <ImageGrid images={images} />
         </div>
       )}
-      <div className={styles.cardBody}>
-        {text && (
-          <p className={styles.cardText}>
-            {displayText}
-            {isTruncated && (
-              <button
-                className={styles.expandBtn}
-                onClick={() => setExpanded((e) => !e)}
-              >
-                {expanded ? " Ver menos" : " Ver más"}
-              </button>
-            )}
-          </p>
-        )}
-        <div className={styles.cardFooter}>
+
+      {/* Footer */}
+      <div className={styles.cardFooter}>
+        <div className={styles.cardMeta}>
           <span className={styles.cardDate}>
-            <Calendar size={13} />
+            <Calendar size={12} />
             {formatDate(post.created_time)}
           </span>
-          <a
-            href={post.permalink_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.cardLink}
-          >
-            Ver en Facebook
-            <ExternalLink size={13} />
-          </a>
+          {comments.length > 0 && (
+            <span className={styles.cardComments}>
+              <MessageCircle size={12} />
+              {comments.length}
+            </span>
+          )}
         </div>
-
-        {comments.length > 0 && (
-          <div className={styles.commentsSection}>
-            <button
-              className={styles.commentsToggle}
-              onClick={() => setShowComments((s) => !s)}
-            >
-              <MessageCircle size={14} />
-              {comments.length} {comments.length === 1 ? "comentario" : "comentarios"}
-              {showComments ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-            </button>
-            {showComments && (
-              <div className={styles.commentsList}>
-                {comments.map((c) => (
-                  <Comment key={c.id} comment={c} />
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+        <a
+          href={post.permalink_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.cardLink}
+        >
+          <Facebook size={13} />
+          Ver en Facebook
+          <ExternalLink size={11} />
+        </a>
       </div>
+
+      {/* Comments */}
+      {comments.length > 0 && (
+        <div className={styles.commentsSection}>
+          <button
+            className={styles.commentsToggle}
+            onClick={() => setShowComments((s) => !s)}
+          >
+            <MessageCircle size={14} />
+            {comments.length} {comments.length === 1 ? "comentario" : "comentarios"}
+            {showComments ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          </button>
+          {showComments && (
+            <div className={styles.commentsList}>
+              {comments.map((c) => (
+                <Comment key={c.id} comment={c} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </article>
   );
 }
@@ -111,12 +201,13 @@ function PostCard({ post }: { post: FacebookPost }) {
 function SkeletonCard() {
   return (
     <div className={styles.skeleton}>
-      <div className={`${styles.skeletonImage} ${styles.shimmer}`} />
-      <div className={styles.skeletonBody}>
+      <div className={`${styles.skeletonAuthor} ${styles.shimmer}`} />
+      <div className={styles.skeletonContent}>
         <div className={`${styles.skeletonLine} ${styles.shimmer}`} />
         <div className={`${styles.skeletonLine} ${styles.skeletonLineShort} ${styles.shimmer}`} />
-        <div className={`${styles.skeletonMeta} ${styles.shimmer}`} />
       </div>
+      <div className={`${styles.skeletonImage} ${styles.shimmer}`} />
+      <div className={`${styles.skeletonMeta} ${styles.shimmer}`} />
     </div>
   );
 }
@@ -129,7 +220,7 @@ function useScrollReveal(dep: number) {
         entries.forEach((e) => {
           if (e.isIntersecting) e.target.classList.add(styles.visible);
         }),
-      { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
+      { threshold: 0.05, rootMargin: "0px 0px -20px 0px" }
     );
     ref.current
       ?.querySelectorAll(`.${styles.fadeInUp}`)
@@ -169,38 +260,36 @@ export default function Blog() {
 
   return (
     <div className={styles.page} ref={containerRef}>
-      {/* Hero */}
-      <section className={styles.hero}>
-        <div className={styles.heroContent}>
-          <div className={`${styles.fbBadge} ${styles.fadeInUp}`}>
-            <Facebook size={20} />
-            <span>Feed de Facebook</span>
+      {/* Header */}
+      <header className={styles.header}>
+        <div className={styles.headerInner}>
+          <div className={styles.headerLeft}>
+            <div className={styles.headerIcon}>
+              <Facebook size={22} color="#fff" />
+            </div>
+            <div className={styles.headerText}>
+              <h1 className={styles.headerTitle}>Nuestras Publicaciones</h1>
+              <p className={styles.headerSubtitle}>Espejo de nuestra página oficial de Facebook</p>
+            </div>
           </div>
-          <h1 className={`${styles.heroTitle} ${styles.fadeInUp}`}>
-            Nuestras Publicaciones
-          </h1>
-          <p className={`${styles.heroSubtitle} ${styles.fadeInUp}`}>
-            Mantente al día con las últimas noticias, rescates y eventos de
-            Ciudadanos Pro Albergue de Animales de Aguadilla.
-          </p>
           <a
             href="https://www.facebook.com/Ciudadanos-Pro-Albergue-de-Animales-de-Aguadilla-Inc-147815628577682/"
             target="_blank"
             rel="noopener noreferrer"
-            className={`${styles.fbPageLink} ${styles.fadeInUp}`}
+            className={styles.fbPageLink}
           >
-            <Facebook size={16} />
-            Seguirnos en Facebook
+            <Facebook size={13} />
+            <span>Seguirnos</span>
           </a>
         </div>
-      </section>
+      </header>
 
       {/* Feed */}
       <section className={styles.feed}>
         <div className={styles.feedInner}>
           {loading && (
             <div className={styles.feedList}>
-              {Array.from({ length: 3 }).map((_, i) => (
+              {Array.from({ length: 5 }).map((_, i) => (
                 <SkeletonCard key={i} />
               ))}
             </div>
@@ -218,7 +307,7 @@ export default function Blog() {
 
           {!loading && !error && posts.length === 0 && (
             <div className={styles.emptyState}>
-              <Facebook size={48} />
+              <Facebook size={40} color="#ccc" />
               <p>No hay publicaciones disponibles en este momento.</p>
               <a
                 href="https://www.facebook.com/Ciudadanos-Pro-Albergue-de-Animales-de-Aguadilla-Inc-147815628577682/"
@@ -237,7 +326,7 @@ export default function Blog() {
                 <div
                   key={post.id}
                   className={styles.fadeInUp}
-                  style={{ transitionDelay: `${Math.min(i * 80, 400)}ms` }}
+                  style={{ transitionDelay: `${Math.min(i * 60, 300)}ms` }}
                 >
                   <PostCard post={post} />
                 </div>

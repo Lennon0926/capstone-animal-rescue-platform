@@ -7,6 +7,12 @@ export interface FacebookComment {
   created_time: string;
 }
 
+export interface FacebookAttachment {
+  type: string;
+  media?: { image?: { src: string; width: number; height: number } };
+  subattachments?: { data: FacebookAttachment[] };
+}
+
 export interface FacebookPost {
   id: string;
   message?: string;
@@ -15,6 +21,7 @@ export interface FacebookPost {
   created_time: string;
   permalink_url: string;
   comments?: { data: FacebookComment[] };
+  attachments?: { data: FacebookAttachment[] };
 }
 
 interface FacebookGraphResponse {
@@ -50,7 +57,7 @@ export default async function handler(
   const limit = Number(req.query.limit ?? 12);
 
   try {
-    const fields = "message,story,full_picture,created_time,permalink_url,comments{message,from{name,id},created_time}";
+    const fields = "message,story,full_picture,created_time,permalink_url,comments{message,from{name,id},created_time},attachments{type,media,subattachments{type,media}}";
     const url = `https://graph.facebook.com/v21.0/${pageId}/posts?fields=${fields}&limit=${limit}&access_token=${accessToken}`;
 
     const fbRes = await fetch(url);
