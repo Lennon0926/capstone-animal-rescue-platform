@@ -158,8 +158,8 @@ export default function AdminHome() {
           <div>
             <h1>Admin Dashboard</h1>
             <p className={styles.subtitle}>
-              Welcome to the admin dashboard. Here you can manage animals, view
-              reports, and perform other administrative tasks.
+              Bienvenido al panel de administración. Aquí puedes 
+              manejar los animales y revisar las estadísticas.
             </p>
           </div>
         </div>
