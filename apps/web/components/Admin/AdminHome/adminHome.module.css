@@ -53,16 +53,38 @@
 /* Select Dropdown Styling */
 .selectTrigger {
   display: none;
-  width: 160px;
+  width: 180px;
   border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-medium);
+  min-height: 44px;
 }
 
 .selectContent {
   border-radius: var(--radius-lg);
+  border: 2px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  background-color: var(--color-bg);
+  min-width: 180px;
 }
 
 .selectItem {
   border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-base);
+  cursor: pointer;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.selectItem:hover {
+  background-color: var(--color-surface);
+}
+
+.selectItem:focus {
+  background-color: var(--color-primary-soft);
 }
 
 /* Card Content */
@@ -71,11 +93,17 @@
   padding-top: var(--space-4);
 }
 
+/* Chart Wrapper */
+.chartWrapper {
+  width: 100%;
+}
+
 /* Chart Container */
 .chartContainer {
   aspect-ratio: auto;
   height: 250px;
   width: 100%;
+  font-size: 16px;
 }
 
 /* Desktop/Tablet Styles */
@@ -130,4 +158,55 @@
   .cardHeaderContent {
     text-align: center;
   }
+}
+
+/* Custom Tooltip Styles */
+.customTooltip {
+  background-color: white;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-lg);
+  min-width: 220px;
+}
+
+.tooltipLabel {
+  font-size: 16px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin: 0 0 var(--space-3) 0;
+  padding-bottom: var(--space-2);
+  border-bottom: 2px solid var(--color-border);
+}
+
+.tooltipContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tooltipItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 15px;
+}
+
+.tooltipDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tooltipName {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.tooltipValue {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin-left: auto;
+  font-size: 16px;
 }

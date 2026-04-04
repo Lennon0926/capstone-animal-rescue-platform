@@ -14,7 +14,6 @@ import {
   ChartLegend,
   ChartLegendContent,
   ChartTooltip,
-  ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
 import {
@@ -25,6 +24,39 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import styles from "./adminHome.module.css"
+
+// Custom Tooltip Component
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    const date = new Date(label);
+    const formattedDate = date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+
+    return (
+      <div className={styles.customTooltip}>
+        <p className={styles.tooltipLabel}>{formattedDate}</p>
+        <div className={styles.tooltipContent}>
+          {payload.map((entry: any, index: number) => (
+            <div key={index} className={styles.tooltipItem}>
+              <span 
+                className={styles.tooltipDot} 
+                style={{ backgroundColor: entry.color }}
+              />
+              <span className={styles.tooltipName}>
+                {entry.name.charAt(0).toUpperCase() + entry.name.slice(1)}:
+              </span>
+              <span className={styles.tooltipValue}>{entry.value} visitors</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
 
 const chartData = [
   { date: "2024-04-01", desktop: 222, mobile: 150 },
@@ -193,10 +225,11 @@ export default function AdminHome() {
             </Select>
           </CardHeader>
           <CardContent className={styles.cardContent}>
-            <ChartContainer
-              config={chartConfig}
-              className={styles.chartContainer}
-            >
+            <div className={styles.chartWrapper}>
+              <ChartContainer
+                config={chartConfig}
+                className={styles.chartContainer}
+              >
               <AreaChart data={filteredData}>
                 <defs>
                   <linearGradient id="fillDesktop" x1="0" y1="0" x2="0" y2="1">
@@ -239,20 +272,7 @@ export default function AdminHome() {
                     })
                   }}
                 />
-                <ChartTooltip
-                  cursor={false}
-                  content={
-                    <ChartTooltipContent
-                      labelFormatter={(value) => {
-                        return new Date(value).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                        })
-                      }}
-                      indicator="dot"
-                    />
-                  }
-                />
+                <ChartTooltip content={<CustomTooltip />} />
                 <Area
                   dataKey="mobile"
                   type="monotone"
@@ -272,6 +292,7 @@ export default function AdminHome() {
                 <ChartLegend content={<ChartLegendContent />} />
               </AreaChart>
             </ChartContainer>
+            </div>
           </CardContent>
         </Card>
       </div>
