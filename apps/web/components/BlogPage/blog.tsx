@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Facebook, ExternalLink, Calendar, RefreshCw, MessageCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { Facebook, ExternalLink, Calendar, RefreshCw, MessageCircle, ChevronDown, ChevronUp, Share2, Clapperboard } from "lucide-react";
 import type { FacebookPost, FacebookComment } from "@/pages/api/facebook-posts";
 import styles from "./blog.module.css";
 
@@ -15,6 +15,23 @@ function formatDate(iso: string): string {
     day: "numeric",
   });
 }
+
+type PostType = "reel" | "shared" | "normal";
+
+function getPostType(post: FacebookPost): PostType {
+  const attachType = post.attachments?.data[0]?.type ?? "";
+  // Shared post: story field (share without caption) OR "share" attachment type (share with caption)
+  if (post.story || attachType === "share") return "shared";
+  // Own reel/video post
+  if (attachType === "video_inline" || attachType === "video" || attachType === "reel") return "reel";
+  return "normal";
+}
+
+const POST_TYPE_BADGE: Record<PostType, { label: string; icon: React.ReactNode; className: string } | null> = {
+  reel:   { label: "Reel", icon: <Clapperboard size={11} />, className: "badgeReel" },
+  shared: { label: "Compartido", icon: <Share2 size={11} />, className: "badgeShared" },
+  normal: null,
+};
 
 /** Collect all image URLs from a post: subattachments first, then full_picture fallback. */
 function getImages(post: FacebookPost): string[] {
@@ -101,6 +118,8 @@ function PostCard({ post }: { post: FacebookPost }) {
   const images = getImages(post);
 
   const title = extractTitle(text);
+  const postType = getPostType(post);
+  const badge = POST_TYPE_BADGE[postType];
 
   return (
     <article className={styles.card}>
@@ -112,6 +131,12 @@ function PostCard({ post }: { post: FacebookPost }) {
       >
         <div className={styles.cardAuthorAvatar}>C</div>
         <span className={styles.cardAuthorName}>{AUTHOR_NAME}</span>
+        {badge && (
+          <span className={`${styles.postBadge} ${styles[badge.className]}`}>
+            {badge.icon}
+            {badge.label}
+          </span>
+        )}
         <span className={styles.cardAuthorChevron}>
           {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
         </span>
