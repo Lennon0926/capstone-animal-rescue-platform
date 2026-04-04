@@ -576,6 +576,105 @@ Error 500
   }
 }
 
+### Uploads (Admin UI Support)
+- GET `/uploads/config`
+
+Description: Return upload configuration and live Cloudflare R2 health for admin image flows.
+Authentication: Admin (Authorization: Bearer <token>)
+
+Request example
+- GET /api/v1/uploads/config
+
+Response 200
+{
+  "data": {
+    "r2Configured": true,
+    "missingEnvVars": [],
+    "publicObjectUrlConfigured": true,
+    "missingPublicObjectUrlEnvVars": [],
+    "allowedMimeTypes": [
+      "image/jpeg",
+      "image/png",
+      "image/webp"
+    ],
+    "maxImageSizeBytes": 5242880,
+    "health": {
+      "ok": true,
+      "code": "R2_OK",
+      "message": "Cloudflare R2 is available.",
+      "checkedAt": "2026-03-29T12:00:00Z"
+    }
+  }
+}
+
+Error 500
+{
+  "error": {
+    "code": "INTERNAL_SERVER_ERROR",
+    "message": "Unexpected server error",
+    "details": []
+  }
+}
+
+- POST `/uploads/animals/{animalId}/image`
+
+Description: Upload an animal image to Cloudflare R2.
+Authentication: Admin (Authorization: Bearer <token>)
+Path Parameters
+  animalId (string)
+Request body
+  multipart/form-data with one file in field `image`
+
+Request example
+- POST /api/v1/uploads/animals/a1f9c2e4-8c3a-4b2f-9c5d-1f3e7a9b2d10/image
+
+Response 201
+{
+  "data": {
+    "objectKey": "animals/a1f9c2e4-8c3a-4b2f-9c5d-1f3e7a9b2d10/1739932938123-luna.jpg",
+    "url": "https://cdn.shelter.org/animals/a1f9c2e4-8c3a-4b2f-9c5d-1f3e7a9b2d10/1739932938123-luna.jpg",
+    "urlType": "public",
+    "contentType": "image/jpeg",
+    "size": 381248
+  }
+}
+
+Error 400
+{
+  "error": {
+    "code": "INVALID_ANIMAL_ID",
+    "message": "animalId must be valid for image uploads.",
+    "details": []
+  }
+}
+
+Error 413
+{
+  "error": {
+    "code": "IMAGE_TOO_LARGE",
+    "message": "Image exceeds the configured upload limit.",
+    "details": []
+  }
+}
+
+Error 415
+{
+  "error": {
+    "code": "INVALID_IMAGE_TYPE",
+    "message": "Unsupported image content type.",
+    "details": []
+  }
+}
+
+Error 503
+{
+  "error": {
+    "code": "R2_UNAUTHORIZED",
+    "message": "Cloudflare R2 rejected the configured server credentials for the upload bucket.",
+    "details": []
+  }
+}
+
 ### Applications (Admin)
 - GET `/admin/applications`
 

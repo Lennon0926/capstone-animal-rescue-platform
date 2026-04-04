@@ -31,7 +31,12 @@ jest.mock("../lib/supabase", () => ({
 }));
 
 beforeAll(() => {
+  jest.spyOn(console, "error").mockImplementation(() => {});
   process.env.PORT = "4000";
+});
+
+afterAll(() => {
+  console.error.mockRestore();
 });
 
 beforeEach(() => {
@@ -88,6 +93,7 @@ describe("Smoke: core animal flow", () => {
 
     const config = await request(app).get("/api/uploads/config");
     expect(config.status).toBe(200);
+    expect(config.body.data.publicObjectUrlConfigured).toBe(true);
     expect(config.body.data.allowedMimeTypes).toContain("image/jpeg");
     expect(config.body.data.maxImageSizeBytes).toBeGreaterThan(0);
   });

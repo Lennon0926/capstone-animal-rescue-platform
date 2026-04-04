@@ -392,11 +392,13 @@ export default function AdminAnimalsList({
                             animal.image_url,
                             animal.species,
                             animal.aid,
+                            animal.image_object_key,
                           )}
                           alt={animal.name}
                           className={styles.thumbnail}
                           width={60}
                           height={60}
+                          sizes="60px"
                           onError={(e) => {
                             e.currentTarget.style.display = "none";
                           }}

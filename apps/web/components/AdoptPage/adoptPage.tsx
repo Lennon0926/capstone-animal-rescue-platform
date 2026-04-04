@@ -116,7 +116,12 @@ function FlipCard({ animal }: { animal: Animal }) {
         <div className={`${styles.cardFace} ${styles.cardFront}`}>
           <div className={styles.imageWrapper}>
             <Image
-              src={getAnimalImageUrl(animal.image_url, animal.species, animal.aid)}
+              src={getAnimalImageUrl(
+                animal.image_url,
+                animal.species,
+                animal.aid,
+                animal.image_object_key,
+              )}
               alt={animal.name}
               fill
               sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 25vw"

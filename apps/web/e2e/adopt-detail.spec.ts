@@ -5,7 +5,9 @@ const fluffy = MOCK_ANIMALS[0];
 
 test.describe("Animal detail page (/adopt/[id])", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(`/adopt/${fluffy.aid}`);
+    await page.goto(`/adopt/${fluffy.aid}`, {
+      waitUntil: "domcontentloaded",
+    });
   });
 
   // --- Page load ---

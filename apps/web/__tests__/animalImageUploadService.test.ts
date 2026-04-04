@@ -3,6 +3,7 @@ const MOCK_API_BASE = "http://localhost:4000";
 let uploadAnimalImage: typeof import("@/services/animalImageUploadService").uploadAnimalImage;
 
 beforeEach(() => {
+  jest.spyOn(console, "error").mockImplementation(() => {});
   jest.resetModules();
   process.env.NEXT_PUBLIC_API_BASE_URL = MOCK_API_BASE;
   uploadAnimalImage =
@@ -143,29 +144,38 @@ describe("fetchAnimals", () => {
   });
 });
 
-describe("updateAnimalImageUrl", () => {
-  let updateAnimalImageUrl: typeof import("@/services/animalImageUploadService").updateAnimalImageUrl;
+describe("updateAnimalImageObjectKey", () => {
+  let updateAnimalImageObjectKey: typeof import("@/services/animalImageUploadService").updateAnimalImageObjectKey;
 
   beforeEach(() => {
-    updateAnimalImageUrl = require("@/services/animalImageUploadService").updateAnimalImageUrl;
+    updateAnimalImageObjectKey =
+      require("@/services/animalImageUploadService").updateAnimalImageObjectKey;
   });
 
-  it("sends PATCH request with image_url", async () => {
-    const mockAnimal = { aid: 1, name: "Max", image_url: "https://cdn.example.com/image.jpg" };
+  it("sends PATCH request with image_object_key", async () => {
+    const mockAnimal = {
+      aid: 1,
+      name: "Max",
+      image_url: "https://cdn.example.com/animals/1/1-photo.jpg",
+      image_object_key: "animals/1/1-photo.jpg",
+    };
 
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ success: true, data: mockAnimal }),
     });
 
-    const result = await updateAnimalImageUrl(1, "https://cdn.example.com/image.jpg");
+    const result = await updateAnimalImageObjectKey(
+      1,
+      "animals/1/1-photo.jpg"
+    );
 
     expect(global.fetch).toHaveBeenCalledWith(
       `${MOCK_API_BASE}/api/animals/1`,
       {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image_url: "https://cdn.example.com/image.jpg" }),
+        body: JSON.stringify({ image_object_key: "animals/1/1-photo.jpg" }),
       }
     );
     expect(result).toEqual(mockAnimal);
@@ -174,12 +184,60 @@ describe("updateAnimalImageUrl", () => {
   it("throws on failed update", async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: false,
+      status: 404,
       json: () => Promise.resolve({ error: "Animal not found" }),
     });
 
-    await expect(updateAnimalImageUrl(999, "https://example.com/img.jpg")).rejects.toThrow(
-      "Animal not found"
+    await expect(
+      updateAnimalImageObjectKey(999, "animals/999/missing.jpg")
+    ).rejects.toThrow("Animal not found");
+
+    const errorLogs = (console.error as jest.Mock).mock.calls.map(([entry]) =>
+      String(entry)
     );
+    expect(
+      errorLogs.some(
+        (entry) =>
+          entry.includes('"event":"animal_image_update_failed"') &&
+          entry.includes('"animalId":999') &&
+          entry.includes('"errorMessage":"Animal not found"')
+      )
+    ).toBe(true);
+  });
+
+  it("uses the server message from structured error objects", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 400,
+      json: () =>
+        Promise.resolve({
+          error: {
+            code: 400,
+            message: "Invalid image_object_key.",
+            details: { traceId: "trace-123" },
+          },
+        }),
+    });
+
+    await expect(
+      updateAnimalImageObjectKey(1, "animals/1/bad key.jpg")
+    ).rejects.toMatchObject({
+      name: "UploadApiError",
+      message: "Invalid image_object_key.",
+      code: "400",
+    });
+
+    const errorLogs = (console.error as jest.Mock).mock.calls.map(([entry]) =>
+      String(entry)
+    );
+    expect(
+      errorLogs.some(
+        (entry) =>
+          entry.includes('"event":"animal_image_update_failed"') &&
+          entry.includes('"errorCode":"400"') &&
+          entry.includes('"errorMessage":"Invalid image_object_key."')
+      )
+    ).toBe(true);
   });
 });
 
@@ -203,6 +261,7 @@ describe("uploadAndUpdateAnimalImage", () => {
       aid: 1,
       name: "Max",
       image_url: "https://cdn.example.com/animals/1/1-photo.jpg",
+      image_object_key: "animals/1/1-photo.jpg",
     };
 
     global.fetch = jest.fn()

@@ -28,6 +28,33 @@ function sanitizeLongText(value) {
 }
 
 /**
+ * Validates and normalizes an R2 object key.
+ * @param {unknown} value - Value to validate
+ * @returns {string} Normalized object key
+ */
+function sanitizeImageObjectKey(value) {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  const normalizedValue = value.trim().replace(/^\/+/, "").slice(0, 500);
+  if (!normalizedValue) {
+    return "";
+  }
+
+  if (
+    normalizedValue.includes("..") ||
+    normalizedValue.includes("//")
+  ) {
+    return "";
+  }
+
+  return /^[a-zA-Z0-9/_\-.]+$/.test(normalizedValue)
+    ? normalizedValue
+    : "";
+}
+
+/**
  * Validates pagination parameters.
  * @param {Object} query - Request query parameters
  * @returns {{limit: number, offset: number}}
@@ -165,7 +192,7 @@ function validateCreateAnimal(req, res, next) {
     const size = sanitizeString(req.body.size).toLowerCase();
     const gender = sanitizeString(req.body.gender).toLowerCase();
     const status = sanitizeString(req.body.status).toLowerCase();
-    let image_url = "";
+    let image_object_key = "";
 
     const validSpecies = ["perro", "gato"];
     const validSizes = ["pequeño", "mediano", "grande", "muy grande"];
@@ -196,14 +223,17 @@ function validateCreateAnimal(req, res, next) {
       throw new ApiError(400, "Invalid status.");
     }
 
-    // Image URL is optional on creation (can be added later via PATCH)
-    // but if provided, it must not be empty
-    if (req.body.image_url !== undefined && req.body.image_url !== null && typeof req.body.image_url === "string") {
-      const trimmed = req.body.image_url.trim();
-      if (trimmed.length > 0 && trimmed.length <= 500) {
-        image_url = trimmed;
-      } else if (trimmed.length > 500) {
-        throw new ApiError(400, "Image URL is too long (max 500 characters).");
+    if (req.body.image_url !== undefined) {
+      throw new ApiError(
+        400,
+        "image_url is read-only. Use image_object_key for animal images."
+      );
+    }
+
+    if (req.body.image_object_key !== undefined) {
+      image_object_key = sanitizeImageObjectKey(req.body.image_object_key);
+      if (!image_object_key) {
+        throw new ApiError(400, "Invalid image_object_key.");
       }
     }
 
@@ -216,9 +246,8 @@ function validateCreateAnimal(req, res, next) {
       status,
     };
 
-    // Only add image_url if it was provided and valid
-    if (image_url) {
-      req.validatedBody.image_url = image_url;
+    if (image_object_key) {
+      req.validatedBody.image_object_key = image_object_key;
     }
 
     // Handle tags if provided
@@ -292,16 +321,19 @@ function validateUpdateAnimal(req, res, next) {
     }
 
     if (req.body.image_url !== undefined) {
-      const image_url =
-        typeof req.body.image_url === "string"
-          ? req.body.image_url.trim().slice(0, 500)
-          : "";
+      throw new ApiError(
+        400,
+        "image_url is read-only. Use image_object_key for animal images."
+      );
+    }
 
-      if (!image_url) {
-        throw new ApiError(400, "Invalid image_url.");
+    if (req.body.image_object_key !== undefined) {
+      const image_object_key = sanitizeImageObjectKey(req.body.image_object_key);
+      if (!image_object_key) {
+        throw new ApiError(400, "Invalid image_object_key.");
       }
 
-      updates.image_url = image_url;
+      updates.image_object_key = image_object_key;
     }
 
     if (req.body.record_id !== undefined) {
@@ -329,6 +361,7 @@ function validateUpdateAnimal(req, res, next) {
 
 module.exports = {
   sanitizeString,
+  sanitizeImageObjectKey,
   validatePagination,
   validateSort,
   validateAnimalFilters,
