@@ -1,0 +1,133 @@
+/* Main Container */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* Header Section */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.header h1 {
+  font-size: var(--text-hero-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin: 0;
+  margin-bottom: var(--space-2);
+}
+
+.subtitle {
+  color: var(--color-text-muted);
+  margin: 0;
+  font-size: var(--text-base);
+}
+
+/* Card Styling */
+.card {
+  padding-top: 0;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-5);
+  flex-direction: column;
+  row-gap: var(--space-2);
+}
+
+.cardHeaderContent {
+  display: grid;
+  flex: 1;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+/* Select Dropdown Styling */
+.selectTrigger {
+  display: none;
+  width: 160px;
+  border-radius: var(--radius-md);
+}
+
+.selectContent {
+  border-radius: var(--radius-lg);
+}
+
+.selectItem {
+  border-radius: var(--radius-md);
+}
+
+/* Card Content */
+.cardContent {
+  padding: var(--space-2);
+  padding-top: var(--space-4);
+}
+
+/* Chart Container */
+.chartContainer {
+  aspect-ratio: auto;
+  height: 250px;
+  width: 100%;
+}
+
+/* Desktop/Tablet Styles */
+@media (min-width: 640px) {
+  .cardHeader {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .selectTrigger {
+    display: flex;
+    margin-left: auto;
+  }
+
+  .cardContent {
+    padding: var(--space-6);
+    padding-top: var(--space-6);
+  }
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+  }
+
+  .header h1 {
+    font-size: var(--text-hero-md);
+  }
+
+  .subtitle {
+    font-size: var(--text-sm);
+  }
+
+  .chartContainer {
+    height: 200px;
+  }
+
+  .cardContent {
+    padding: var(--space-2);
+  }
+}
+
+/* Ensure proper spacing for small screens */
+@media (max-width: 640px) {
+  .selectTrigger {
+    display: flex;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .cardHeaderContent {
+    text-align: center;
+  }
+}
