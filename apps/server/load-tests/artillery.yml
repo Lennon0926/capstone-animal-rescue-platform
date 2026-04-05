@@ -1,0 +1,70 @@
+# Artillery load test — Issue #113: 50 Concurrent Users on Critical API Endpoints
+#
+# Prerequisites: the Express server must be running before executing this test.
+#   Local:    npm run dev  (in apps/server)
+#   Deployed: set LOAD_TEST_TARGET to the deployed URL
+#
+# Usage:
+#   npm run load-test              # against http://localhost:4000
+#   LOAD_TEST_TARGET=https://your-deployment.vercel.app npm run load-test:url
+
+config:
+  target: "{{ $processEnvironment.LOAD_TEST_TARGET }}"
+  phases:
+    - duration: 10
+      arrivalRate: 1
+      rampTo: 50
+      name: "Ramp up (0 → 50 VU)"
+    - duration: 60
+      arrivalRate: 50
+      name: "Sustained load (50 VU)"
+  processor: "./processor.js"
+  defaults:
+    headers:
+      Accept: "application/json"
+  # CI pass/fail gate — loosest across all endpoints
+  ensure:
+    p95: 1000
+    maxErrorRate: 1
+
+scenarios:
+  - name: "Health Check"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/health"
+          expect:
+            - statusCode: 200
+
+  - name: "List Animals"
+    weight: 50
+    beforeScenario: "generateQueryVariations"
+    flow:
+      - get:
+          url: "/api/animals"
+          qs:
+            limit: "{{ limit }}"
+            offset: "{{ offset }}"
+            species: "{{ species }}"
+            status: "{{ animalStatus }}"
+          expect:
+            - statusCode: 200
+
+  - name: "Filter Options"
+    weight: 20
+    flow:
+      - get:
+          url: "/api/animals/filters"
+          expect:
+            - statusCode: 200
+
+  - name: "Single Animal"
+    weight: 20
+    beforeScenario: "setAnimalId"
+    flow:
+      - get:
+          url: "/api/animals/{{ animalId }}"
+          expect:
+            - statusCode:
+                - 200
+                - 404
