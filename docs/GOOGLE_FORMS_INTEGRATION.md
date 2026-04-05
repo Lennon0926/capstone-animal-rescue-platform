@@ -78,14 +78,27 @@ function onFormSubmit(e) {
 }
 ```
 
-### 4. Add Form URL to Environment
+### 4. Find Entry IDs for Pre-filling
+
+Entry IDs are the numeric identifiers Google uses to map URL parameters to specific form fields.
+
+1. Open your Google Form in the editor
+2. Click the three-dot menu (⋮) → **"Get pre-filled link"**
+3. Enter sample values in the fields you want to pre-fill and click **"Get Link"**
+4. The generated URL will contain parameters like `entry.123456789=value` — the numbers after `entry.` are your entry IDs
+
+### 5. Add Form URL and Entry IDs to Environment
 
 **`apps/web/.env.local`:**
 ```env
 NEXT_PUBLIC_GOOGLE_FORM_URL=https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform
+NEXT_PUBLIC_GOOGLE_FORM_ENTRY_ANIMAL_ID=entry.XXXXXXXXX
+NEXT_PUBLIC_GOOGLE_FORM_ENTRY_ANIMAL_NAME=entry.YYYYYYYYY
 ```
 
-Replace `YOUR_FORM_ID` with the ID from your form's share URL.
+- Replace `YOUR_FORM_ID` with the ID from your form's share URL.
+- Replace `entry.XXXXXXXXX` with the entry ID for the "Animal ID" field.
+- Replace `entry.YYYYYYYYY` with the entry ID for the "Animal Name" field.
 
 ## Frontend Integration
 
@@ -103,11 +116,26 @@ const formUrl = buildAdoptionFormUrl(animal.aid, animal.name);
 
 ### Pre-filled URL Format
 
-| Parameter | Field in form | Example |
-|-----------|--------------|---------|
-| `entry.765999001` | "Animal al que desea adoptar" | `entry.765999001=Max` |
+```
+https://docs.google.com/forms/d/e/{FORM_ID}/viewform?{ANIMAL_ID_ENTRY}={animalId}&{ANIMAL_NAME_ENTRY}={animalName}
+```
 
-The animal's name is passed to the "Animal interested in" field so staff can immediately see which animal the applicant wants to adopt without having to ask.
+**Example:**
+```
+https://docs.google.com/forms/d/e/1FAIpQLSe.../viewform?entry.123456789=42&entry.987654321=Fluffy
+```
+
+| Env variable | URL parameter | Form field | Purpose |
+|---|---|---|---|
+| `NEXT_PUBLIC_GOOGLE_FORM_ENTRY_ANIMAL_ID` | `entry.XXXXXXXXX` | Animal ID (short answer) | Links the application to the database record |
+| `NEXT_PUBLIC_GOOGLE_FORM_ENTRY_ANIMAL_NAME` | `entry.YYYYYYYYY` | Animal Name (short answer) | Lets staff immediately see which animal the applicant wants |
+
+### Fallback Behavior
+
+When `NEXT_PUBLIC_GOOGLE_FORM_URL` is not set:
+- Animal detail page shows "El formulario de adopción no está disponible en este momento."
+- Animal cards do not show the "Adoptar" button
+- No errors are thrown
 
 ### Where the button appears
 
@@ -125,8 +153,10 @@ The animal's name is passed to the "Animal interested in" field so staff can imm
 
 ## Environment Variables
 
-| Variable | Location | Description |
-|----------|----------|-------------|
-| `NEXT_PUBLIC_GOOGLE_FORM_URL` | `apps/web/.env.local` | Public Google Form URL |
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_GOOGLE_FORM_URL` | Base viewform URL (strip any `?usp=...` before pasting) |
+| `NEXT_PUBLIC_GOOGLE_FORM_ENTRY_ANIMAL_ID` | Entry ID for the animal database ID field |
+| `NEXT_PUBLIC_GOOGLE_FORM_ENTRY_ANIMAL_NAME` | Entry ID for the animal name field |
 
 
