@@ -1,8 +1,8 @@
 /** Viewport width below which the mobile hamburger menu is used. */
 export const MOBILE_BREAKPOINT = 768;
 
-/** Hardcoded animal cards on the landing page AnimalsSection (not from API). */
-export const LANDING_PAGE_ANIMALS = ["Max", "Luna", "Charlie"] as const;
+/** Animal names expected on the landing page AnimalsSection (fetched from mock API). */
+export const LANDING_PAGE_ANIMALS = ["Fluffy", "Max"] as const;
 
 /** Step titles in the HowItWorks section. */
 export const ADOPTION_STEPS = [
@@ -23,7 +23,7 @@ export const MOCK_ANIMALS = Array.from({ length: 13 }, (_, i) => ({
   species: i % 2 === 0 ? "dog" : "cat",
   size: "medium",
   gender: "male",
-  status: "available",
+  status: "disponible",
   image_url: "",
   tags: i === 0 ? ["vaccinated", "friendly"] : [],
   created_at: "2024-01-01T00:00:00Z",

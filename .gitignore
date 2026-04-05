@@ -2,6 +2,7 @@
 .DS_Store
 
 # GitHub Copilot skills
+.claude/
 .github/*
 !.github/workflows/
 !.github/dependabot.yml

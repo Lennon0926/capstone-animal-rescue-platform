@@ -21,13 +21,39 @@ function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-const STATUS_LABELS: Record<string, string> = {
-  available: "Disponible",
-  pending: "Pendiente",
-  adopted: "Adoptado",
-  fostered: "En Hogar Temporal",
-  medical_hold: "En Atención Médica",
-};
+function formatStatus(status: string) {
+  const map: Record<string, string> = {
+    disponible: "Disponible",
+    adoptado: "Adoptado",
+    pendiente: "Pendiente",
+    'atención médica': "Atención Médica",
+    'en hogar temporal': "En Hogar Temporal",
+  };
+
+  return map[status?.toLowerCase()] || status;
+}
+
+function getStatusClass(status: string) {
+  switch (status.toLowerCase()) {
+    case "disponible":
+    case "available":
+      return styles.statusAvailable;
+    case "adoptado":
+    case "adopted":
+      return styles.statusAdopted;
+    case "pendiente":
+    case "pending":
+      return styles.statusPending;
+    case "en hogar temporal":
+    case "fostered":
+      return styles.statusFostered;
+    case "atención médica":
+    case "medical_hold":
+      return styles.statusMedical_hold;
+    default:
+      return styles.statusAvailable;
+  }
+}
 
 // Extract all unique filter options from animals (tags + species + size + gender + status)
 function getAllFilterOptions(animals: Animal[]): string[] {
@@ -90,7 +116,12 @@ function FlipCard({ animal }: { animal: Animal }) {
         <div className={`${styles.cardFace} ${styles.cardFront}`}>
           <div className={styles.imageWrapper}>
             <Image
-              src={getAnimalImageUrl(animal.image_url, animal.species, animal.aid)}
+              src={getAnimalImageUrl(
+                animal.image_url,
+                animal.species,
+                animal.aid,
+                animal.image_object_key,
+              )}
               alt={animal.name}
               fill
               sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 25vw"
@@ -98,7 +129,6 @@ function FlipCard({ animal }: { animal: Animal }) {
             />
             <div className={styles.cardOverlay}>
               <h3 className={styles.cardName}>{animal.name}</h3>
-              <p className={styles.cardSpecies}>{capitalize(animal.species)}</p>
             </div>
             <div className={styles.flipHint}>
               <RotateCcw size={12} />
@@ -111,8 +141,8 @@ function FlipCard({ animal }: { animal: Animal }) {
           <div className={styles.cardBackContent}>
             <div className={styles.cardBackHeader}>
               <h3 className={styles.cardBackName}>{animal.name}</h3>
-              <span className={`${styles.status} ${styles[`status${capitalize(animal.status)}`] ?? styles.statusAvailable}`}>
-                {STATUS_LABELS[animal.status] ?? animal.status}
+              <span className={`${styles.status} ${getStatusClass(animal.status)}`}>
+                {formatStatus(animal.status)}
               </span>
             </div>
 

@@ -66,7 +66,7 @@ test.describe("Home page (/home)", () => {
     await expect(heading).toBeVisible();
   });
 
-  test("hardcoded animal cards render", async ({ page }) => {
+  test("animal cards render from API", async ({ page }) => {
     for (const name of LANDING_PAGE_ANIMALS) {
       const card = page.getByRole("heading", { name, exact: true });
       await card.scrollIntoViewIfNeeded();

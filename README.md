@@ -2,6 +2,7 @@
 
 A full-stack web application for animal rescue coordination, built with Next.js and Express.
 
+
 ## Project Structure
 
 ```
@@ -91,8 +92,8 @@ R2_PUBLIC_BASE_URL=
 # Optional: Override upload size limit in bytes (default: 5 MB)
 R2_MAX_IMAGE_SIZE_BYTES=5242880
 
-# Optional: Signed URL TTL in seconds when R2_PUBLIC_BASE_URL is not set (default: 1 hour)
-R2_SIGNED_READ_URL_TTL_SECONDS=3600
+# Optional: Cache TTL for live R2 health probes in milliseconds (default: 30000)
+R2_HEALTHCHECK_CACHE_TTL_MS=30000
 ```
 
 **Web** (`apps/web/.env.local`):
@@ -140,6 +141,14 @@ cd apps/server && npm run dev
 cd apps/web && npm run dev
 ```
 
+Optional experimental frontend command:
+
+```bash
+cd apps/web && npm run dev:turbo
+```
+
+`npm run dev` uses webpack as the stable default for local development. `npm run dev:turbo` keeps Turbopack available as an opt-in path for troubleshooting or comparison.
+
 - API: `http://localhost:4000`
 - Frontend: `http://localhost:3000`
 
@@ -166,13 +175,16 @@ cd apps/web && npm run dev
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
+| GET | `/api/uploads/config` | Return upload configuration plus live Cloudflare R2 health |
 | POST | `/api/uploads/animals/:animalId/image` | Upload an animal image to Cloudflare R2 |
 
 **Upload details:**
 - Request: `multipart/form-data`, field name `image`
 - Allowed types: `image/jpeg`, `image/png`, `image/webp`
 - Max size: 5 MB (override with `R2_MAX_IMAGE_SIZE_BYTES`)
-- Returns: object key and a public or signed URL
+- `GET /api/uploads/config` returns `r2Configured`, `publicObjectUrlConfigured`, upload limits, and `health` with `{ ok, code, message, checkedAt }`
+- Upload failures caused by Cloudflare R2 availability or authorization issues now return `503` with structured error codes such as `R2_UNAUTHORIZED` or `R2_UNAVAILABLE`
+- Returns: object key and a public URL
 
 ```json
 {
@@ -182,6 +194,25 @@ cd apps/web && npm run dev
     "urlType": "public",
     "contentType": "image/jpeg",
     "size": 381248
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "r2Configured": true,
+    "missingEnvVars": [],
+    "publicObjectUrlConfigured": true,
+    "missingPublicObjectUrlEnvVars": [],
+    "allowedMimeTypes": ["image/jpeg", "image/png", "image/webp"],
+    "maxImageSizeBytes": 5242880,
+    "health": {
+      "ok": true,
+      "code": "R2_OK",
+      "message": "Cloudflare R2 is available.",
+      "checkedAt": "2026-03-29T12:00:00.000Z"
+    }
   }
 }
 ```

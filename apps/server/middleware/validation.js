@@ -28,6 +28,33 @@ function sanitizeLongText(value) {
 }
 
 /**
+ * Validates and normalizes an R2 object key.
+ * @param {unknown} value - Value to validate
+ * @returns {string} Normalized object key
+ */
+function sanitizeImageObjectKey(value) {
+  if (typeof value !== "string") {
+    return "";
+  }
+
+  const normalizedValue = value.trim().replace(/^\/+/, "").slice(0, 500);
+  if (!normalizedValue) {
+    return "";
+  }
+
+  if (
+    normalizedValue.includes("..") ||
+    normalizedValue.includes("//")
+  ) {
+    return "";
+  }
+
+  return /^[a-zA-Z0-9/_\-.]+$/.test(normalizedValue)
+    ? normalizedValue
+    : "";
+}
+
+/**
  * Validates pagination parameters.
  * @param {Object} query - Request query parameters
  * @returns {{limit: number, offset: number}}
@@ -70,21 +97,19 @@ function validateAnimalFilters(query) {
     filters.species = sanitizeString(query.species);
   }
 
-  // Validate status filter — default to "available" if not provided
-  const validStatuses = ["available", "adopted", "pending", "fostered", "medical_hold"];
+  // Validate status filter — only filter if explicitly provided
+  const validStatuses = ["disponible", "adoptado", "pendiente", "en hogar temporal", "atención médica"];
   if (query.status) {
     const status = sanitizeString(query.status);
     if (validStatuses.includes(status.toLowerCase())) {
       filters.status = status;
     }
-  } else {
-    filters.status = "available";
   }
 
   // Validate size filter
   if (query.size) {
     const size = sanitizeString(query.size);
-    const validSizes = ["small", "medium", "large", "extra_large"];
+    const validSizes = ["pequeño", "mediano", "grande", "muy grande"];
     if (validSizes.includes(size.toLowerCase())) {
       filters.size = size;
     }
@@ -93,7 +118,7 @@ function validateAnimalFilters(query) {
   // Validate gender filter
   if (query.gender) {
     const gender = sanitizeString(query.gender);
-    const validGenders = ["male", "female", "unknown"];
+    const validGenders = ["macho", "hembra", "desconocido"];
     if (validGenders.includes(gender.toLowerCase())) {
       filters.gender = gender;
     }
@@ -167,14 +192,12 @@ function validateCreateAnimal(req, res, next) {
     const size = sanitizeString(req.body.size).toLowerCase();
     const gender = sanitizeString(req.body.gender).toLowerCase();
     const status = sanitizeString(req.body.status).toLowerCase();
-    const image_url = typeof req.body.image_url === "string"
-      ? req.body.image_url.trim().slice(0, 500)
-      : "";
+    let image_object_key = "";
 
-    const validSpecies = ["dog", "cat"];
-    const validSizes = ["small", "medium", "large", "extra_large"];
-    const validGenders = ["male", "female", "unknown"];
-    const validStatuses = ["available", "adopted", "pending", "fostered", "medical_hold"];
+    const validSpecies = ["perro", "gato"];
+    const validSizes = ["pequeño", "mediano", "grande", "muy grande"];
+    const validGenders = ["macho", "hembra", "desconocido"];
+    const validStatuses = ["disponible", "adoptado", "pendiente", "en hogar temporal", "atención médica"];
 
     if (!name) {
       throw new ApiError(400, "Name is required.");
@@ -200,8 +223,18 @@ function validateCreateAnimal(req, res, next) {
       throw new ApiError(400, "Invalid status.");
     }
 
-    if (!image_url) {
-      throw new ApiError(400, "Image URL is required.");
+    if (req.body.image_url !== undefined) {
+      throw new ApiError(
+        400,
+        "image_url is read-only. Use image_object_key for animal images."
+      );
+    }
+
+    if (req.body.image_object_key !== undefined) {
+      image_object_key = sanitizeImageObjectKey(req.body.image_object_key);
+      if (!image_object_key) {
+        throw new ApiError(400, "Invalid image_object_key.");
+      }
     }
 
     req.validatedBody = {
@@ -211,8 +244,16 @@ function validateCreateAnimal(req, res, next) {
       size,
       gender,
       status,
-      image_url,
     };
+
+    if (image_object_key) {
+      req.validatedBody.image_object_key = image_object_key;
+    }
+
+    // Handle tags if provided
+    if (req.body.tags !== undefined && Array.isArray(req.body.tags)) {
+      req.validatedBody.tags = req.body.tags;
+    }
 
     next();
   } catch (err) {
@@ -245,7 +286,7 @@ function validateUpdateAnimal(req, res, next) {
 
     if (req.body.species !== undefined) {
       const species = sanitizeString(req.body.species).toLowerCase();
-      const validSpecies = ["dog", "cat"];
+      const validSpecies = ["perro", "gato"];
       if (!validSpecies.includes(species)) {
         throw new ApiError(400, "Invalid species.");
       }
@@ -254,7 +295,7 @@ function validateUpdateAnimal(req, res, next) {
 
     if (req.body.size !== undefined) {
       const size = sanitizeString(req.body.size).toLowerCase();
-      const validSizes = ["small", "medium", "large", "extra_large"];
+      const validSizes = ["pequeño", "mediano", "grande", "muy grande"];
       if (!validSizes.includes(size)) {
         throw new ApiError(400, "Invalid size.");
       }
@@ -263,7 +304,7 @@ function validateUpdateAnimal(req, res, next) {
 
     if (req.body.gender !== undefined) {
       const gender = sanitizeString(req.body.gender).toLowerCase();
-      const validGenders = ["male", "female", "unknown"];
+      const validGenders = ["macho", "hembra", "desconocido"];
       if (!validGenders.includes(gender)) {
         throw new ApiError(400, "Invalid gender.");
       }
@@ -272,7 +313,7 @@ function validateUpdateAnimal(req, res, next) {
 
     if (req.body.status !== undefined) {
       const status = sanitizeString(req.body.status).toLowerCase();
-      const validStatuses = ["available", "adopted", "pending", "fostered", "medical_hold"];
+      const validStatuses = ["disponible", "adoptado", "pendiente", "en hogar temporal", "atención médica"];
       if (!validStatuses.includes(status)) {
         throw new ApiError(400, "Invalid status.");
       }
@@ -280,20 +321,31 @@ function validateUpdateAnimal(req, res, next) {
     }
 
     if (req.body.image_url !== undefined) {
-      const image_url =
-        typeof req.body.image_url === "string"
-          ? req.body.image_url.trim().slice(0, 500)
-          : "";
+      throw new ApiError(
+        400,
+        "image_url is read-only. Use image_object_key for animal images."
+      );
+    }
 
-      if (!image_url) {
-        throw new ApiError(400, "Invalid image_url.");
+    if (req.body.image_object_key !== undefined) {
+      const image_object_key = sanitizeImageObjectKey(req.body.image_object_key);
+      if (!image_object_key) {
+        throw new ApiError(400, "Invalid image_object_key.");
       }
 
-      updates.image_url = image_url;
+      updates.image_object_key = image_object_key;
     }
 
     if (req.body.record_id !== undefined) {
       updates.record_id = req.body.record_id;
+    }
+
+    if (req.body.tags !== undefined) {
+      if (Array.isArray(req.body.tags)) {
+        updates.tags = req.body.tags;
+      } else {
+        throw new ApiError(400, "Invalid tags format. Tags must be an array.");
+      }
     }
 
     if (Object.keys(updates).length === 0) {
@@ -309,6 +361,7 @@ function validateUpdateAnimal(req, res, next) {
 
 module.exports = {
   sanitizeString,
+  sanitizeImageObjectKey,
   validatePagination,
   validateSort,
   validateAnimalFilters,

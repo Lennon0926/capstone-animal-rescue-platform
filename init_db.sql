@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS public.animals (
     gender VARCHAR(20) CHECK (gender IN ('male', 'female', 'unknown')),
     status VARCHAR(20) DEFAULT 'available' CHECK (status IN ('available', 'adopted', 'pending', 'fostered', 'medical_hold')),
     image_url TEXT,
+    image_object_key TEXT,
     tags TEXT[] DEFAULT '{}',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     record_id INTEGER

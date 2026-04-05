@@ -16,6 +16,7 @@ export default function Header() {
             width={45}
             height={45}
             alt="CPAAA Logo"
+            sizes="45px"
           />
           <div className={styles.logo}>
             <Link href="/">Ciudadanos Pro Albergue de Animales de Aguadilla</Link>
