@@ -114,8 +114,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 NEXT_PUBLIC_GOOGLE_FORM_URL=your-google-form-url
 ```
 
-> See [docs/SECRETS_MANAGEMENT.md](docs/SECRETS_MANAGEMENT.md) for the full variable reference, optional vars, and secret rotation procedures.
-> See [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) for Supabase project setup instructions.
+> See [docs/guides/SECRETS_MANAGEMENT.md](docs/guides/SECRETS_MANAGEMENT.md) for the full variable reference, optional vars, and secret rotation procedures.
+> See [docs/guides/SUPABASE_SETUP.md](docs/guides/SUPABASE_SETUP.md) for Supabase project setup instructions.
 
 ### 4. Seed the database
 
@@ -242,10 +242,11 @@ CI runs lint, build, unit tests, and E2E tests for every push and pull request t
 
 | Document | Description |
 |----------|-------------|
-| [docs/SECRETS_MANAGEMENT.md](docs/SECRETS_MANAGEMENT.md) | All env vars, GitHub Secrets setup, deployment config, rotation procedures |
-| [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) | Database setup and schema reference |
-| [docs/GOOGLE_FORMS_INTEGRATION.md](docs/GOOGLE_FORMS_INTEGRATION.md) | Adoption application intake via Google Forms |
-| [docs/SECURITY_ALERTS.md](docs/SECURITY_ALERTS.md) | Security alert handling and procedures |
+| [docs/guides/SECRETS_MANAGEMENT.md](docs/guides/SECRETS_MANAGEMENT.md) | All env vars, GitHub Secrets setup, deployment config, rotation procedures |
+| [docs/guides/SUPABASE_SETUP.md](docs/guides/SUPABASE_SETUP.md) | Database setup and schema reference |
+| [docs/guides/GOOGLE_FORMS_INTEGRATION.md](docs/guides/GOOGLE_FORMS_INTEGRATION.md) | Adoption application intake via Google Forms |
+| [docs/guides/SECURITY_ALERTS.md](docs/guides/SECURITY_ALERTS.md) | Security alert handling and procedures |
+| [docs/guides/ROLLBACK.md](docs/guides/ROLLBACK.md) | Rollback procedures for Vercel deployments |
 | [docs/api/endpoints.md](docs/api/endpoints.md) | API endpoint reference (request/response examples) |
 | [docs/api/contract-v1.md](docs/api/contract-v1.md) | Planned v1 API contract |
 
