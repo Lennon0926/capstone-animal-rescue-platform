@@ -246,7 +246,8 @@ CI runs lint, build, unit tests, and E2E tests for every push and pull request t
 | [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) | Database setup and schema reference |
 | [docs/GOOGLE_FORMS_INTEGRATION.md](docs/GOOGLE_FORMS_INTEGRATION.md) | Adoption application intake via Google Forms |
 | [docs/SECURITY_ALERTS.md](docs/SECURITY_ALERTS.md) | Security alert handling and procedures |
-| [docs/api/contract-v1.md](docs/api/contract-v1.md) | Full API contract |
+| [docs/api/endpoints.md](docs/api/endpoints.md) | API endpoint reference (request/response examples) |
+| [docs/api/contract-v1.md](docs/api/contract-v1.md) | Planned v1 API contract |
 
 ## ngrok Tunnel
 
