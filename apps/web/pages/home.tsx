@@ -1,10 +1,11 @@
 import type { GetServerSideProps } from "next";
 import HeaderSection from "@/components/Header/headerSection";
-import DonationSection from "@/components/LandingPage/Donate/donationSection";
-import OurMissionSection from "@/components/LandingPage/Mission/ourMissionSection";
+import HeroSection from "@/components/LandingPage/Hero/heroSection";
+import MissionVideoSection from "@/components/LandingPage/MissionVideo/missionVideoSection";
+import TimelineSection from "@/components/LandingPage/Timeline/timelineSection";
+import GetInvolvedSection from "@/components/LandingPage/GetInvolved/getInvolvedSection";
 import AnimalsSection from "@/components/LandingPage/Animals/animalsSection";
-import HowItWorks from "@/components/LandingPage/HowItWorks/howItWorksSection";
-import DonationBanner from "@/components/LandingPage/Donate/donationBanner";
+import ContactSection from "@/components/LandingPage/Contact/contactSection";
 import FooterSection from "@/components/Footer/footerSection";
 import type { Animal } from "@/types/animal";
 
@@ -22,11 +23,12 @@ function Home({ animals, fetchError }: HomeProps) {
   return (
     <div>
       <HeaderSection />
-      <DonationSection />
-      <OurMissionSection />
+      <HeroSection />
+      <MissionVideoSection />
+      <TimelineSection />
+      <GetInvolvedSection />
       <AnimalsSection animals={animals} fetchError={fetchError} />
-      <HowItWorks />
-      <DonationBanner />
+      <ContactSection />
       <FooterSection />
     </div>
   );
