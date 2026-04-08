@@ -1,18 +1,48 @@
 .section {
-  padding: var(--space-section-y) var(--space-section-x);
-  background-color: var(--color-bg);
+  --timeline-reveal-distance: 2rem;
+  --timeline-highlight-opacity: 0.82;
+  --timeline-highlight-width: 40%;
+  --timeline-hover-shift: -0.3rem;
+
+  position: relative;
+  z-index: 3;
+  margin-top: clamp(-15rem, -18vw, -9rem);
+  padding: clamp(1.25rem, 2.8vw, 2.4rem) clamp(1.5rem, 4vw, 4rem)
+    clamp(5rem, 10vw, 8.5rem);
+  background-color: transparent;
+}
+
+.section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.08) 8%,
+    rgba(255, 255, 255, 0.22) 15%,
+    rgba(255, 255, 255, 0.44) 24%,
+    rgba(255, 255, 255, 0.72) 34%,
+    rgba(255, 255, 255, 0.9) 42%,
+    var(--color-bg) 52%,
+    var(--color-bg) 100%
+  );
+  pointer-events: none;
 }
 
 .inner {
-  max-width: var(--container-max-width);
+  position: relative;
+  z-index: 1;
+  width: min(1720px, 100%);
   margin: 0 auto;
 }
 
-.sectionTitle {
-  font-size: var(--text-3xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--color-primary);
-  margin-bottom: var(--space-12);
+.sectionLabel {
+  font-size: clamp(1.1rem, 1.15vw, 1.45rem);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  letter-spacing: -0.02em;
+  margin: 0 0 clamp(0.5rem, 1.5vw, 1rem);
 }
 
 .timeline {
@@ -20,68 +50,205 @@
   flex-direction: column;
 }
 
+.revealEntry {
+  opacity: 0;
+  transform: translateY(var(--timeline-reveal-distance));
+  transition:
+    opacity 0.78s ease var(--timeline-delay, 0ms),
+    transform 0.78s ease var(--timeline-delay, 0ms),
+    border-color 0.32s ease;
+}
+
+.isVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .entry {
+  position: relative;
+  isolation: isolate;
   display: grid;
-  grid-template-columns: 200px 1fr;
-  gap: var(--space-12);
-  padding: var(--space-10) 0;
+  grid-template-columns: minmax(0, 0.96fr) minmax(320px, 0.94fr);
+  gap: clamp(2.5rem, 7vw, 10rem);
+  padding: clamp(2.25rem, 5vw, 4.5rem) 0;
   border-bottom: 1px solid var(--color-border);
+  align-items: start;
+}
+
+.entry::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(231, 111, 81, 0.18) 0%,
+      rgba(231, 111, 81, 0.08) 34%,
+      rgba(231, 111, 81, 0) 100%
+    )
+    left center / 0% 100% no-repeat,
+    linear-gradient(
+      270deg,
+      rgba(231, 111, 81, 0.18) 0%,
+      rgba(231, 111, 81, 0.08) 34%,
+      rgba(231, 111, 81, 0) 100%
+    )
+    right center / 0% 100% no-repeat;
+  background-repeat: no-repeat;
+  opacity: 0;
+  filter: blur(8px);
+  transition:
+    opacity 0.24s ease,
+    background-size 0.62s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .entry:first-child {
   padding-top: 0;
 }
 
-.entry:last-child {
-  border-bottom: none;
-}
-
-.yearColumn {
-  display: flex;
-  align-items: flex-start;
-}
-
 .year {
-  font-size: var(--text-timeline-year);
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  font-size: clamp(6rem, 21vw, 12.75rem);
   font-weight: var(--font-weight-bold);
-  color: var(--color-primary);
-  line-height: 1;
-  letter-spacing: var(--letter-tight);
+  color: var(--color-primary-hover);
+  line-height: 0.82;
+  letter-spacing: -0.07em;
+  transition:
+    color 0.32s ease,
+    transform 0.32s ease;
 }
 
-.descriptionColumn {
+.copyColumn {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
+  padding-top: clamp(0.4rem, 1vw, 1rem);
+  max-width: 42rem;
 }
 
 .entryTitle {
-  font-size: var(--text-lg);
+  margin: 0;
+  font-size: clamp(1.9rem, 2.45vw, 3.25rem);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text);
+  line-height: 1.18;
+  letter-spacing: -0.03em;
+  transition:
+    color 0.32s ease,
+    transform 0.32s ease;
 }
 
 .entryText {
-  font-size: var(--text-base);
+  margin: 0;
+  font-size: clamp(1.2rem, 1.55vw, 2rem);
   color: var(--color-text-muted);
-  line-height: 1.6;
-  max-width: 600px;
+  line-height: 1.45;
+  transition:
+    color 0.32s ease,
+    transform 0.32s ease;
+}
+
+@media (hover: hover) {
+  .entry:hover {
+    border-color: transparent;
+  }
+
+  .entry:hover::before {
+    opacity: var(--timeline-highlight-opacity);
+    background-size:
+      var(--timeline-highlight-width) 100%,
+      var(--timeline-highlight-width) 100%;
+  }
+
+  .entry:hover .year,
+  .entry:hover .entryTitle,
+  .entry:hover .entryText {
+    transform: translateY(var(--timeline-hover-shift));
+  }
+
+  .entry:hover .year {
+    color: var(--color-primary);
+  }
+
+  .entry:hover .entryTitle,
+  .entry:hover .entryText {
+    color: var(--color-text);
+  }
 }
 
 @media (max-width: 768px) {
+  .section {
+    margin-top: clamp(-8rem, -20vw, -5rem);
+    padding: var(--space-6) var(--space-5) var(--space-20);
+  }
+
+  .inner {
+    width: 100%;
+  }
+
+  .sectionLabel {
+    margin-bottom: var(--space-3);
+  }
+
   .entry {
     grid-template-columns: 1fr;
-    gap: var(--space-3);
-    padding: var(--space-6) 0;
+    gap: var(--space-4);
+    padding: var(--space-8) 0;
   }
 
   .year {
-    font-size: var(--text-2xl);
+    font-size: clamp(5rem, 28vw, 7rem);
+    line-height: 0.88;
   }
 
-  .sectionTitle {
-    font-size: var(--text-2xl);
-    margin-bottom: var(--space-8);
+  .copyColumn {
+    padding-top: 0;
+    max-width: none;
+  }
+
+  .entryTitle {
+    font-size: clamp(1.55rem, 7vw, 2rem);
+  }
+
+  .entryText {
+    font-size: clamp(1rem, 4.4vw, 1.2rem);
+    line-height: 1.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .revealEntry,
+  .year,
+  .entryTitle,
+  .entryText {
+    transition: none;
+  }
+
+  .revealEntry {
+    opacity: 1;
+    transform: none;
+  }
+
+  .entry::before {
+    transition: none;
+    opacity: 0;
+  }
+
+  .entry:hover::before {
+    background-size:
+      var(--timeline-highlight-width) 100%,
+      var(--timeline-highlight-width) 100%;
+  }
+
+  .entry:hover .year,
+  .entry:hover .entryTitle,
+  .entry:hover .entryText {
+    transform: none;
   }
 }

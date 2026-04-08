@@ -1,6 +1,13 @@
+"use client";
+
+import type { CSSProperties } from "react";
+import { useRef } from "react";
+import { useRevealOnIntersect } from "@/components/LandingPage/useRevealOnIntersect";
 import styles from "./timelineSection.module.css";
 
-const timelineData = [
+const TIMELINE_ENTRY_DELAY_MS = 90;
+
+const TIMELINE_ENTRIES = [
   {
     year: "2015",
     title: "Fundación",
@@ -31,25 +38,45 @@ const timelineData = [
     description:
       "Lanzamiento de la plataforma digital para facilitar adopciones, donaciones y conectar a la comunidad con los animales que necesitan un hogar.",
   },
-];
+] as const;
 
 export default function TimelineSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useRevealOnIntersect({
+    rootRef: sectionRef,
+    selector: `.${styles.revealEntry}`,
+    visibleClassName: styles.isVisible,
+  });
+
   return (
-    <section className={styles.section}>
+    <section
+      className={styles.section}
+      aria-labelledby="timeline-heading"
+      ref={sectionRef}
+    >
       <div className={styles.inner}>
-        <h2 className={styles.sectionTitle}>Nuestra Historia</h2>
+        <h2 id="timeline-heading" className={styles.sectionLabel}>
+          Nuestra historia
+        </h2>
 
         <div className={styles.timeline}>
-          {timelineData.map((item, index) => (
-            <div key={item.year} className={styles.entry}>
-              <div className={styles.yearColumn}>
-                <span className={styles.year}>{item.year}</span>
-              </div>
-              <div className={styles.descriptionColumn}>
+          {TIMELINE_ENTRIES.map((item, index) => (
+            <article
+              key={item.year}
+              className={`${styles.entry} ${styles.revealEntry}`}
+              style={
+                {
+                  "--timeline-delay": `${index * TIMELINE_ENTRY_DELAY_MS}ms`,
+                } as CSSProperties
+              }
+            >
+              <p className={styles.year}>{item.year}</p>
+              <div className={styles.copyColumn}>
                 <h3 className={styles.entryTitle}>{item.title}</h3>
                 <p className={styles.entryText}>{item.description}</p>
               </div>
-            </div>
+            </article>
           ))}
         </div>
       </div>
