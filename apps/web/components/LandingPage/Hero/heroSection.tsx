@@ -3,18 +3,22 @@ import styles from "./heroSection.module.css";
 export default function HeroSection() {
   return (
     <section className={styles.hero}>
-      <video
-        className={styles.video}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-      >
-        <source src="/videos/close-up-dog.mp4" type="video/mp4" />
-      </video>
+      <div className={styles.videoReveal}>
+        <video
+          className={styles.video}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+        >
+          <source src="/videos/close-up-dog.mp4" type="video/mp4" />
+        </video>
 
-      <div className={styles.overlay} />
+        <div className={styles.overlay} aria-hidden="true" />
+      </div>
+
+      <div className={styles.revealFrame} aria-hidden="true" />
 
       <div className={styles.content}>
         <h1 className={styles.title}>

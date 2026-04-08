@@ -22,7 +22,7 @@ type HomeProps = {
 function Home({ animals, fetchError }: HomeProps) {
   return (
     <div>
-      <HeaderSection />
+      <HeaderSection revealOnFirstScroll />
       <HeroSection />
       <MissionVideoSection />
       <TimelineSection />
