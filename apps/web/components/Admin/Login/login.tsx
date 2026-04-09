@@ -22,6 +22,16 @@ export default function LoginPage() {
       return;
     }
 
+    if (email.length < 5) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -29,29 +39,41 @@ export default function LoginPage() {
       console.log('Attempting to sign in with email:', email);
       
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         password,
       });
 
+      // Handle Supabase errors - don't throw, just set error state
       if (signInError) {
-        console.error('Sign in error:', signInError);
-        throw new Error(signInError.message || 'Failed to sign in');
+        console.error('Sign in error:', signInError.message);
+        
+        if (signInError.message === 'Invalid login credentials') {
+          setError('Invalid email or password. Please try again.');
+        } else {
+          setError(signInError.message || 'Failed to sign in. Please try again.');
+        }
+        
+        setLoading(false);
+        return;
       }
 
-      if (!data.session) {
-        console.error('No session returned');
-        throw new Error('Login successful but no session created. Please try again.');
+      // Check if session was created
+      if (!data || !data.session) {
+        console.error('No session returned:', data);
+        setError('Login successful but session could not be created. Please try again.');
+        setLoading(false);
+        return;
       }
 
       console.log('Sign in successful, redirecting to admin home');
-      router.push('/admin/home');
+      // Add a small delay to ensure session is persisted
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await router.push('/admin/home');
     } catch (err) {
+      // Catch any unexpected errors
       console.error('Login exception:', err);
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred. Please try again.');
-      }
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred. Please try again.';
+      setError(errorMessage);
       setLoading(false);
     }
   };
