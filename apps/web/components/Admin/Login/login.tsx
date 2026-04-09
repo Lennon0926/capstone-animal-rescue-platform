@@ -16,25 +16,42 @@ export default function LoginPage() {
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!email || !password) {
+      setError('Please enter both email and password');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
+      console.log('Attempting to sign in with email:', email);
+      
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
         password,
       });
 
-      if (error) throw error;
+      if (signInError) {
+        console.error('Sign in error:', signInError);
+        throw new Error(signInError.message || 'Failed to sign in');
+      }
 
+      if (!data.session) {
+        console.error('No session returned');
+        throw new Error('Login successful but no session created. Please try again.');
+      }
+
+      console.log('Sign in successful, redirecting to admin home');
       router.push('/admin/home');
     } catch (err) {
+      console.error('Login exception:', err);
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError('Ocurrió un error desconocido. Por favor, inténtalo de nuevo.');
+        setError('An unknown error occurred. Please try again.');
       }
-    } finally {
       setLoading(false);
     }
   };
