@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import type { User } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 
-export function useAuthRequired() {
+interface AuthState {
+  isLoading: boolean;
+  user: User | null;
+}
+
+export function useAuthRequired(): AuthState {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
