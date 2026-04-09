@@ -32,7 +32,7 @@ export default function LoginPage() {
       if (err instanceof Error) {
         setError(err.message);
       } else {
-        setError('An error occurred during login');
+        setError('Ocurrió un error desconocido. Por favor, inténtalo de nuevo.');
       }
     } finally {
       setLoading(false);
