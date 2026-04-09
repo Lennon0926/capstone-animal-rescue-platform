@@ -30,7 +30,7 @@ export default function AdminHeader() {
             alt="CPAAA Logo"
             sizes="45px"
           />
-          <div className={styles.logo}>
+          <div className={styles.logo} onClick={handleLogout}>
             <Link href="/">Ciudadanos Pro Albergue de Animales de Aguadilla</Link>
           </div>
         </div>
