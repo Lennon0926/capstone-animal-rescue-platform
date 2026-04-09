@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next";
 import HeaderSection from "@/components/Header/headerSection";
-import FooterSection from "@/components/Footer/footerSection";
 import EditAnimalForm from "@/components/Admin/EditAnimal/editAnimalForm";
+import { useAuthRequired } from "@/lib/useAuthRequired";
 import type { Animal } from "@/types/animal";
 
 type ApiResponse = {
@@ -15,6 +15,10 @@ type EditAnimalPageProps = {
 };
 
 export default function EditAnimalPage({ animal, error }: EditAnimalPageProps) {
+  const { isLoading } = useAuthRequired();
+
+  if (isLoading) return <div>Loading...</div>;
+
   return (
     <>
       <HeaderSection />
@@ -25,7 +29,6 @@ export default function EditAnimalPage({ animal, error }: EditAnimalPageProps) {
       ) : (
         <EditAnimalForm notFound />
       )}
-      <FooterSection />
     </>
   );
 }
