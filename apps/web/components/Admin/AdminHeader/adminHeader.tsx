@@ -12,7 +12,7 @@ export default function AdminHeader() {
   const handleLogout = async () => {
     try {
       await signOut();
-      router.push("/admin/login");
+      router.push("/home");
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -36,6 +36,9 @@ export default function AdminHeader() {
         </div>
 
         <nav className={styles.navDesktop}>
+          <Link href="/home" className={styles.navLink} onClick={handleLogout}>
+            Home
+          </Link>
           <Link href="/admin/home" className={styles.navLink}>
             Dashboard
           </Link>

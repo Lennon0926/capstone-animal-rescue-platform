@@ -65,13 +65,11 @@ export default function LoginPage() {
         return;
       }
 
-      console.log('Sign in successful, redirecting to admin home');
       // Add a small delay to ensure session is persisted
       await new Promise(resolve => setTimeout(resolve, 500));
       await router.push('/admin/home');
     } catch (err) {
       // Catch any unexpected errors
-      console.error('Login exception:', err);
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred. Please try again.';
       setError(errorMessage);
       setLoading(false);
@@ -86,7 +84,7 @@ export default function LoginPage() {
         <div className={styles.header}>
           <h1 className={styles.title}>Admin Login</h1>
           <p className={styles.subtitle}>
-            Sign in to access the admin dashboard
+            Sign para acceder al panel de administración. Asegúrate de usar tus credenciales de administrador para iniciar sesión.
           </p>
         </div>
 
@@ -95,7 +93,7 @@ export default function LoginPage() {
         <form onSubmit={handleEmailLogin} className={styles.form}>
           <div className={styles.formGroup}>
             <label htmlFor="email" className={styles.label}>
-              Email Address
+              Email
             </label>
             <input
               id="email"
@@ -111,7 +109,7 @@ export default function LoginPage() {
 
           <div className={styles.formGroup}>
             <label htmlFor="password" className={styles.label}>
-              Password
+              Contraseña
             </label>
             <div className={styles.passwordWrapper}>
               <input
