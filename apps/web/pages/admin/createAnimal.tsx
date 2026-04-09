@@ -1,4 +1,4 @@
-import HeaderSection from "@/components/Header/headerSection";
+import AdminHeader from "@/components/Admin/AdminHeader/adminHeader";
 import CreateAnimalForm from "@/components/Admin/CreateAnimal/createAnimalForm";
 import { useAuthRequired } from "@/lib/useAuthRequired";
 
@@ -9,7 +9,7 @@ export default function CreateAnimalPage() {
 
   return (
     <>
-      <HeaderSection />
+      <AdminHeader />
       <CreateAnimalForm />
     </>
   );

@@ -1,5 +1,5 @@
 import { GetServerSideProps } from "next";
-import HeaderSection from "@/components/Header/headerSection";
+import AdminHeader from "@/components/Admin/AdminHeader/adminHeader";
 import EditAnimalForm from "@/components/Admin/EditAnimal/editAnimalForm";
 import { useAuthRequired } from "@/lib/useAuthRequired";
 import type { Animal } from "@/types/animal";
@@ -21,7 +21,7 @@ export default function EditAnimalPage({ animal, error }: EditAnimalPageProps) {
 
   return (
     <>
-      <HeaderSection />
+      <AdminHeader />
       {error ? (
         <EditAnimalForm error={error} />
       ) : animal ? (

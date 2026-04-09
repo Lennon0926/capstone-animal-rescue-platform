@@ -1,4 +1,4 @@
-import HeaderSection from "@/components/Header/headerSection";
+import AdminHeader from "@/components/Admin/AdminHeader/adminHeader";
 import AdminHome from "@/components/Admin/AdminHome/adminHome";
 import { useAuthRequired } from "@/lib/useAuthRequired";
 
@@ -9,7 +9,7 @@ export default function AdminHomePage() {
 
   return (
     <>
-      <HeaderSection />
+      <AdminHeader />
       <AdminHome />
     </>
   );

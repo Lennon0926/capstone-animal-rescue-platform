@@ -1,5 +1,5 @@
 import { GetServerSideProps } from "next";
-import HeaderSection from "@/components/Header/headerSection";
+import AdminHeader from "@/components/Admin/AdminHeader/adminHeader";
 import AdminAnimalsList from "@/components/Admin/AdminAnimalsList/adminAnimalsList";
 import { useAuthRequired } from "@/lib/useAuthRequired";
 import type { Animal } from "@/types/animal";
@@ -27,7 +27,7 @@ export default function AdminAnimalsPage({ animals }: AdminAnimalsPageProps) {
 
   return (
     <>
-      <HeaderSection />
+      <AdminHeader />
       <AdminAnimalsList initialAnimals={animals} />
     </>
   );
