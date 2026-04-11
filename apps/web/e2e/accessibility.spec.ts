@@ -3,10 +3,16 @@
  * WCAG 2.1 Level AA audit — Issue #114, SMART Objective 5
  *
  * Pages:
- *   /home           Landing page (index.tsx redirects → /home)
- *   /adopt          Animal listing
- *   /adopt/1        Animal detail (Fluffy, aid=1 from mock server)
- *   /admin/animals  Admin dashboard
+ *   /home                Landing page (index.tsx redirects → /home)
+ *   /about               About page
+ *   /blog                Blog page
+ *   /donation            Donation page
+ *   /adopt               Animal listing
+ *   /adopt/1             Animal detail (Fluffy, aid=1 from mock server)
+ *   /admin/animals       Admin dashboard
+ *   /admin/createAnimal  Create animal form
+ *   /admin/editAnimal    Edit animal form (animal id=1)
+ *   /admin/upload        Image upload management
  *
  * Run: npx playwright test e2e/accessibility.spec.ts --project="Desktop Chrome" --reporter=list
  */
@@ -153,5 +159,132 @@ test.describe("Accessibility — Admin Dashboard (/admin/animals)", () => {
 
     const criticalCount = violations.filter((v) => v.impact === "critical").length;
     expect(criticalCount, "No Critical violations on /admin/animals").toBe(0);
+  });
+});
+
+// ─────────────────────────────────────────────────────────
+// About — /about
+// ─────────────────────────────────────────────────────────
+test.describe("Accessibility — About (/about)", () => {
+  test("WCAG 2.1 AA audit", async ({ page }) => {
+    await page.goto("/about", { waitUntil: "networkidle" });
+
+    const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+    const violations = results.violations as AxeViolation[];
+
+    printViolations("/about", violations);
+    test.info().annotations.push({
+      type: "a11y",
+      description: JSON.stringify(countByImpact(violations)),
+    });
+
+    const criticalCount = violations.filter((v) => v.impact === "critical").length;
+    expect(criticalCount, "No Critical violations on /about").toBe(0);
+  });
+});
+
+// ─────────────────────────────────────────────────────────
+// Blog — /blog
+// ─────────────────────────────────────────────────────────
+test.describe("Accessibility — Blog (/blog)", () => {
+  test("WCAG 2.1 AA audit", async ({ page }) => {
+    await page.goto("/blog", { waitUntil: "networkidle" });
+
+    const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+    const violations = results.violations as AxeViolation[];
+
+    printViolations("/blog", violations);
+    test.info().annotations.push({
+      type: "a11y",
+      description: JSON.stringify(countByImpact(violations)),
+    });
+
+    const criticalCount = violations.filter((v) => v.impact === "critical").length;
+    expect(criticalCount, "No Critical violations on /blog").toBe(0);
+  });
+});
+
+// ─────────────────────────────────────────────────────────
+// Donation — /donation
+// ─────────────────────────────────────────────────────────
+test.describe("Accessibility — Donation (/donation)", () => {
+  test("WCAG 2.1 AA audit", async ({ page }) => {
+    await page.goto("/donation", { waitUntil: "networkidle" });
+
+    const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+    const violations = results.violations as AxeViolation[];
+
+    printViolations("/donation", violations);
+    test.info().annotations.push({
+      type: "a11y",
+      description: JSON.stringify(countByImpact(violations)),
+    });
+
+    const criticalCount = violations.filter((v) => v.impact === "critical").length;
+    expect(criticalCount, "No Critical violations on /donation").toBe(0);
+  });
+});
+
+// ─────────────────────────────────────────────────────────
+// Create Animal — /admin/createAnimal
+// ─────────────────────────────────────────────────────────
+test.describe("Accessibility — Create Animal (/admin/createAnimal)", () => {
+  test("WCAG 2.1 AA audit", async ({ page }) => {
+    await page.goto("/admin/createAnimal", { waitUntil: "networkidle" });
+
+    const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+    const violations = results.violations as AxeViolation[];
+
+    printViolations("/admin/createAnimal", violations);
+    test.info().annotations.push({
+      type: "a11y",
+      description: JSON.stringify(countByImpact(violations)),
+    });
+
+    const criticalCount = violations.filter((v) => v.impact === "critical").length;
+    expect(criticalCount, "No Critical violations on /admin/createAnimal").toBe(0);
+  });
+});
+
+// ─────────────────────────────────────────────────────────
+// Edit Animal — /admin/editAnimal?id=1
+// ─────────────────────────────────────────────────────────
+test.describe("Accessibility — Edit Animal (/admin/editAnimal)", () => {
+  test("WCAG 2.1 AA audit", async ({ page }) => {
+    const { aid } = MOCK_ANIMALS[0]; // Fluffy
+    await page.goto(`/admin/editAnimal?id=${aid}`, { waitUntil: "networkidle" });
+
+    const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+    const violations = results.violations as AxeViolation[];
+
+    printViolations(`/admin/editAnimal?id=${aid}`, violations);
+    test.info().annotations.push({
+      type: "a11y",
+      description: JSON.stringify(countByImpact(violations)),
+    });
+
+    const criticalCount = violations.filter((v) => v.impact === "critical").length;
+    expect(criticalCount, "No Critical violations on /admin/editAnimal").toBe(0);
+  });
+});
+
+// ─────────────────────────────────────────────────────────
+// Upload — /admin/upload
+// ─────────────────────────────────────────────────────────
+test.describe("Accessibility — Upload (/admin/upload)", () => {
+  test("WCAG 2.1 AA audit", async ({ page }) => {
+    await page.goto("/admin/upload", { waitUntil: "networkidle" });
+
+    const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+    const violations = results.violations as AxeViolation[];
+
+    printViolations("/admin/upload", violations);
+    test.info().annotations.push({
+      type: "a11y",
+      description: JSON.stringify(countByImpact(violations)),
+    });
+
+    const criticalCount = violations.filter((v) => v.impact === "critical").length;
+    expect(criticalCount, "No Critical violations on /admin/upload").toBe(0);
   });
 });
