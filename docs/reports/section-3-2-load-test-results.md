@@ -13,7 +13,7 @@ All load tests were executed locally on 2026-04-11 against the `perf/113-load-te
 | Target | `http://localhost:4000` (Express server) |
 | Virtual Users | 50 (ramped 0 → 50 over 10 s, sustained 60 s) |
 | Total Duration | 69 s |
-| Scripts Location | `apps/server/load-tests/` |
+| Scripts Location | `tests/load/` |
 
 **Endpoints tested:**
 
@@ -28,6 +28,12 @@ All load tests were executed locally on 2026-04-11 against the `perf/113-load-te
 > **Excluded scenarios:**
 > - *Adoption form redirect* — the "Solicitud de Adopción" flow constructs a Google Forms URL client-side and opens it in the browser. There is no server-side redirect endpoint to load-test.
 > - *Image upload* (`POST /api/uploads/animals/:id/image`) — requires live Cloudflare R2 credentials and binary multipart data. Testing without R2 configured would only exercise the `R2_NOT_CONFIGURED` error path, not real upload capacity. Covered by `r2Service.test.js`.
+
+---
+
+## Visualizations
+
+![p95 Response Time per Endpoint](./charts/load-test-p95.svg)
 
 ---
 
@@ -55,6 +61,8 @@ Every endpoint recorded a p95 response time well under the 2-second threshold (b
 ---
 
 ## Optimizations Applied
+
+![Performance Optimization — Baseline vs Final](./charts/load-test-optimization.svg)
 
 Four rounds of optimization were performed before recording final results.
 
@@ -146,10 +154,10 @@ The remaining errors occur only because the load test deliberately generates man
 
 | Artifact | Location |
 |----------|----------|
-| Artillery scenario config | `apps/server/load-tests/artillery.yml` |
-| Scenario processor (randomized params) | `apps/server/load-tests/processor.js` |
-| Report generator script | `apps/server/load-tests/generate-report.js` |
+| Artillery scenario config | `tests/load/artillery.yml` |
+| Scenario processor (randomized params) | `tests/load/processor.js` |
+| Report generator script | `tests/load/generate-report.js` |
 | DB migration (RPC function) | `supabase/migrations/20260411174624_optimize_filter_options_rpc.sql` |
 | Full raw report (2026-04-11) | `docs/reports/load-test-2026-04-11.md` |
-| Raw JSON output | `apps/server/load-tests/results.json` (gitignored) |
-| HTML report | `apps/server/load-tests/report.html` (generate with `npm run load-test:html`) |
+| Raw JSON output | `tests/load/results.json` (gitignored) |
+| HTML report | `tests/load/report.html` (generate with `npm run load-test:html`) |

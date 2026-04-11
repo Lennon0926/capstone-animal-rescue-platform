@@ -15,10 +15,10 @@
     "seed:append": "node scripts/seed.js --append",
     "migrate:image-storage": "node scripts/migrateImageUrls.js",
     "migrate:image-storage:apply": "node scripts/migrateImageUrls.js --apply",
-    "load-test": "LOAD_TEST_TARGET=http://localhost:4000 artillery run load-tests/artillery.yml --output load-tests/results.json",
-    "load-test:url": "artillery run load-tests/artillery.yml --output load-tests/results.json",
-    "load-test:report": "node load-tests/generate-report.js",
-    "load-test:html": "artillery report load-tests/results.json --output load-tests/report.html"
+    "load-test": "LOAD_TEST_TARGET=http://localhost:4000 artillery run ../../tests/load/artillery.yml --output ../../tests/load/results.json",
+    "load-test:url": "artillery run ../../tests/load/artillery.yml --output ../../tests/load/results.json",
+    "load-test:report": "node ../../tests/load/generate-report.js",
+    "load-test:html": "artillery report ../../tests/load/results.json --output ../../tests/load/report.html"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.998.0",
