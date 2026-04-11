@@ -5,13 +5,23 @@
   gap: var(--space-6);
 }
 
+/* Metric Section - groups cards and graph together */
+.metricSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.metricSection:not(:first-of-type) {
+  margin-top: var(--space-20);
+}
+
 /* Header Section */
 .header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: var(--space-6);
-  margin-bottom: var(--space-6);
 }
 
 .header h1 {
@@ -26,6 +36,45 @@
   color: var(--color-text-muted);
   margin: 0;
   font-size: var(--text-base);
+}
+
+/* Stats Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+}
+
+.statCard {
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg);
+  transition: all 0.2s ease;
+}
+
+.statCard:hover {
+  box-shadow: var(--shadow-lg);
+  transform: scale(1.02);
+}
+
+.statCardContent {
+  padding: var(--space-5) !important;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.statLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statValue {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
 }
 
 /* Card Styling */
@@ -47,6 +96,14 @@
   flex: 1;
   gap: var(--space-1);
   width: 100%;
+}
+
+.cardTitle {
+  font-size: var(--text-2xl) !important;
+  font-weight: var(--font-weight-bold) !important;
+  color: var(--color-primary) !important;
+  margin: 0 !important;
+  line-height: 1.2;
 }
 
 /* Select Dropdown Styling */
