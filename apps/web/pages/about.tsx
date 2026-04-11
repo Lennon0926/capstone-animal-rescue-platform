@@ -8,6 +8,7 @@ export const About = () => {
     <div>
       <Head>
         <title>Quiénes Somos | Huellitas Sin Hogar</title>
+        <meta name="description" content="Conoce a Ciudadanos Pro Albergue de Animales de Aguadilla (CPAAA), nuestra misión y el equipo detrás de Huellitas Sin Hogar." />
       </Head>
       <HeaderSection />
       <AboutPage />

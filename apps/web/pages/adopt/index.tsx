@@ -26,6 +26,7 @@ export default function Adopt({ animals }: AdoptPageProps) {
     <>
       <Head>
         <title>Adoptar | Huellitas Sin Hogar</title>
+        <meta name="description" content="Explora los animales disponibles para adopción en Huellitas Sin Hogar y encuentra a tu nuevo compañero de vida." />
       </Head>
       <HeaderSection />
       <AdoptPage animals={animals} />

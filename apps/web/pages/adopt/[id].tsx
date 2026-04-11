@@ -15,18 +15,21 @@ type AnimalInfoPageProps = {
 };
 
 export default function AdoptAnimalPage({ animal }: AnimalInfoPageProps) {
-  if (!animal) {
-    return <div>No se encontró el animal.</div>;
-  }
-
   return (
     <div>
       <Head>
-        <title>{`${animal.name} | Huellitas Sin Hogar`}</title>
+        <title>{animal ? `${animal.name} | Huellitas Sin Hogar` : "Animal | Huellitas Sin Hogar"}</title>
+        <meta name="description" content={animal ? `Adopta a ${animal.name} en Huellitas Sin Hogar. ${animal.description ?? ""}`.trim() : "Conoce a los animales disponibles para adopción en Huellitas Sin Hogar."} />
       </Head>
-      <HeaderSection />
-      <AnimalInfo animal={animal} />
-      <FooterSection />
+      {!animal ? (
+        <div>No se encontró el animal.</div>
+      ) : (
+        <>
+          <HeaderSection />
+          <AnimalInfo animal={animal} />
+          <FooterSection />
+        </>
+      )}
     </div>
   );
 }
