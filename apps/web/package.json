@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "jest --verbose",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "audit:lighthouse": "npx @lhci/cli autorun"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

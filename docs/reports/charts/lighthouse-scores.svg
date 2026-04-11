@@ -1,0 +1,158 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="520" viewBox="0 0 760 520" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="13">
+
+  <!-- Background -->
+  <rect width="760" height="520" fill="#ffffff" rx="8"/>
+
+  <!-- Title -->
+  <text x="380" y="28" text-anchor="middle" font-size="15" font-weight="bold" fill="#111827">Lighthouse Audit — Page Performance Scores</text>
+  <text x="380" y="47" text-anchor="middle" font-size="11" fill="#6b7280">6 public pages · Desktop preset · localhost:3000 · 2026-04-11 · report-analytics-progress-report</text>
+
+  <!--
+    Real Lighthouse v13 scores (npx @lhci/cli autorun, desktop preset):
+      /home      Perf=98  A11y=98  BP=89  SEO=91   LCP=248ms   CLS=0.012  TTFB=2520ms
+      /adopt     Perf=100 A11y=100 BP=89  SEO=91   LCP=518ms   CLS=0.000  TTFB=937ms
+      /adopt/1   Perf=100 A11y=94  BP=96  SEO=80   LCP=492ms   CLS=0.000  TTFB=327ms
+      /about     Perf=100 A11y=98  BP=89  SEO=91   LCP=488ms   CLS=0.000  TTFB=3ms
+      /blog      Perf=100 A11y=98  BP=89  SEO=91   LCP=484ms   CLS=0.000  TTFB=2ms
+      /donation  Perf=100 A11y=98  BP=89  SEO=91   LCP=484ms   CLS=0.000  TTFB=2ms
+
+    Plot area: x=60..740 (680px), y=90..380 (290px tall)
+    6 groups × 113px = 678px ≈ 680px
+    Group i starts at x = 60 + i×113; first bar at group_start + 13
+    Bar width=20px, bar gap=1px, so bar j at group_start+13 + j×21
+    Y scale: height = score/100 × 290;  y = 380 − height
+    Gridlines at score 25→y=308, 50→y=235, 75→y=162, 100→y=90
+  -->
+
+  <!-- Legend -->
+  <rect x="108" y="60" width="14" height="14" fill="#4361ee" rx="2"/>
+  <text x="126" y="72" font-size="11" fill="#374151">Performance</text>
+  <rect x="255" y="60" width="14" height="14" fill="#3a9d5c" rx="2"/>
+  <text x="273" y="72" font-size="11" fill="#374151">Accessibility</text>
+  <rect x="407" y="60" width="14" height="14" fill="#f4a261" rx="2"/>
+  <text x="425" y="72" font-size="11" fill="#374151">Best Practices</text>
+  <rect x="570" y="60" width="14" height="14" fill="#9b59b6" rx="2"/>
+  <text x="588" y="72" font-size="11" fill="#374151">SEO</text>
+
+  <!-- Y axis -->
+  <line x1="60" y1="90" x2="60" y2="380" stroke="#9ca3af" stroke-width="1.5"/>
+
+  <!-- X axis -->
+  <line x1="60" y1="380" x2="740" y2="380" stroke="#9ca3af" stroke-width="1.5"/>
+
+  <!-- Y axis label (rotated) -->
+  <text x="16" y="235" text-anchor="middle" font-size="11" fill="#6b7280" transform="rotate(-90 16 235)">Score (0–100)</text>
+
+  <!-- Gridline y=100 (score 100) -->
+  <line x1="60" y1="90" x2="740" y2="90" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="52" y="94" text-anchor="end" font-size="10" fill="#6b7280">100</text>
+
+  <!-- Gridline y=75 (score 75) -->
+  <line x1="60" y1="162" x2="740" y2="162" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="52" y="166" text-anchor="end" font-size="10" fill="#6b7280">75</text>
+
+  <!-- Gridline y=50 (score 50) -->
+  <line x1="60" y1="235" x2="740" y2="235" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="52" y="239" text-anchor="end" font-size="10" fill="#6b7280">50</text>
+
+  <!-- Gridline y=25 (score 25) -->
+  <line x1="60" y1="308" x2="740" y2="308" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="52" y="312" text-anchor="end" font-size="10" fill="#6b7280">25</text>
+
+  <!-- Y=0 label -->
+  <text x="52" y="384" text-anchor="end" font-size="10" fill="#6b7280">0</text>
+
+  <!-- Group separator lines (subtle vertical guides) -->
+  <line x1="173" y1="90" x2="173" y2="380" stroke="#f3f4f6" stroke-width="1"/>
+  <line x1="286" y1="90" x2="286" y2="380" stroke="#f3f4f6" stroke-width="1"/>
+  <line x1="399" y1="90" x2="399" y2="380" stroke="#f3f4f6" stroke-width="1"/>
+  <line x1="512" y1="90" x2="512" y2="380" stroke="#f3f4f6" stroke-width="1"/>
+  <line x1="625" y1="90" x2="625" y2="380" stroke="#f3f4f6" stroke-width="1"/>
+
+  <!-- ── /home (i=0): group_x=60, first bar at 73 ── -->
+  <!-- Perf 98: h=284, y=96 -->
+  <rect x="73"  y="96"  width="20" height="284" fill="#4361ee" rx="2"/>
+  <!-- A11y 98: h=284, y=96 -->
+  <rect x="94"  y="96"  width="20" height="284" fill="#3a9d5c" rx="2"/>
+  <!-- BP 89: h=258, y=122 -->
+  <rect x="115" y="122" width="20" height="258" fill="#f4a261" rx="2"/>
+  <!-- SEO 91: h=264, y=116 -->
+  <rect x="136" y="116" width="20" height="264" fill="#9b59b6" rx="2"/>
+  <text x="115" y="398" text-anchor="middle" font-size="11" fill="#374151">/home</text>
+
+  <!-- ── /adopt (i=1): group_x=173, first bar at 186 ── -->
+  <!-- Perf 100: h=290, y=90 -->
+  <rect x="186" y="90"  width="20" height="290" fill="#4361ee" rx="2"/>
+  <!-- A11y 100: h=290, y=90 -->
+  <rect x="207" y="90"  width="20" height="290" fill="#3a9d5c" rx="2"/>
+  <!-- BP 89: h=258, y=122 -->
+  <rect x="228" y="122" width="20" height="258" fill="#f4a261" rx="2"/>
+  <!-- SEO 91: h=264, y=116 -->
+  <rect x="249" y="116" width="20" height="264" fill="#9b59b6" rx="2"/>
+  <text x="228" y="398" text-anchor="middle" font-size="11" fill="#374151">/adopt</text>
+
+  <!-- ── /adopt/1 (i=2): group_x=286, first bar at 299 ── -->
+  <!-- Perf 100: h=290, y=90 -->
+  <rect x="299" y="90"  width="20" height="290" fill="#4361ee" rx="2"/>
+  <!-- A11y 94: h=273, y=107 -->
+  <rect x="320" y="107" width="20" height="273" fill="#3a9d5c" rx="2"/>
+  <!-- BP 96: h=278, y=102 -->
+  <rect x="341" y="102" width="20" height="278" fill="#f4a261" rx="2"/>
+  <!-- SEO 80: h=232, y=148 -->
+  <rect x="362" y="148" width="20" height="232" fill="#9b59b6" rx="2"/>
+  <text x="341" y="398" text-anchor="middle" font-size="11" fill="#374151">/adopt/1</text>
+
+  <!-- ── /about (i=3): group_x=399, first bar at 412 ── -->
+  <!-- Perf 100: h=290, y=90 -->
+  <rect x="412" y="90"  width="20" height="290" fill="#4361ee" rx="2"/>
+  <!-- A11y 98: h=284, y=96 -->
+  <rect x="433" y="96"  width="20" height="284" fill="#3a9d5c" rx="2"/>
+  <!-- BP 89: h=258, y=122 -->
+  <rect x="454" y="122" width="20" height="258" fill="#f4a261" rx="2"/>
+  <!-- SEO 91: h=264, y=116 -->
+  <rect x="475" y="116" width="20" height="264" fill="#9b59b6" rx="2"/>
+  <text x="454" y="398" text-anchor="middle" font-size="11" fill="#374151">/about</text>
+
+  <!-- ── /blog (i=4): group_x=512, first bar at 525 ── -->
+  <!-- Perf 100: h=290, y=90 -->
+  <rect x="525" y="90"  width="20" height="290" fill="#4361ee" rx="2"/>
+  <!-- A11y 98: h=284, y=96 -->
+  <rect x="546" y="96"  width="20" height="284" fill="#3a9d5c" rx="2"/>
+  <!-- BP 89: h=258, y=122 -->
+  <rect x="567" y="122" width="20" height="258" fill="#f4a261" rx="2"/>
+  <!-- SEO 91: h=264, y=116 -->
+  <rect x="588" y="116" width="20" height="264" fill="#9b59b6" rx="2"/>
+  <text x="567" y="398" text-anchor="middle" font-size="11" fill="#374151">/blog</text>
+
+  <!-- ── /donation (i=5): group_x=625, first bar at 638 ── -->
+  <!-- Perf 100: h=290, y=90 -->
+  <rect x="638" y="90"  width="20" height="290" fill="#4361ee" rx="2"/>
+  <!-- A11y 98: h=284, y=96 -->
+  <rect x="659" y="96"  width="20" height="284" fill="#3a9d5c" rx="2"/>
+  <!-- BP 89: h=258, y=122 -->
+  <rect x="680" y="122" width="20" height="258" fill="#f4a261" rx="2"/>
+  <!-- SEO 91: h=264, y=116 -->
+  <rect x="701" y="116" width="20" height="264" fill="#9b59b6" rx="2"/>
+  <text x="680" y="398" text-anchor="middle" font-size="11" fill="#374151">/donation</text>
+
+  <!-- ── Summary row ── -->
+  <rect x="40" y="418" width="680" height="62" fill="#f8fafc" rx="6" stroke="#e2e8f0" stroke-width="1"/>
+
+  <text x="113" y="439" text-anchor="middle" font-size="11" fill="#6b7280">Pages Audited</text>
+  <text x="113" y="462" text-anchor="middle" font-size="16" font-weight="bold" fill="#111827">6</text>
+
+  <text x="262" y="439" text-anchor="middle" font-size="11" fill="#6b7280">Avg Performance</text>
+  <text x="262" y="462" text-anchor="middle" font-size="16" font-weight="bold" fill="#4361ee">99.7</text>
+
+  <text x="400" y="439" text-anchor="middle" font-size="11" fill="#6b7280">Avg Accessibility</text>
+  <text x="400" y="462" text-anchor="middle" font-size="16" font-weight="bold" fill="#3a9d5c">97.7</text>
+
+  <text x="540" y="439" text-anchor="middle" font-size="11" fill="#6b7280">LCP SMART Obj. 1</text>
+  <rect x="594" y="426" width="112" height="40" fill="#d1fae5" rx="4" stroke="#10b981" stroke-width="1"/>
+  <text x="650" y="441" text-anchor="middle" font-size="10" fill="#065f46">All pages ≤ 3 s LCP</text>
+  <text x="650" y="458" text-anchor="middle" font-size="11" font-weight="bold" fill="#065f46">PASS ✓</text>
+
+  <!-- Source note -->
+  <text x="380" y="500" text-anchor="middle" font-size="10" fill="#9ca3af">Source: docs/reports/section-3-1-lighthouse-audit.md · Lighthouse v13 · Desktop · localhost:3000 · 2026-04-11</text>
+
+</svg>
