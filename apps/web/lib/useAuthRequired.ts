@@ -33,7 +33,6 @@ export function useAuthRequired(): AuthState {
         setUser(session.user);
         setIsLoading(false);
       } catch (err) {
-        console.error('Auth check failed:', err);
         router.push('/admin/login');
       }
     };
