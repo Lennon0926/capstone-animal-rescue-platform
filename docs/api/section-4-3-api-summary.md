@@ -22,7 +22,7 @@ The table below summarizes every implemented endpoint:
 **Key implementation details:**
 
 - **Pagination** uses `limit` (1–100, default 50) and `offset` (default 0) with a `hasMore` flag in the response.
-- **Filtering** supports species, status, size, gender, name, tags, and a combined `search` parameter.
+- **Filtering** supports species, status, size, gender, name, tags, and a combined `search` parameter. The `/api/animals/filters` endpoint is backed by a single `get_animal_filter_options` database RPC and caches results for 30 seconds.
 - **Image uploads** accept `multipart/form-data` with JPEG, PNG, or WebP files up to 5 MB, stored in Cloudflare R2.
 - **Health probes** are split into three tiers: `/` (info), `/health` (liveness), and `/ready` (readiness), suitable for container orchestrators.
 

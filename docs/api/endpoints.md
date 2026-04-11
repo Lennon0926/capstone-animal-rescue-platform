@@ -235,6 +235,8 @@ GET /api/animals?species=perro&status=disponible&sortBy=name&sortOrder=asc&limit
 
 Returns the distinct values currently in the database for each filterable field.
 
+> **Note:** Results are served from a 30-second server-side cache backed by a single `get_animal_filter_options` database RPC. Values may lag up to 30 seconds after a new animal is added.
+
 **Request Example**
 
 ```
