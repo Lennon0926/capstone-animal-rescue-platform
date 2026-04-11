@@ -131,22 +131,34 @@ The Testing Plan requires ≥ 95% of critical backend functions to pass. The thr
 
 ## Load Test Results — SLO Assessment
 
-**Report:** `docs/reports/load-test-2026-04-05.md`
-**Tool:** Artillery v2.0.30 | **Profile:** 0 → 50 VU ramp over 10s, sustained 60s
+**Report:** `docs/reports/load-test-2026-04-11.md`
+**Tool:** Artillery v2.x | **Profile:** 0 → 50 VU ramp over 10s, sustained 60s | **Run date:** 2026-04-11
 
 | Endpoint | Requests | p95 | p99 | Error Rate | SLO (< 1% errors) |
 |----------|----------|-----|-----|------------|-------------------|
-| `GET /api/health` | 307 | 138ms | 169ms | 0.00% | **PASS** |
-| `GET /api/animals` | 1,615 | 156ms | 340ms | **15.67%** | **FAIL** |
-| `GET /api/animals/filters` | 665 | 207ms | 488ms | 0.00% | **PASS** |
-| `GET /api/animals/:aid` | 668 | 156ms | 424ms | 0.00% | **PASS** |
-| **Overall** | **3,255** | **166ms** | **400ms** | **7.77%** | **FAIL** |
+| `GET /health` | 319 | 1ms | 2ms | 0.00% | **PASS** |
+| `GET /api/animals` | 1,468 | 162ms | 233ms | **21.05%** | **FAIL** |
+| `GET /api/animals/filters` | 502 | 1ms | 3ms | 0.00% | **PASS** |
+| `GET /api/animals/:aid` | 653 | 202ms | 308ms | 0.00% | **PASS** |
+| `GET /api/uploads/config` | 313 | 1ms | 13ms | 0.00% | **PASS** |
+| **Overall** | **3,255** | **162ms** | **238ms** | **9.49%** | **FAIL** |
 
-**Overall SLO verdict: FAIL** — 3 of 4 endpoints pass individually; `GET /api/animals` fails the < 1% error-rate threshold.
+**Overall SLO verdict: FAIL** — 4 of 5 endpoints pass individually; `GET /api/animals` fails the < 1% error-rate threshold with 309 HTTP 500 responses.
+
+### Comparison with prior run (2026-04-05)
+
+| Metric | 2026-04-05 | 2026-04-11 | Change |
+|--------|-----------|-----------|--------|
+| Total errors | 253 | 309 | +56 |
+| `GET /api/animals` error rate | 15.67% | 21.05% | +5.38pp |
+| Overall p95 | 166ms | 162ms | −4ms |
+| Overall p99 | 400ms | 238ms | −162ms |
+
+Latency improved — p99 dropped from 400ms to 238ms — but the error rate on `GET /api/animals` worsened. Both runs exhibit the same failure mode.
 
 ### Root cause
 
-All 253 errors (HTTP 500) came exclusively from `GET /api/animals`. The most likely cause is Supabase free-tier connection pool exhaustion: the free plan caps pooled connections at ~25, and this scenario drives ~25 concurrent VUs to that endpoint at peak. When the pool saturates, Supabase rejects queries and the server propagates a 500. Latency on all endpoints was excellent (p95 ≤ 207ms), confirming the server layer itself is not the bottleneck.
+All 309 errors (HTTP 500) came exclusively from `GET /api/animals`. The cause is Supabase free-tier connection pool exhaustion: the free plan caps pooled connections at ~25, and this scenario drives ~25 concurrent VUs to that endpoint at peak. When the pool saturates, Supabase rejects queries and the server returns 500. Latency on all passing endpoints was excellent (p95 ≤ 202ms), confirming the server layer itself is not the bottleneck.
 
 ### Production risk and mitigation
 
