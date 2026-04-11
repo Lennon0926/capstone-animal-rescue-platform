@@ -136,6 +136,35 @@
   color: var(--color-text-inverse);
 }
 
+.cardActions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: auto;
+}
+
+.cardActions .learnMore {
+  flex: 1;
+  margin-top: 0;
+}
+
+.adoptButton {
+  flex: 1;
+  padding: var(--space-3);
+  text-align: center;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  transition: all var(--transition-fast);
+  background-color: transparent;
+}
+
+.adoptButton:hover {
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
 @media (max-width: 1024px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
