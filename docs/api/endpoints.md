@@ -20,6 +20,20 @@ Upload endpoints return route-specific string error codes instead.
 
 ---
 
+## Known Limitations
+
+The following gaps were identified during a REST best-practices audit and are tracked as open issues:
+
+| # | Gap | Affected Endpoints | Issue |
+|---|-----|--------------------|-------|
+| 1 | **No authentication** — all write endpoints are publicly accessible | `POST`, `PATCH`, `DELETE /api/animals`, `POST /api/uploads/...` | tracked separately |
+| 2 | **No rate limiting** — no request throttling per IP | all endpoints | [#132](https://github.com/Lennon0926/capstone-animal-rescue-platform/issues/132) |
+| 3 | **No API versioning** — routes use `/api/` instead of `/api/v1/` | all endpoints | [#133](https://github.com/Lennon0926/capstone-animal-rescue-platform/issues/133) |
+| 4 | **CORS allows all origins** — not restricted to known client origins | all endpoints | [#134](https://github.com/Lennon0926/capstone-animal-rescue-platform/issues/134) |
+| 5 | **No Content-Type enforcement** — non-JSON bodies on write endpoints are silently dropped instead of returning `415` | `POST /api/animals`, `PATCH /api/animals/:aid` | [#135](https://github.com/Lennon0926/capstone-animal-rescue-platform/issues/135) |
+
+---
+
 ## Table of Contents
 
 - [Health & System](#health--system)

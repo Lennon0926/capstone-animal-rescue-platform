@@ -183,6 +183,8 @@ cd apps/web && npm run dev:turbo
 
 Full request and response examples are documented in [docs/api/endpoints.md](docs/api/endpoints.md).
 
+> **API maturity note:** Authentication is not yet implemented — all endpoints are currently public. Rate limiting (#132), API versioning (#133), CORS hardening (#134), and Content-Type enforcement (#135) are open issues.
+
 **Upload details:**
 - Request: `multipart/form-data`, field name `image`
 - Allowed types: `image/jpeg`, `image/png`, `image/webp`

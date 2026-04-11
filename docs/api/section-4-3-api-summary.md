@@ -27,3 +27,15 @@ The table below summarizes every implemented endpoint:
 - **Health probes** are split into three tiers: `/` (info), `/health` (liveness), and `/ready` (readiness), suitable for container orchestrators.
 
 For full request/response examples and field-level documentation, see [`docs/api/endpoints.md`](./endpoints.md).
+
+---
+
+**Known Gaps (post-audit)**
+
+A REST best-practices audit identified the following open issues:
+
+- **Authentication not yet implemented** — all write endpoints (`POST`, `PATCH`, `DELETE`) are publicly accessible; tracked separately.
+- **No rate limiting** — no per-IP throttling is in place ([#132](https://github.com/Lennon0926/capstone-animal-rescue-platform/issues/132)).
+- **No API versioning** — routes use `/api/` prefix; `/api/v1/` planned ([#133](https://github.com/Lennon0926/capstone-animal-rescue-platform/issues/133)).
+- **CORS not restricted** — currently allows all origins; production hardening tracked in ([#134](https://github.com/Lennon0926/capstone-animal-rescue-platform/issues/134)).
+- **No Content-Type enforcement** — write endpoints silently drop non-JSON bodies instead of returning `415` ([#135](https://github.com/Lennon0926/capstone-animal-rescue-platform/issues/135)).
