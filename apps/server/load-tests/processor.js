@@ -4,8 +4,11 @@
 // Update this pool if the seed data changes.
 const ANIMAL_ID_POOL = [24, 22, 21, 20, 17, 16, 15, 14, 7, 2, 3, 9, 8, 4, 6, 10, 5];
 
-const SPECIES_OPTIONS = ["Dog", "Cat", ""];
-const STATUS_OPTIONS = ["available", "adopted", "pending", "fostered", ""];
+// Spanish values matching the server's validation enums (validation.js).
+// English values are silently dropped by the filter middleware, causing all
+// requests to hit Supabase with no filter and increasing pool pressure.
+const SPECIES_OPTIONS = ["perro", "gato", ""];
+const STATUS_OPTIONS = ["disponible", "adoptado", "pendiente", "en hogar temporal", ""];
 const LIMIT_OPTIONS = [10, 20, 50];
 const OFFSET_OPTIONS = [0, 0, 0, 10]; // weighted toward 0
 
