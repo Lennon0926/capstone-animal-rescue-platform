@@ -21,7 +21,7 @@ const STORIES = [
     id: "alma",
     imageSrc: "/about/img-1.jpg",
     imageAlt: "Voluntario con un perro rescatado",
-    ctaLabel: "Conoce más",
+    ctaLabel: "Conocer mas",
     href: "/about",
     parallaxSpeed: -0.45,
     desktopPosition: "topLeft",
@@ -30,7 +30,7 @@ const STORIES = [
     id: "nilo",
     imageSrc: "/about/img-3.jpg",
     imageAlt: "Perro rescatado recibiendo cuidado",
-    ctaLabel: "Conoce más",
+    ctaLabel: "Conocer mas",
     href: "/about",
     parallaxSpeed: 0.62,
     desktopPosition: "topRight",
@@ -39,7 +39,7 @@ const STORIES = [
     id: "luna",
     imageSrc: "/about/img-5.jpg",
     imageAlt: "Equipo y animal rescatado en una actividad comunitaria",
-    ctaLabel: "Conoce más",
+    ctaLabel: "Conocer mas",
     href: "/about",
     parallaxSpeed: -0.7,
     desktopPosition: "bottomLeft",
@@ -48,7 +48,7 @@ const STORIES = [
     id: "max",
     imageSrc: "/about/img-7.jpg",
     imageAlt: "Perro en proceso de recuperación y adopción",
-    ctaLabel: "Conoce más",
+    ctaLabel: "Conocer mas",
     href: "/about",
     parallaxSpeed: 0.52,
     desktopPosition: "bottomRight",
@@ -189,7 +189,11 @@ export default function StoriesSection() {
                   sizes="(max-width: 900px) min(100vw - 40px, 28rem), 20rem"
                   className={styles.mediaImage}
                 />
-                <Link href={story.href} className={styles.learnMore}>
+                <Link
+                  href={story.href}
+                  className={styles.learnMore}
+                  aria-label={`${story.ctaLabel} sobre esta historia`}
+                >
                   {story.ctaLabel}
                 </Link>
               </div>

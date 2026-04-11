@@ -90,7 +90,9 @@ describe("StoriesSection", () => {
       }),
     ).toBeInTheDocument();
     expect(screen.getAllByTestId("story-card")).toHaveLength(4);
-    expect(screen.getAllByRole("link", { name: "Conoce más" })).toHaveLength(4);
+    expect(
+      screen.getAllByRole("link", { name: "Conocer mas sobre esta historia" }),
+    ).toHaveLength(4);
   });
 
   it("renders after the timeline section on the home page", () => {
