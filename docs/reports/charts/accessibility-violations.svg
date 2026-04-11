@@ -1,85 +1,147 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="360" viewBox="0 0 720 360" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="13">
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="545" viewBox="0 0 720 545" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="13">
 
   <!-- Background -->
-  <rect width="720" height="360" fill="#ffffff" rx="8"/>
+  <rect width="720" height="545" fill="#ffffff" rx="8"/>
 
   <!-- Title -->
-  <text x="360" y="30" text-anchor="middle" font-size="15" font-weight="bold" fill="#111827">Accessibility Audit — WCAG 2.1 AA Violations</text>
-  <text x="360" y="50" text-anchor="middle" font-size="11" fill="#6b7280">Initial violations per page · Node.js v24.13.1 · 2026-04-11 · report-analytics-progress-report</text>
+  <text x="360" y="28" text-anchor="middle" font-size="15" font-weight="bold" fill="#111827">Accessibility Audit — WCAG 2.1 AA Violations</text>
+  <text x="360" y="47" text-anchor="middle" font-size="11" fill="#6b7280">Initial violations per page · all 10 pages audited · 2026-04-11 · report-analytics-progress-report</text>
 
   <!--
-    Audit results (initial, before fixes):
-      /home          — 0 critical, 1 serious (document-title)
-      /adopt         — 0 critical, 2 serious (document-title + nested-interactive)
-      /adopt/1       — 0 critical, 1 serious (document-title)
-      /admin/animals — 0 critical, 2 serious (document-title + color-contrast)
+    All pages and initial violations (before fixes):
+      /home              — 1 Serious (document-title)
+      /adopt             — 2 Serious (document-title + nested-interactive)
+      /adopt/1           — 1 Serious (document-title)
+      /admin/animals     — 2 Serious (document-title + color-contrast)
+      /about             — 1 Serious (document-title)
+      /blog              — 1 Serious (document-title)
+      /donation          — 1 Serious (document-title)
+      /admin/createAnimal — 2 Serious (document-title + color-contrast)
+      /admin/editAnimal  — 2 Serious (document-title + color-contrast)
+      /admin/upload      — 1 Serious (document-title)
 
-    All 6 violations were Serious severity. All resolved after fixes.
-    Chart area: x=200..640 (width=440), max violations = 2
-    Scale: 440/2 = 220px per violation
-    Row centers at y=105, 165, 225, 285, bar height=28px
+    Total: 14 Serious, 0 Critical/Moderate/Minor. All resolved.
+
+    Chart area: x=210..620 (width=410), max=2 violations
+    Scale: 410/2 = 205px per violation
+    1 violation → 205px bar, 2 violations → 410px bar
+    Row centres at y=90,130,170,210,250,290,330,370,410,450 (40px apart)
+    Bar height=22px, bar top = centre−11
   -->
 
   <!-- Legend -->
-  <rect x="222" y="58" width="14" height="14" fill="#f97316" rx="2"/>
-  <text x="240" y="70" fill="#374151" font-size="11">Serious</text>
-  <rect x="308" y="58" width="14" height="14" fill="#6b7280" rx="2"/>
-  <text x="326" y="70" fill="#374151" font-size="11">All violations resolved after fixes</text>
+  <rect x="258" y="58" width="14" height="14" fill="#f97316" rx="2"/>
+  <text x="276" y="70" fill="#374151" font-size="11">Serious violation (initial)</text>
+  <rect x="438" y="58" width="14" height="14" fill="#d1fae5" rx="2" stroke="#10b981" stroke-width="1"/>
+  <text x="456" y="70" fill="#374151" font-size="11">Fixed</text>
 
   <!-- Y axis -->
-  <line x1="200" y1="74" x2="200" y2="302" stroke="#9ca3af" stroke-width="1.5"/>
+  <line x1="210" y1="76" x2="210" y2="462" stroke="#9ca3af" stroke-width="1.5"/>
 
-  <!-- X axis + grid lines at 0.5, 1, 1.5, 2 -->
-  <line x1="200" y1="302" x2="650" y2="302" stroke="#9ca3af" stroke-width="1.5"/>
-  <line x1="310" y1="74" x2="310" y2="302" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="310" y="315" text-anchor="middle" font-size="10" fill="#6b7280">0.5</text>
-  <line x1="420" y1="74" x2="420" y2="302" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="420" y="315" text-anchor="middle" font-size="10" fill="#6b7280">1</text>
-  <line x1="530" y1="74" x2="530" y2="302" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="530" y="315" text-anchor="middle" font-size="10" fill="#6b7280">1.5</text>
-  <line x1="640" y1="74" x2="640" y2="302" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="640" y="315" text-anchor="middle" font-size="10" fill="#6b7280">2</text>
-  <text x="200" y="315" text-anchor="middle" font-size="10" fill="#6b7280">0</text>
-  <text x="425" y="330" text-anchor="middle" font-size="10" fill="#6b7280">Violations Found (Initial)</text>
+  <!-- X axis -->
+  <line x1="210" y1="462" x2="620" y2="462" stroke="#9ca3af" stroke-width="1.5"/>
 
-  <!-- ── Row 1: /home (1 serious) ── -->
-  <text x="195" y="108" text-anchor="end" font-size="11" fill="#374151">/home</text>
-  <!-- 1 serious: 1/2*440 = 220px -->
-  <rect x="201" y="91" width="220" height="28" fill="#f97316" rx="3"/>
-  <text x="340" y="110" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff">1 Serious</text>
-  <!-- Fixed badge -->
-  <rect x="432" y="91" width="64" height="28" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
-  <text x="464" y="110" text-anchor="middle" font-size="11" font-weight="bold" fill="#065f46">FIXED</text>
+  <!-- Grid lines at 0.5 / 1 / 1.5 / 2 violations -->
+  <line x1="313" y1="76" x2="313" y2="462" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="313" y="475" text-anchor="middle" font-size="10" fill="#6b7280">0.5</text>
 
-  <!-- ── Row 2: /adopt (2 serious) ── -->
-  <text x="195" y="168" text-anchor="end" font-size="11" fill="#374151">/adopt</text>
-  <!-- 2 serious: 2/2*440 = 440px -->
-  <rect x="201" y="151" width="440" height="28" fill="#f97316" rx="3"/>
-  <text x="421" y="170" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff">2 Serious</text>
-  <!-- Fixed badge -->
-  <rect x="652" y="151" width="64" height="28" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
-  <text x="684" y="170" text-anchor="middle" font-size="11" font-weight="bold" fill="#065f46">FIXED</text>
+  <line x1="415" y1="76" x2="415" y2="462" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="415" y="475" text-anchor="middle" font-size="10" fill="#6b7280">1</text>
 
-  <!-- ── Row 3: /adopt/1 (1 serious) ── -->
-  <text x="195" y="228" text-anchor="end" font-size="11" fill="#374151">/adopt/1</text>
-  <!-- 1 serious: 220px -->
-  <rect x="201" y="211" width="220" height="28" fill="#f97316" rx="3"/>
-  <text x="340" y="230" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff">1 Serious</text>
-  <rect x="432" y="211" width="64" height="28" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
-  <text x="464" y="230" text-anchor="middle" font-size="11" font-weight="bold" fill="#065f46">FIXED</text>
+  <line x1="518" y1="76" x2="518" y2="462" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="518" y="475" text-anchor="middle" font-size="10" fill="#6b7280">1.5</text>
 
-  <!-- ── Row 4: /admin/animals (2 serious) ── -->
-  <text x="195" y="288" text-anchor="end" font-size="11" fill="#374151">/admin/animals</text>
-  <!-- 2 serious: 440px -->
-  <rect x="201" y="271" width="440" height="28" fill="#f97316" rx="3"/>
-  <text x="421" y="290" text-anchor="middle" font-size="11" font-weight="bold" fill="#ffffff">2 Serious</text>
-  <rect x="652" y="271" width="64" height="28" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
-  <text x="684" y="290" text-anchor="middle" font-size="11" font-weight="bold" fill="#065f46">FIXED</text>
+  <line x1="620" y1="76" x2="620" y2="462" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="620" y="475" text-anchor="middle" font-size="10" fill="#6b7280">2</text>
+
+  <text x="210" y="475" text-anchor="middle" font-size="10" fill="#6b7280">0</text>
+  <text x="415" y="490" text-anchor="middle" font-size="10" fill="#6b7280">Violations Found (Initial)</text>
+
+  <!-- ── Row 1: /home (1 Serious) ── -->
+  <text x="205" y="94" text-anchor="end" font-size="11" fill="#374151">/home</text>
+  <rect x="211" y="79" width="205" height="22" fill="#f97316" rx="3"/>
+  <text x="313" y="95" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffffff">1 Serious</text>
+  <rect x="422" y="79" width="58" height="22" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
+  <text x="451" y="95" text-anchor="middle" font-size="10" font-weight="bold" fill="#065f46">FIXED</text>
+
+  <!-- ── Row 2: /adopt (2 Serious) ── -->
+  <text x="205" y="134" text-anchor="end" font-size="11" fill="#374151">/adopt</text>
+  <rect x="211" y="119" width="410" height="22" fill="#f97316" rx="3"/>
+  <text x="416" y="135" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffffff">2 Serious</text>
+  <rect x="627" y="119" width="58" height="22" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
+  <text x="656" y="135" text-anchor="middle" font-size="10" font-weight="bold" fill="#065f46">FIXED</text>
+
+  <!-- ── Row 3: /adopt/1 (1 Serious) ── -->
+  <text x="205" y="174" text-anchor="end" font-size="11" fill="#374151">/adopt/1</text>
+  <rect x="211" y="159" width="205" height="22" fill="#f97316" rx="3"/>
+  <text x="313" y="175" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffffff">1 Serious</text>
+  <rect x="422" y="159" width="58" height="22" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
+  <text x="451" y="175" text-anchor="middle" font-size="10" font-weight="bold" fill="#065f46">FIXED</text>
+
+  <!-- ── Row 4: /admin/animals (2 Serious) ── -->
+  <text x="205" y="214" text-anchor="end" font-size="11" fill="#374151">/admin/animals</text>
+  <rect x="211" y="199" width="410" height="22" fill="#f97316" rx="3"/>
+  <text x="416" y="215" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffffff">2 Serious</text>
+  <rect x="627" y="199" width="58" height="22" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
+  <text x="656" y="215" text-anchor="middle" font-size="10" font-weight="bold" fill="#065f46">FIXED</text>
+
+  <!-- ── Row 5: /about (1 Serious) ── -->
+  <text x="205" y="254" text-anchor="end" font-size="11" fill="#374151">/about</text>
+  <rect x="211" y="239" width="205" height="22" fill="#f97316" rx="3"/>
+  <text x="313" y="255" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffffff">1 Serious</text>
+  <rect x="422" y="239" width="58" height="22" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
+  <text x="451" y="255" text-anchor="middle" font-size="10" font-weight="bold" fill="#065f46">FIXED</text>
+
+  <!-- ── Row 6: /blog (1 Serious) ── -->
+  <text x="205" y="294" text-anchor="end" font-size="11" fill="#374151">/blog</text>
+  <rect x="211" y="279" width="205" height="22" fill="#f97316" rx="3"/>
+  <text x="313" y="295" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffffff">1 Serious</text>
+  <rect x="422" y="279" width="58" height="22" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
+  <text x="451" y="295" text-anchor="middle" font-size="10" font-weight="bold" fill="#065f46">FIXED</text>
+
+  <!-- ── Row 7: /donation (1 Serious) ── -->
+  <text x="205" y="334" text-anchor="end" font-size="11" fill="#374151">/donation</text>
+  <rect x="211" y="319" width="205" height="22" fill="#f97316" rx="3"/>
+  <text x="313" y="335" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffffff">1 Serious</text>
+  <rect x="422" y="319" width="58" height="22" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
+  <text x="451" y="335" text-anchor="middle" font-size="10" font-weight="bold" fill="#065f46">FIXED</text>
+
+  <!-- ── Row 8: /admin/createAnimal (2 Serious) ── -->
+  <text x="205" y="374" text-anchor="end" font-size="11" fill="#374151">/admin/createAnimal</text>
+  <rect x="211" y="359" width="410" height="22" fill="#f97316" rx="3"/>
+  <text x="416" y="375" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffffff">2 Serious</text>
+  <rect x="627" y="359" width="58" height="22" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
+  <text x="656" y="375" text-anchor="middle" font-size="10" font-weight="bold" fill="#065f46">FIXED</text>
+
+  <!-- ── Row 9: /admin/editAnimal (2 Serious) ── -->
+  <text x="205" y="414" text-anchor="end" font-size="11" fill="#374151">/admin/editAnimal</text>
+  <rect x="211" y="399" width="410" height="22" fill="#f97316" rx="3"/>
+  <text x="416" y="415" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffffff">2 Serious</text>
+  <rect x="627" y="399" width="58" height="22" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
+  <text x="656" y="415" text-anchor="middle" font-size="10" font-weight="bold" fill="#065f46">FIXED</text>
+
+  <!-- ── Row 10: /admin/upload (1 Serious) ── -->
+  <text x="205" y="454" text-anchor="end" font-size="11" fill="#374151">/admin/upload</text>
+  <rect x="211" y="439" width="205" height="22" fill="#f97316" rx="3"/>
+  <text x="313" y="455" text-anchor="middle" font-size="10" font-weight="bold" fill="#ffffff">1 Serious</text>
+  <rect x="422" y="439" width="58" height="22" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
+  <text x="451" y="455" text-anchor="middle" font-size="10" font-weight="bold" fill="#065f46">FIXED</text>
 
   <!-- ── Summary row ── -->
-  <rect x="60" y="332" width="600" height="22" fill="#f8fafc" rx="4" stroke="#e2e8f0" stroke-width="1"/>
-  <text x="360" y="347" text-anchor="middle" font-size="11" fill="#374151">
-    6 violations found · 0 Critical · 6 Serious · 0 Moderate · 0 Minor · All resolved · SMART Objective 5: <tspan font-weight="bold" fill="#065f46">PASS</tspan>
-  </text>
+  <rect x="40" y="497" width="640" height="32" fill="#f8fafc" rx="6" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="116" y="509" text-anchor="middle" font-size="11" fill="#6b7280">Pages</text>
+  <text x="116" y="523" text-anchor="middle" font-size="14" font-weight="bold" fill="#111827">10</text>
+  <text x="248" y="509" text-anchor="middle" font-size="11" fill="#ef4444">Critical</text>
+  <text x="248" y="523" text-anchor="middle" font-size="14" font-weight="bold" fill="#ef4444">0</text>
+  <text x="360" y="509" text-anchor="middle" font-size="11" fill="#f97316">Serious (initial)</text>
+  <text x="360" y="523" text-anchor="middle" font-size="14" font-weight="bold" fill="#f97316">14</text>
+  <text x="472" y="509" text-anchor="middle" font-size="11" fill="#6b7280">Remaining</text>
+  <text x="472" y="523" text-anchor="middle" font-size="14" font-weight="bold" fill="#6b7280">0</text>
+  <rect x="570" y="500" width="100" height="26" fill="#d1fae5" rx="4" stroke="#10b981" stroke-width="1"/>
+  <text x="620" y="510" text-anchor="middle" font-size="10" fill="#065f46">SMART Obj. 5</text>
+  <text x="620" y="522" text-anchor="middle" font-size="11" font-weight="bold" fill="#065f46">PASS ✓</text>
+
+  <!-- Source note -->
+  <text x="360" y="540" text-anchor="middle" font-size="10" fill="#9ca3af">Source: docs/reports/section-3-3-accessibility-audit.md · axe-core WCAG 2.1 AA · Desktop Chrome · 2026-04-11</text>
 
 </svg>
