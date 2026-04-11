@@ -1,6 +1,6 @@
 # Section 4.3 — API Documentation Summary
 
-The Express backend exposes a RESTful API at port 4000. All endpoints return JSON and currently require no authentication. Input validation and sanitization are handled by dedicated middleware, and errors follow a consistent `{ error: { code, message } }` schema.
+The Express backend exposes a RESTful API at port 4000. All endpoints return JSON and currently require no authentication. Input validation and sanitization are handled by dedicated middleware. Most routes use the shared error handler and return `success: false` with a numeric HTTP status in `error.code`, while upload endpoints use route-specific string error codes such as `INVALID_IMAGE_TYPE` and `R2_UNAUTHORIZED`.
 
 The table below summarizes every implemented endpoint:
 

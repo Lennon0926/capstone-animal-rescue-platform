@@ -168,8 +168,11 @@ cd apps/web && npm run dev:turbo
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/animals` | List animals with filters and pagination |
-| GET | `/api/animals/:aid` | Get a single animal by ID |
 | GET | `/api/animals/filters` | Get available filter values (species, status, etc.) |
+| GET | `/api/animals/:aid` | Get a single animal by ID |
+| POST | `/api/animals` | Create a new animal record |
+| PATCH | `/api/animals/:aid` | Partially update an existing animal |
+| DELETE | `/api/animals/:aid` | Delete an animal by ID |
 
 ### Uploads
 
@@ -177,6 +180,8 @@ cd apps/web && npm run dev:turbo
 |--------|----------|-------------|
 | GET | `/api/uploads/config` | Return upload configuration plus live Cloudflare R2 health |
 | POST | `/api/uploads/animals/:animalId/image` | Upload an animal image to Cloudflare R2 |
+
+Full request and response examples are documented in [docs/api/endpoints.md](docs/api/endpoints.md).
 
 **Upload details:**
 - Request: `multipart/form-data`, field name `image`
