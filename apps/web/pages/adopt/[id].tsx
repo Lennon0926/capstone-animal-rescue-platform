@@ -1,4 +1,5 @@
 import { GetServerSideProps } from "next";
+import Head from "next/head";
 import AnimalInfo from "@/components/Animal/AnimalInfoPage/animalInfo";
 import HeaderSection from "@/components/Header/headerSection";
 import FooterSection from "@/components/Footer/footerSection";
@@ -20,6 +21,9 @@ export default function AdoptAnimalPage({ animal }: AnimalInfoPageProps) {
 
   return (
     <div>
+      <Head>
+        <title>{`${animal.name} | Huellitas Sin Hogar`}</title>
+      </Head>
       <HeaderSection />
       <AnimalInfo animal={animal} />
       <FooterSection />

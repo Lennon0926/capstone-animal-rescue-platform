@@ -1,4 +1,5 @@
 import type { GetServerSideProps } from "next";
+import Head from "next/head";
 import HeaderSection from "@/components/Header/headerSection";
 import DonationSection from "@/components/LandingPage/Donate/donationSection";
 import OurMissionSection from "@/components/LandingPage/Mission/ourMissionSection";
@@ -21,6 +22,9 @@ type HomeProps = {
 function Home({ animals, fetchError }: HomeProps) {
   return (
     <div>
+      <Head>
+        <title>Inicio | Huellitas Sin Hogar</title>
+      </Head>
       <HeaderSection />
       <DonationSection />
       <OurMissionSection />
