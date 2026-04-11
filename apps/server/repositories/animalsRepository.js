@@ -399,4 +399,5 @@ module.exports = {
   VALID_SORT_FIELDS,
   serializeAnimalRecord,
   normalizeAnimalImageFields,
+  clearAnimalsCache: _clearAnimalsCache,
 };
