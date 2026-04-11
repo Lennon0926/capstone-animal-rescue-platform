@@ -66,10 +66,10 @@ test.describe("Animal detail page (/adopt/[id])", () => {
     await expect(backLink).toHaveAttribute("href", "/adopt");
   });
 
-  test("adoption CTA link is visible and points to /adopt", async ({ page }) => {
-    const cta = page.getByRole("link", { name: /Iniciar Proceso de Adopción/i });
-    await expect(cta).toBeVisible();
-    await expect(cta).toHaveAttribute("href", "/adopt");
+  test("shows adoption unavailable message when form URL is not configured", async ({ page }) => {
+    // NEXT_PUBLIC_GOOGLE_FORM_URL is not set in the test environment,
+    // so the fallback message should appear instead of the Google Form link.
+    await expect(page.getByText(/El formulario de adopción no está disponible/i)).toBeVisible();
   });
 
   // --- Error state ---
