@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="380" viewBox="0 0 720 380" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="13">
+
+  <!-- Background -->
+  <rect width="720" height="380" fill="#ffffff" rx="8"/>
+
+  <!-- Title -->
+  <text x="360" y="30" text-anchor="middle" font-size="15" font-weight="bold" fill="#111827">p95 Response Time per Endpoint — Load Test #113</text>
+  <text x="360" y="50" text-anchor="middle" font-size="11" fill="#6b7280">50 concurrent VUs · Artillery v2.0.30 · 2026-04-11</text>
+
+  <!-- Chart area: x=70..680, y=65..290  (width=610, height=225) -->
+
+  <!-- Grid lines and y-axis labels -->
+  <!-- max scale = 250 ms; lines at 0, 50, 100, 150, 200, 250 -->
+  <!-- y = 290 - (value/250)*225 -->
+
+  <!-- y=290 → 0 ms -->
+  <line x1="70" y1="290" x2="680" y2="290" stroke="#e5e7eb" stroke-width="1"/>
+  <text x="62" y="294" text-anchor="end" fill="#6b7280" font-size="11">0</text>
+
+  <!-- y=245 → 50 ms -->
+  <line x1="70" y1="245" x2="680" y2="245" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="62" y="249" text-anchor="end" fill="#6b7280" font-size="11">50</text>
+
+  <!-- y=200 → 100 ms -->
+  <line x1="70" y1="200" x2="680" y2="200" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="62" y="204" text-anchor="end" fill="#6b7280" font-size="11">100</text>
+
+  <!-- y=155 → 150 ms -->
+  <line x1="70" y1="155" x2="680" y2="155" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="62" y="159" text-anchor="end" fill="#6b7280" font-size="11">150</text>
+
+  <!-- y=110 → 200 ms -->
+  <line x1="70" y1="110" x2="680" y2="110" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="62" y="114" text-anchor="end" fill="#6b7280" font-size="11">200</text>
+
+  <!-- y=65 → 250 ms -->
+  <line x1="70" y1="65" x2="680" y2="65" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="62" y="69" text-anchor="end" fill="#6b7280" font-size="11">250</text>
+
+  <!-- Y-axis label -->
+  <text transform="rotate(-90,18,177)" x="18" y="177" text-anchor="middle" font-size="11" fill="#6b7280">Response Time (ms)</text>
+
+  <!-- Axes -->
+  <line x1="70" y1="65" x2="70" y2="290" stroke="#9ca3af" stroke-width="1.5"/>
+  <line x1="70" y1="290" x2="680" y2="290" stroke="#9ca3af" stroke-width="1.5"/>
+
+  <!--
+    5 endpoints, bar width=60, gap=62, group width=122
+    Centers at x: 161, 283, 405, 527, 649
+    Each group: p50 (left), p95 (right)
+
+    Data:
+      GET /health            p50=1   p95=1
+      GET /api/animals       p50=1   p95=156
+      GET /api/animals/filters p50=1 p95=1
+      GET /api/animals/:id   p50=120 p95=194
+      GET /api/uploads/config p50=1  p95=1
+
+    Bar heights: h = (value/250)*225
+      1ms   → 0.9px  (show as 2px min)
+      156ms → 140.4px
+      120ms → 108px
+      194ms → 174.6px
+
+    Colors: p50=#6366f1 (indigo), p95=#f59e0b (amber)
+    Bar width = 26px each, gap between pair = 8px
+    Group centers: 152, 286, 420, 554, 618  (spacing = 610/5 = 122, starts at 70+61=131)
+  -->
+
+  <!-- Legend -->
+  <rect x="510" y="66" width="14" height="14" fill="#6366f1" rx="2"/>
+  <text x="528" y="78" fill="#374151" font-size="11">p50</text>
+  <rect x="560" y="66" width="14" height="14" fill="#f59e0b" rx="2"/>
+  <text x="578" y="78" fill="#374151" font-size="11">p95</text>
+
+  <!-- ── GET /health (center=148) ── -->
+  <!-- p50=1ms → h=0.9→2 -->
+  <rect x="122" y="288" width="26" height="2" fill="#6366f1" rx="2"/>
+  <!-- p95=1ms → h=0.9→2 -->
+  <rect x="152" y="288" width="26" height="2" fill="#f59e0b" rx="2"/>
+  <!-- value labels -->
+  <text x="135" y="283" text-anchor="middle" font-size="10" fill="#374151">1</text>
+  <text x="165" y="283" text-anchor="middle" font-size="10" fill="#374151">1</text>
+
+  <!-- ── GET /api/animals (center=270) ── -->
+  <!-- p50=1ms → h=2 -->
+  <rect x="244" y="288" width="26" height="2" fill="#6366f1" rx="2"/>
+  <!-- p95=156ms → h=140 -->
+  <rect x="274" y="150" width="26" height="140" fill="#f59e0b" rx="2"/>
+  <text x="257" y="283" text-anchor="middle" font-size="10" fill="#374151">1</text>
+  <text x="287" y="145" text-anchor="middle" font-size="10" fill="#374151">156</text>
+
+  <!-- ── GET /api/animals/filters (center=392) ── -->
+  <rect x="366" y="288" width="26" height="2" fill="#6366f1" rx="2"/>
+  <rect x="396" y="288" width="26" height="2" fill="#f59e0b" rx="2"/>
+  <text x="379" y="283" text-anchor="middle" font-size="10" fill="#374151">1</text>
+  <text x="409" y="283" text-anchor="middle" font-size="10" fill="#374151">1</text>
+
+  <!-- ── GET /api/animals/:id (center=514) ── -->
+  <!-- p50=120ms → h=108 -->
+  <rect x="488" y="182" width="26" height="108" fill="#6366f1" rx="2"/>
+  <!-- p95=194ms → h=175 -->
+  <rect x="518" y="115" width="26" height="175" fill="#f59e0b" rx="2"/>
+  <text x="501" y="177" text-anchor="middle" font-size="10" fill="#374151">120</text>
+  <text x="531" y="110" text-anchor="middle" font-size="10" fill="#374151">194</text>
+
+  <!-- ── GET /api/uploads/config (center=636) ── -->
+  <rect x="610" y="288" width="26" height="2" fill="#6366f1" rx="2"/>
+  <rect x="640" y="288" width="26" height="2" fill="#f59e0b" rx="2"/>
+  <text x="623" y="283" text-anchor="middle" font-size="10" fill="#374151">1</text>
+  <text x="653" y="283" text-anchor="middle" font-size="10" fill="#374151">1</text>
+
+  <!-- SLO threshold line at 2000ms — off-chart, add annotation instead -->
+  <text x="680" y="60" text-anchor="end" font-size="10" fill="#10b981">SLO ≤ 2000 ms (all PASS, max 194 ms)</text>
+
+  <!-- X-axis labels -->
+  <text x="148" y="310" text-anchor="middle" font-size="10" fill="#374151">GET /health</text>
+
+  <text x="270" y="310" text-anchor="middle" font-size="10" fill="#374151">GET /api/animals</text>
+
+  <text x="392" y="310" text-anchor="middle" font-size="10" fill="#374151">GET /api/animals</text>
+  <text x="392" y="323" text-anchor="middle" font-size="10" fill="#374151">/filters</text>
+
+  <text x="514" y="310" text-anchor="middle" font-size="10" fill="#374151">GET /api/animals</text>
+  <text x="514" y="323" text-anchor="middle" font-size="10" fill="#374151">/:id</text>
+
+  <text x="636" y="310" text-anchor="middle" font-size="10" fill="#374151">GET /api/uploads</text>
+  <text x="636" y="323" text-anchor="middle" font-size="10" fill="#374151">/config</text>
+
+  <!-- Error rate annotation for /api/animals -->
+  <rect x="218" y="335" width="104" height="18" fill="#fef3c7" rx="3"/>
+  <text x="270" y="348" text-anchor="middle" font-size="10" fill="#92400e">22.24% errors (pool limit)</text>
+
+  <!-- Source note -->
+  <text x="360" y="375" text-anchor="middle" font-size="10" fill="#9ca3af">Source: docs/reports/section-3-2-load-test-results.md</text>
+
+</svg>
