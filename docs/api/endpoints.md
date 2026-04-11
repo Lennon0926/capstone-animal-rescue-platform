@@ -4,6 +4,34 @@
 **Content-Type:** `application/json` (unless noted otherwise)
 **Authentication:** All endpoints are currently public (no auth required)
 
+Most API routes use the shared Express error handler and return:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": 400,
+    "message": "Human-readable error message"
+  }
+}
+```
+
+Upload endpoints return route-specific string error codes instead.
+
+---
+
+## Known Limitations
+
+The following gaps were identified during a REST best-practices audit and are tracked as open issues:
+
+| # | Gap | Affected Endpoints | Issue |
+|---|-----|--------------------|-------|
+| 1 | **No authentication** — all write endpoints are publicly accessible | `POST`, `PATCH`, `DELETE /api/animals`, `POST /api/uploads/...` | tracked separately |
+| 2 | **No rate limiting** — no request throttling per IP | all endpoints | [#132](https://github.com/Lennon0926/capstone-animal-rescue-platform/issues/132) |
+| 3 | **No API versioning** — routes use `/api/` instead of `/api/v1/` | all endpoints | [#133](https://github.com/Lennon0926/capstone-animal-rescue-platform/issues/133) |
+| 4 | **CORS allows all origins** — not restricted to known client origins | all endpoints | [#134](https://github.com/Lennon0926/capstone-animal-rescue-platform/issues/134) |
+| 5 | **No Content-Type enforcement** — non-JSON bodies on write endpoints are silently dropped instead of returning `415` | `POST /api/animals`, `PATCH /api/animals/:aid` | [#135](https://github.com/Lennon0926/capstone-animal-rescue-platform/issues/135) |
+
 ---
 
 ## Table of Contents
@@ -19,6 +47,12 @@
 ### GET `/`
 
 Returns API info and available endpoints.
+
+**Request Example**
+
+```bash
+curl http://localhost:4000/
+```
 
 **Response `200`**
 
@@ -39,6 +73,12 @@ Returns API info and available endpoints.
 ### GET `/api/health`
 
 Returns API health status including database connectivity.
+
+**Request Example**
+
+```bash
+curl http://localhost:4000/api/health
+```
 
 **Response `200`** (healthy)
 
@@ -74,6 +114,12 @@ Returns API health status including database connectivity.
 
 Simple liveness probe. Returns uptime without checking dependencies.
 
+**Request Example**
+
+```bash
+curl http://localhost:4000/health
+```
+
 **Response `200`**
 
 ```json
@@ -89,6 +135,12 @@ Simple liveness probe. Returns uptime without checking dependencies.
 ### GET `/ready`
 
 Readiness probe. Returns `503` if required environment variables are missing.
+
+**Request Example**
+
+```bash
+curl http://localhost:4000/ready
+```
 
 **Response `200`** (ready)
 
@@ -169,8 +221,9 @@ GET /api/animals?species=perro&status=disponible&sortBy=name&sortOrder=asc&limit
 
 ```json
 {
+  "success": false,
   "error": {
-    "code": "INTERNAL_ERROR",
+    "code": 500,
     "message": "Failed to fetch animals"
   }
 }
@@ -181,6 +234,8 @@ GET /api/animals?species=perro&status=disponible&sortBy=name&sortOrder=asc&limit
 ### GET `/api/animals/filters`
 
 Returns the distinct values currently in the database for each filterable field.
+
+> **Note:** Results are served from a 30-second server-side cache backed by a single `get_animal_filter_options` database RPC. Values may lag up to 30 seconds after a new animal is added.
 
 **Request Example**
 
@@ -206,8 +261,9 @@ GET /api/animals/filters
 
 ```json
 {
+  "success": false,
   "error": {
-    "code": "INTERNAL_ERROR",
+    "code": 500,
     "message": "Failed to fetch filter options"
   }
 }
@@ -255,8 +311,9 @@ GET /api/animals/1
 
 ```json
 {
+  "success": false,
   "error": {
-    "code": "VALIDATION_ERROR",
+    "code": 400,
     "message": "Invalid animal ID. Must be a positive integer."
   }
 }
@@ -266,8 +323,9 @@ GET /api/animals/1
 
 ```json
 {
+  "success": false,
   "error": {
-    "code": "NOT_FOUND",
+    "code": 404,
     "message": "Animal with ID 999 not found"
   }
 }
@@ -333,8 +391,9 @@ curl -X POST http://localhost:4000/api/animals \
 
 ```json
 {
+  "success": false,
   "error": {
-    "code": "VALIDATION_ERROR",
+    "code": 400,
     "message": "Name is required."
   }
 }
@@ -397,8 +456,9 @@ curl -X PATCH http://localhost:4000/api/animals/1 \
 
 ```json
 {
+  "success": false,
   "error": {
-    "code": "VALIDATION_ERROR",
+    "code": 400,
     "message": "No valid fields provided for update."
   }
 }
@@ -408,8 +468,9 @@ curl -X PATCH http://localhost:4000/api/animals/1 \
 
 ```json
 {
+  "success": false,
   "error": {
-    "code": "NOT_FOUND",
+    "code": 404,
     "message": "Animal with ID 999 not found"
   }
 }
@@ -450,8 +511,9 @@ DELETE /api/animals/1
 
 ```json
 {
+  "success": false,
   "error": {
-    "code": "NOT_FOUND",
+    "code": 404,
     "message": "Animal with ID 999 not found"
   }
 }

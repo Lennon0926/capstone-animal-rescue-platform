@@ -1,6 +1,6 @@
 # Section 4.3 — API Documentation Summary
 
-The Express backend exposes a RESTful API at port 4000. All endpoints return JSON and currently require no authentication. Input validation and sanitization are handled by dedicated middleware, and errors follow a consistent `{ error: { code, message } }` schema.
+The Express backend exposes a RESTful API at port 4000. All endpoints return JSON and currently require no authentication. Input validation and sanitization are handled by dedicated middleware. Most routes use the shared error handler and return `success: false` with a numeric HTTP status in `error.code`, while upload endpoints use route-specific string error codes such as `INVALID_IMAGE_TYPE` and `R2_UNAUTHORIZED`.
 
 The table below summarizes every implemented endpoint:
 
@@ -22,8 +22,20 @@ The table below summarizes every implemented endpoint:
 **Key implementation details:**
 
 - **Pagination** uses `limit` (1–100, default 50) and `offset` (default 0) with a `hasMore` flag in the response.
-- **Filtering** supports species, status, size, gender, name, tags, and a combined `search` parameter.
+- **Filtering** supports species, status, size, gender, name, tags, and a combined `search` parameter. The `/api/animals/filters` endpoint is backed by a single `get_animal_filter_options` database RPC and caches results for 30 seconds.
 - **Image uploads** accept `multipart/form-data` with JPEG, PNG, or WebP files up to 5 MB, stored in Cloudflare R2.
 - **Health probes** are split into three tiers: `/` (info), `/health` (liveness), and `/ready` (readiness), suitable for container orchestrators.
 
 For full request/response examples and field-level documentation, see [`docs/api/endpoints.md`](./endpoints.md).
+
+---
+
+**Known Gaps (post-audit)**
+
+A REST best-practices audit identified the following open issues:
+
+- **Authentication not yet implemented** — all write endpoints (`POST`, `PATCH`, `DELETE`) are publicly accessible; tracked separately.
+- **No rate limiting** — no per-IP throttling is in place ([#132](https://github.com/Lennon0926/capstone-animal-rescue-platform/issues/132)).
+- **No API versioning** — routes use `/api/` prefix; `/api/v1/` planned ([#133](https://github.com/Lennon0926/capstone-animal-rescue-platform/issues/133)).
+- **CORS not restricted** — currently allows all origins; production hardening tracked in ([#134](https://github.com/Lennon0926/capstone-animal-rescue-platform/issues/134)).
+- **No Content-Type enforcement** — write endpoints silently drop non-JSON bodies instead of returning `415` ([#135](https://github.com/Lennon0926/capstone-animal-rescue-platform/issues/135)).
