@@ -22,6 +22,7 @@ A full-stack web application for animal rescue coordination, built with Next.js 
 └── init_db.sql          # Initial database schema
 ```
 
+
 ## Tech Stack
 
 | Layer    | Technology |
