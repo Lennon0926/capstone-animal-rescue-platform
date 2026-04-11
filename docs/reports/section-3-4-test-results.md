@@ -1,6 +1,6 @@
 # Section 3.4 — Unit, Integration, and E2E Test Results
 
-All test suites were executed locally on 2026-04-11 against the `docs/115-test-results-documentation` branch (Node.js v24.13.1). The server suite was re-run after adding mutation endpoint coverage (POST / PATCH / DELETE).
+All test suites were executed locally on 2026-04-11 against the `docs/115-test-results-documentation` branch (Node.js v24.13.1). The server suite was re-run after adding mutation endpoint coverage (POST / PATCH / DELETE) and after the test file was updated to use an `rpc`-based mock for the filters endpoint and a cache-clearing hook in `beforeEach`.
 
 ---
 
@@ -95,21 +95,21 @@ Coverage was collected via Jest's built-in instrumentation (`--coverage`). Value
 | `lib/supabase.js` | 14.3% | 0.0% | 0.0% | 14.3% |
 | `middleware/errorHandler.js` | **100%** | **100%** | **100%** | **100%** |
 | `middleware/validation.js` | 77.0% | 76.7% | **90.0%** | 77.3% |
-| `repositories/animalsRepository.js` | 85.1% | 69.1% | **100%** | 85.7% |
-| `routes/animals.js` | **93.5%** | **88.9%** | **87.5%** | **93.5%** |
+| `repositories/animalsRepository.js` | 86.2% | 65.7% | **100%** | 86.9% |
+| `routes/animals.js` | **95.3%** | **88.9%** | **100%** | **95.3%** |
 | `routes/health.js` | 94.7% | 87.5% | **100%** | 94.4% |
 | `routes/uploads.js` | 57.9% | 33.3% | 75.0% | 56.8% |
 | `scripts/migrateImageUrls.js` | 31.7% | 25.0% | 50.0% | 31.7% |
 | `services/r2Service.js` | 64.5% | 57.3% | 72.7% | 64.5% |
-| **All files** | **69.2%** | **61.6%** | **75.3%** | **69.5%** |
+| **All files** | **69.8%** | **60.5%** | **76.5%** | **70.2%** |
 
 ### Coverage improvements from new tests
 
 | File | Statements (before → after) | Functions (before → after) |
 |------|----------------------------|---------------------------|
-| `routes/animals.js` | 58.7% → **93.5%** | 50.0% → **87.5%** |
-| `repositories/animalsRepository.js` | 64.0% → **85.1%** | 72.7% → **100%** |
-| **All files (overall)** | 60.4% → **69.2%** | 67.9% → **75.3%** |
+| `routes/animals.js` | 58.7% → **95.3%** | 50.0% → **100%** |
+| `repositories/animalsRepository.js` | 64.0% → **86.2%** | 72.7% → **100%** |
+| **All files (overall)** | 60.4% → **69.8%** | 67.9% → **76.5%** |
 
 ---
 
