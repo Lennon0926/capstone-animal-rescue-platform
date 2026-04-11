@@ -329,7 +329,7 @@ export default function AdminHome() {
           <Card className={styles.card}>
           <CardHeader className={styles.cardHeader}>
             <div className={styles.cardHeaderContent}>
-              <CardTitle className={styles.cardTitle}>Animales Creados por Mes</CardTitle>
+              <CardTitle className={styles.cardTitle}>Animales</CardTitle>
             </div>
             <Select value={timeRange} onValueChange={setTimeRange}>
               <SelectTrigger
@@ -465,7 +465,7 @@ export default function AdminHome() {
         <Card className={styles.card}>
           <CardHeader className={styles.cardHeader}>
             <div className={styles.cardHeaderContent}>
-              <CardTitle className={styles.cardTitle}>Animales Adoptados por Mes</CardTitle>
+              <CardTitle className={styles.cardTitle}>Animales Adoptados</CardTitle>
             </div>
             <Select value={adoptedTimeRange} onValueChange={setAdoptedTimeRange}>
               <SelectTrigger
