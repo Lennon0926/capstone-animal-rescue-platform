@@ -47,20 +47,34 @@ function getSupabaseClient() {
   return supabaseInstance;
 }
 
+// Cache the last connection check for 10 seconds so that concurrent health
+// probe requests under load share one DB round-trip instead of each opening
+// a new connection and competing with the pool.
+let _connectionCache = null;
+let _connectionCachedAt = 0;
+const CONNECTION_CHECK_TTL_MS = 10_000;
+
 /**
  * Verifies the Supabase connection by performing a simple query.
+ * Result is cached for 10 seconds to avoid pool pressure under load.
  * @returns {Promise<{connected: boolean, error?: string}>}
  */
 async function verifyConnection() {
+  if (_connectionCache && Date.now() - _connectionCachedAt < CONNECTION_CHECK_TTL_MS) {
+    return _connectionCache;
+  }
+
   try {
     const client = getSupabaseClient();
     const { error } = await client.from("animals").select("aid").limit(1);
 
-    if (error) {
-      return { connected: false, error: error.message };
-    }
+    const result = error
+      ? { connected: false, error: error.message }
+      : { connected: true };
 
-    return { connected: true };
+    _connectionCache = result;
+    _connectionCachedAt = Date.now();
+    return result;
   } catch (err) {
     return { connected: false, error: err.message };
   }
