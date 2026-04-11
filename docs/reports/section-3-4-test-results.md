@@ -4,6 +4,14 @@ All test suites were executed locally on 2026-04-11 against the `docs/115-test-r
 
 ---
 
+## Visualizations
+
+![Test Suite Summary](./charts/test-suite-summary.svg)
+
+![Server Jest — Tests per File](./charts/test-server-breakdown.svg)
+
+---
+
 ## Summary Table
 
 | Suite | Tool | Spec Files | Total Tests | Passed | Failed | Skipped | Pass Rate |
