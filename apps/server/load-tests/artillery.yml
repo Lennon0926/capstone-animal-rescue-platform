@@ -7,6 +7,22 @@
 # Usage:
 #   npm run load-test              # against http://localhost:4000
 #   LOAD_TEST_TARGET=https://your-deployment.vercel.app npm run load-test:url
+#
+# Endpoints covered:
+#   GET  /api/health                        — liveness probe
+#   GET  /api/animals                       — main listing with filter/sort/pagination
+#   GET  /api/animals/filters               — filter option values
+#   GET  /api/animals/:id                   — single animal detail (adoption page source)
+#   GET  /api/uploads/config                — upload service readiness
+#
+# Adoption form redirect: the "Solicitud de Adopción" flow redirects users to an
+# external Google Form URL constructed client-side. There is no server-side redirect
+# endpoint, so it cannot be exercised in an API load test.
+#
+# Image upload (POST /api/uploads/animals/:id/image): requires live Cloudflare R2
+# credentials and binary multipart data. Load testing this endpoint without R2
+# would only exercise error-handling paths (R2_NOT_CONFIGURED 500), not real
+# upload capacity. Covered separately by unit/integration tests in r2Service.test.js.
 
 config:
   target: "{{ $processEnvironment.LOAD_TEST_TARGET }}"
@@ -32,12 +48,12 @@ scenarios:
     weight: 10
     flow:
       - get:
-          url: "/api/health"
+          url: "/health"
           expect:
             - statusCode: 200
 
   - name: "List Animals"
-    weight: 50
+    weight: 45
     beforeScenario: "generateQueryVariations"
     flow:
       - get:
@@ -51,7 +67,7 @@ scenarios:
             - statusCode: 200
 
   - name: "Filter Options"
-    weight: 20
+    weight: 15
     flow:
       - get:
           url: "/api/animals/filters"
@@ -68,3 +84,11 @@ scenarios:
             - statusCode:
                 - 200
                 - 404
+
+  - name: "Upload Config"
+    weight: 10
+    flow:
+      - get:
+          url: "/api/uploads/config"
+          expect:
+            - statusCode: 200

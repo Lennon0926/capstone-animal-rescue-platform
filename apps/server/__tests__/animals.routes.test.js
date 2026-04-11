@@ -24,7 +24,8 @@ const MOCK_ANIMALS = [
 
 const mockSelect = jest.fn();
 const mockFrom = jest.fn(() => ({ select: mockSelect }));
-const mockSupabaseClient = { from: mockFrom };
+const mockRpc = jest.fn();
+const mockSupabaseClient = { from: mockFrom, rpc: mockRpc };
 
 jest.mock("../lib/supabase", () => ({
   getSupabaseClient: () => mockSupabaseClient,
@@ -57,6 +58,7 @@ function buildChainableMock(resolvedValue) {
 
 beforeEach(() => {
   jest.clearAllMocks();
+  require("../repositories/animalsRepository").clearAnimalsCache();
 });
 
 describe("GET /api/animals", () => {
@@ -117,11 +119,15 @@ describe("GET /api/animals", () => {
 
 describe("GET /api/animals/filters", () => {
   it("returns distinct filter values", async () => {
-    const chain = buildChainableMock({
-      data: [{ species: "Dog" }, { species: "Cat" }],
+    mockRpc.mockResolvedValue({
+      data: {
+        species: ["gato", "perro"],
+        status: ["adoptado", "disponible"],
+        size: ["grande", "mediano"],
+        gender: ["hembra", "macho"],
+      },
       error: null,
     });
-    mockFrom.mockReturnValue(chain);
 
     const res = await request(getApp()).get("/api/animals/filters");
     expect(res.status).toBe(200);
