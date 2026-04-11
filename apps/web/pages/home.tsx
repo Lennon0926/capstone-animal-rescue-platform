@@ -3,11 +3,13 @@ import HeaderSection from "@/components/Header/headerSection";
 import HeroSection from "@/components/LandingPage/Hero/heroSection";
 import MissionVideoSection from "@/components/LandingPage/MissionVideo/missionVideoSection";
 import TimelineSection from "@/components/LandingPage/Timeline/timelineSection";
+import StoriesSection from "@/components/LandingPage/Stories/storiesSection";
 import GetInvolvedSection from "@/components/LandingPage/GetInvolved/getInvolvedSection";
 import AnimalsSection from "@/components/LandingPage/Animals/animalsSection";
 import ContactSection from "@/components/LandingPage/Contact/contactSection";
 import FooterSection from "@/components/Footer/footerSection";
 import type { Animal } from "@/types/animal";
+import styles from "./home.module.css";
 
 type ApiResponse = {
   success: boolean;
@@ -21,11 +23,12 @@ type HomeProps = {
 
 function Home({ animals, fetchError }: HomeProps) {
   return (
-    <div>
+    <div className={styles.page}>
       <HeaderSection revealOnFirstScroll />
       <HeroSection />
       <MissionVideoSection />
       <TimelineSection />
+      <StoriesSection />
       <GetInvolvedSection />
       <AnimalsSection animals={animals} fetchError={fetchError} />
       <ContactSection />
