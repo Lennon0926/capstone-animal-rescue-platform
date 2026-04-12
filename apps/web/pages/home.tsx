@@ -1,4 +1,4 @@
-import type { GetStaticProps } from "next";
+import type { GetServerSideProps } from "next";
 import Head from "next/head";
 import HeaderSection from "@/components/Header/headerSection";
 import HeroSection from "@/components/LandingPage/Hero/heroSection";
@@ -44,25 +44,26 @@ function Home({ animals, fetchError }: HomeProps) {
 
 export default Home;
 
-export const getStaticProps: GetStaticProps<HomeProps> = async () => {
+export const getServerSideProps: GetServerSideProps<HomeProps> = async ({ res }) => {
+  res.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=300");
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals?status=disponible&limit=3&sortBy=created_at&sortOrder=asc`
     );
 
     if (!response.ok) {
-      return { props: { animals: [], fetchError: true }, revalidate: 60 };
+      return { props: { animals: [], fetchError: true } };
     }
 
     const result: ApiResponse = await response.json();
 
     if (!result.success || !result.data) {
-      return { props: { animals: [], fetchError: true }, revalidate: 60 };
+      return { props: { animals: [], fetchError: true } };
     }
 
-    return { props: { animals: result.data }, revalidate: 60 };
+    return { props: { animals: result.data } };
   } catch (err) {
-    console.error("[home] getStaticProps failed:", err);
-    return { props: { animals: [], fetchError: true }, revalidate: 60 };
+    console.error("[home] getServerSideProps failed:", err);
+    return { props: { animals: [], fetchError: true } };
   }
 };

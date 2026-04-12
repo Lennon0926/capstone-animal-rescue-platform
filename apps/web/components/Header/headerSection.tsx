@@ -51,6 +51,7 @@ export default function Header({
       ]
         .filter(Boolean)
         .join(" ")}
+      data-revealed={isRevealed ? "true" : "false"}
     >
       <div className={styles.inner}>
         <div className={styles.logoContainer}>

@@ -10,13 +10,13 @@ test.describe("Home page (/home)", () => {
   test("header starts hidden and reveals after the first scroll", async ({ page }) => {
     const header = page.locator("header");
 
-    await expect(header).toHaveAttribute("data-visible", "false");
+    await expect(header).toHaveAttribute("data-revealed", "false");
 
     await page.evaluate(() => {
       window.scrollTo({ top: 220, behavior: "auto" });
     });
 
-    await expect(header).toHaveAttribute("data-visible", "true");
+    await expect(header).toHaveAttribute("data-revealed", "true");
     await expect(header.getByAltText("CPAAA Logo")).toBeVisible();
   });
 
