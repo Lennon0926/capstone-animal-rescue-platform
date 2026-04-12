@@ -1,4 +1,5 @@
 import { GetServerSideProps } from "next";
+import Head from "next/head";
 import HeaderSection from "@/components/Header/headerSection";
 import FooterSection from "@/components/Footer/footerSection";
 import AdoptPage from "@/components/AdoptPage/adoptPage";
@@ -23,6 +24,10 @@ type AdoptPageProps = {
 export default function Adopt({ animals }: AdoptPageProps) {
   return (
     <>
+      <Head>
+        <title>Adoptar | Huellitas Sin Hogar</title>
+        <meta name="description" content="Explora los animales disponibles para adopción en Huellitas Sin Hogar y encuentra a tu nuevo compañero de vida." />
+      </Head>
       <HeaderSection />
       <AdoptPage animals={animals} />
       <FooterSection />

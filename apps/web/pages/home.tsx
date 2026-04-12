@@ -1,4 +1,5 @@
-import type { GetServerSideProps } from "next";
+import type { GetStaticProps } from "next";
+import Head from "next/head";
 import HeaderSection from "@/components/Header/headerSection";
 import DonationSection from "@/components/LandingPage/Donate/donationSection";
 import OurMissionSection from "@/components/LandingPage/Mission/ourMissionSection";
@@ -21,6 +22,10 @@ type HomeProps = {
 function Home({ animals, fetchError }: HomeProps) {
   return (
     <div>
+      <Head>
+        <title>Inicio | Huellitas Sin Hogar</title>
+        <meta name="description" content="Huellitas Sin Hogar — adopta, dona y apoya a los animales sin hogar de Aguadilla, Puerto Rico." />
+      </Head>
       <HeaderSection />
       <DonationSection />
       <OurMissionSection />
@@ -34,51 +39,25 @@ function Home({ animals, fetchError }: HomeProps) {
 
 export default Home;
 
-export const getServerSideProps: GetServerSideProps<HomeProps> = async ({
-  res,
-}) => {
-  res.setHeader(
-    "Cache-Control",
-    "public, s-maxage=60, stale-while-revalidate=300"
-  );
-
+export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals?status=disponible&limit=3&sortBy=created_at&sortOrder=asc`
     );
 
     if (!response.ok) {
-      return {
-        props: {
-          animals: [],
-          fetchError: true,
-        },
-      };
+      return { props: { animals: [], fetchError: true }, revalidate: 60 };
     }
 
     const result: ApiResponse = await response.json();
 
     if (!result.success || !result.data) {
-      return {
-        props: {
-          animals: [],
-          fetchError: true,
-        },
-      };
+      return { props: { animals: [], fetchError: true }, revalidate: 60 };
     }
 
-    return {
-      props: {
-        animals: result.data,
-      },
-    };
+    return { props: { animals: result.data }, revalidate: 60 };
   } catch (err) {
-    console.error("[home] getServerSideProps failed:", err);
-    return {
-      props: {
-        animals: [],
-        fetchError: true,
-      },
-    };
+    console.error("[home] getStaticProps failed:", err);
+    return { props: { animals: [], fetchError: true }, revalidate: 60 };
   }
 };
