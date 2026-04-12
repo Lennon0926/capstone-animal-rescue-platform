@@ -82,7 +82,7 @@ function printViolations(pageName: string, violations: AxeViolation[]) {
 // ─────────────────────────────────────────────────────────
 test.describe("Accessibility — Landing Page (/home)", () => {
   test("WCAG 2.1 AA audit", async ({ page }) => {
-    await page.goto("/home", { waitUntil: "networkidle" });
+    await page.goto("/home", { waitUntil: "load" });
 
     const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
     const violations = results.violations as AxeViolation[];
@@ -103,7 +103,7 @@ test.describe("Accessibility — Landing Page (/home)", () => {
 // ─────────────────────────────────────────────────────────
 test.describe("Accessibility — Adopt Page (/adopt)", () => {
   test("WCAG 2.1 AA audit", async ({ page }) => {
-    await page.goto("/adopt", { waitUntil: "networkidle" });
+    await page.goto("/adopt", { waitUntil: "load" });
 
     const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
     const violations = results.violations as AxeViolation[];
@@ -125,7 +125,7 @@ test.describe("Accessibility — Adopt Page (/adopt)", () => {
 test.describe("Accessibility — Animal Detail (/adopt/[id])", () => {
   test("WCAG 2.1 AA audit", async ({ page }) => {
     const { aid } = MOCK_ANIMALS[0]; // Fluffy
-    await page.goto(`/adopt/${aid}`, { waitUntil: "networkidle" });
+    await page.goto(`/adopt/${aid}`, { waitUntil: "load" });
 
     const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
     const violations = results.violations as AxeViolation[];
@@ -146,7 +146,7 @@ test.describe("Accessibility — Animal Detail (/adopt/[id])", () => {
 // ─────────────────────────────────────────────────────────
 test.describe("Accessibility — Admin Dashboard (/admin/animals)", () => {
   test("WCAG 2.1 AA audit", async ({ page }) => {
-    await page.goto("/admin/animals", { waitUntil: "networkidle" });
+    await page.goto("/admin/animals", { waitUntil: "load" });
 
     const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
     const violations = results.violations as AxeViolation[];
@@ -167,7 +167,7 @@ test.describe("Accessibility — Admin Dashboard (/admin/animals)", () => {
 // ─────────────────────────────────────────────────────────
 test.describe("Accessibility — About (/about)", () => {
   test("WCAG 2.1 AA audit", async ({ page }) => {
-    await page.goto("/about", { waitUntil: "networkidle" });
+    await page.goto("/about", { waitUntil: "load" });
 
     const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
     const violations = results.violations as AxeViolation[];
@@ -188,7 +188,7 @@ test.describe("Accessibility — About (/about)", () => {
 // ─────────────────────────────────────────────────────────
 test.describe("Accessibility — Blog (/blog)", () => {
   test("WCAG 2.1 AA audit", async ({ page }) => {
-    await page.goto("/blog", { waitUntil: "networkidle" });
+    await page.goto("/blog", { waitUntil: "load" });
 
     const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
     const violations = results.violations as AxeViolation[];
@@ -209,7 +209,7 @@ test.describe("Accessibility — Blog (/blog)", () => {
 // ─────────────────────────────────────────────────────────
 test.describe("Accessibility — Donation (/donation)", () => {
   test("WCAG 2.1 AA audit", async ({ page }) => {
-    await page.goto("/donation", { waitUntil: "networkidle" });
+    await page.goto("/donation", { waitUntil: "load" });
 
     const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
     const violations = results.violations as AxeViolation[];
@@ -230,7 +230,7 @@ test.describe("Accessibility — Donation (/donation)", () => {
 // ─────────────────────────────────────────────────────────
 test.describe("Accessibility — Create Animal (/admin/createAnimal)", () => {
   test("WCAG 2.1 AA audit", async ({ page }) => {
-    await page.goto("/admin/createAnimal", { waitUntil: "networkidle" });
+    await page.goto("/admin/createAnimal", { waitUntil: "load" });
 
     const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
     const violations = results.violations as AxeViolation[];
@@ -252,7 +252,7 @@ test.describe("Accessibility — Create Animal (/admin/createAnimal)", () => {
 test.describe("Accessibility — Edit Animal (/admin/editAnimal)", () => {
   test("WCAG 2.1 AA audit", async ({ page }) => {
     const { aid } = MOCK_ANIMALS[0]; // Fluffy
-    await page.goto(`/admin/editAnimal?id=${aid}`, { waitUntil: "networkidle" });
+    await page.goto(`/admin/editAnimal?id=${aid}`, { waitUntil: "load" });
 
     const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
     const violations = results.violations as AxeViolation[];
@@ -273,7 +273,7 @@ test.describe("Accessibility — Edit Animal (/admin/editAnimal)", () => {
 // ─────────────────────────────────────────────────────────
 test.describe("Accessibility — Upload (/admin/upload)", () => {
   test("WCAG 2.1 AA audit", async ({ page }) => {
-    await page.goto("/admin/upload", { waitUntil: "networkidle" });
+    await page.goto("/admin/upload", { waitUntil: "load" });
 
     const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
     const violations = results.violations as AxeViolation[];
