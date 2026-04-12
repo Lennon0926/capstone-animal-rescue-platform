@@ -1,131 +1,287 @@
-# Project Development Setup
+# Capstone Animal Rescue Platform
 
-## Virtual Environment Setup (Provisional)
+A full-stack web application for animal rescue coordination, built with Next.js and Express.
 
-This repository includes a **provisional Python virtual environment** to support early development tasks such as scripts, prototypes, testing, or automation.
 
-The final technology stack for this project has **not yet been defined**. This setup exists only to establish good development practices and may change as the project evolves.
+## Project Structure
 
----
+```
+├── apps/
+│   ├── server/          # Express API (Node.js)
+│   │   ├── routes/      # Route handlers (animals, uploads, health)
+│   │   ├── services/    # Business logic (r2Service)
+│   │   ├── middleware/  # Error handling, request validation
+│   │   ├── lib/         # Shared clients (Supabase)
+│   │   ├── __tests__/   # Jest test suites
+│   │   └── server.js    # Entry point
+│   └── web/             # Next.js frontend (React + TypeScript)
+├── docs/                # Project documentation
+├── ngrok/               # Tunnel script for local → public URL
+├── supabase/            # DB schema and migrations
+├── dev.sh               # Start both servers in one command
+└── init_db.sql          # Initial database schema
+```
 
-## Requirements
+## Tech Stack
 
-- Python 3.10 or higher
+| Layer    | Technology |
+|----------|------------|
+| Frontend | Next.js 16, React 19, TypeScript 5, Tailwind CSS 4 |
+| Backend  | Express 5, Node.js 20 |
+| Database | Supabase (PostgreSQL) |
+| Storage  | Cloudflare R2 (image uploads) |
+| CI/CD    | GitHub Actions |
+
+## Prerequisites
+
+- [Node.js](https://nodejs.org/) 20 or higher
+- npm (included with Node.js)
 - Git
-- Terminal (macOS, Linux, or Windows with WSL)
 
-Verify your Python version:
+## Getting Started
 
-```bash
-python3 --version
-```
-
----
-
-## Create the Virtual Environment
-
-From the root of the repository:
+### 1. Clone the repository
 
 ```bash
-python3 -m venv venv
+git clone https://github.com/Lennon0926/capstone-animal-rescue-platform.git
+cd capstone-animal-rescue-platform
 ```
 
-This command creates a local virtual environment inside the `venv/` directory.
-
----
-
-## Activate the Virtual Environment
-
-### macOS / Linux / WSL
+### 2. Install dependencies
 
 ```bash
-source venv/bin/activate
+cd apps/server && npm install
+cd ../web && npm install
 ```
 
-### Windows (PowerShell)
+### 3. Configure environment variables
 
-```powershell
-venv\Scripts\Activate.ps1
-```
-
-When activated, your terminal prompt should indicate that the environment is active.
-
----
-
-## Upgrade Base Tooling
-
-Once the virtual environment is active, upgrade the base Python tooling:
+Copy the example files and fill in your values:
 
 ```bash
-pip install --upgrade pip setuptools wheel
+cp apps/server/.env.example apps/server/.env.local
+cp apps/web/.env.example apps/web/.env.local
 ```
 
-These are standard tools required for package management and builds.
+**Server** (`apps/server/.env.local`):
 
----
+```env
+# Server
+PORT=4000
 
-## Install Default Dependencies
+# Supabase Configuration (Required)
+# Get these from: Supabase Dashboard > Project Settings > API
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
 
-If this is the first time setting up the project **and `requirements.txt` already exists**, install all dependencies with:
+# Note: SUPABASE_ANON_KEY is optional for the backend but required if you
+# need client-level RLS queries from the server.
+SUPABASE_ANON_KEY=your_anon_key_here
+
+# Cloudflare R2 Storage (Required)
+# Get these from: Cloudflare Dashboard > R2 > Manage R2 API Tokens
+R2_ACCOUNT_ID=your_cloudflare_account_id
+R2_ACCESS_KEY_ID=your_r2_access_key_id
+R2_SECRET_ACCESS_KEY=your_r2_secret_access_key
+R2_BUCKET_NAME=your_bucket_name
+
+# Optional: Public base URL for uploaded files (e.g., custom domain via Cloudflare)
+# Example: https://cdn.your-domain.com
+R2_PUBLIC_BASE_URL=
+
+# Optional: Override upload size limit in bytes (default: 5 MB)
+R2_MAX_IMAGE_SIZE_BYTES=5242880
+
+# Optional: Cache TTL for live R2 health probes in milliseconds (default: 30000)
+R2_HEALTHCHECK_CACHE_TTL_MS=30000
+```
+
+**Web** (`apps/web/.env.local`):
+
+```env
+# Backend API URL
+# Development: http://localhost:4000
+# Production: set to your deployed backend URL (e.g., Railway)
+NEXT_PUBLIC_API_BASE_URL=http://localhost:4000
+
+# Supabase Configuration (for client-side access)
+# Get these from: Supabase Dashboard > Project Settings > API
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+
+# Google Forms Integration
+# URL for the adoption application form
+NEXT_PUBLIC_GOOGLE_FORM_URL=your-google-form-url
+```
+
+> See [docs/guides/SECRETS_MANAGEMENT.md](docs/guides/SECRETS_MANAGEMENT.md) for the full variable reference, optional vars, and secret rotation procedures.
+> See [docs/guides/SUPABASE_SETUP.md](docs/guides/SUPABASE_SETUP.md) for Supabase project setup instructions.
+
+### 4. Seed the database
 
 ```bash
-pip install -r requirements.txt
+cd apps/server
+npm run seed
 ```
 
-This is the recommended approach for new team members.
-
-If the file does not exist yet, install a minimal set of commonly used dependencies for general development:
+### 5. Start the development servers
 
 ```bash
-pip install python-dotenv requests pytest
+# Start both servers at once from the repo root:
+./dev.sh
 ```
 
-Purpose of these packages:
-
-- `python-dotenv`: environment variable management
-- `requests`: HTTP client for prototyping and testing
-- `pytest`: basic testing framework
-
----
-
-## Generate `requirements.txt`
-
-After installing dependencies, generate the dependency file:
+Or start them separately:
 
 ```bash
-pip freeze > requirements.txt
+# Terminal 1 — API server
+cd apps/server && npm run dev
+
+# Terminal 2 — Frontend
+cd apps/web && npm run dev
 ```
 
-This file should be updated whenever new dependencies are added.
-
----
-
-## Deactivate the Virtual Environment
-
-When finished working:
+Optional experimental frontend command:
 
 ```bash
-deactivate
+cd apps/web && npm run dev:turbo
 ```
 
----
+`npm run dev` uses webpack as the stable default for local development. `npm run dev:turbo` keeps Turbopack available as an opt-in path for troubleshooting or comparison.
 
-## Files Excluded from Version Control
+- API: `http://localhost:4000`
+- Frontend: `http://localhost:3000`
 
-Ensure the following entries exist in `.gitignore`:
+## API Endpoints
 
-```gitignore
-venv/
-__pycache__/
-*.pyc
-.env
+### Health & System
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/` | API info and available endpoints |
+| GET | `/api/health` | Health check with database connectivity status |
+| GET | `/health` | Liveness probe — returns uptime, no dependency check |
+| GET | `/ready` | Readiness probe — 503 if required env vars are missing |
+
+### Animals
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/animals` | List animals with filters and pagination |
+| GET | `/api/animals/filters` | Get available filter values (species, status, etc.) |
+| GET | `/api/animals/:aid` | Get a single animal by ID |
+| POST | `/api/animals` | Create a new animal record |
+| PATCH | `/api/animals/:aid` | Partially update an existing animal |
+| DELETE | `/api/animals/:aid` | Delete an animal by ID |
+
+### Uploads
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/uploads/config` | Return upload configuration plus live Cloudflare R2 health |
+| POST | `/api/uploads/animals/:animalId/image` | Upload an animal image to Cloudflare R2 |
+
+Full request and response examples are documented in [docs/api/endpoints.md](docs/api/endpoints.md).
+
+> **API maturity note:** Authentication is not yet implemented — all endpoints are currently public. Rate limiting (#132), API versioning (#133), CORS hardening (#134), and Content-Type enforcement (#135) are open issues.
+
+**Upload details:**
+- Request: `multipart/form-data`, field name `image`
+- Allowed types: `image/jpeg`, `image/png`, `image/webp`
+- Max size: 5 MB (override with `R2_MAX_IMAGE_SIZE_BYTES`)
+- `GET /api/uploads/config` returns `r2Configured`, `publicObjectUrlConfigured`, upload limits, and `health` with `{ ok, code, message, checkedAt }`
+- Upload failures caused by Cloudflare R2 availability or authorization issues now return `503` with structured error codes such as `R2_UNAUTHORIZED` or `R2_UNAVAILABLE`
+- Returns: object key and a public URL
+
+```json
+{
+  "data": {
+    "objectKey": "animals/1/1739932938123-shelter-dog.jpg",
+    "url": "https://cdn.your-domain.com/animals/1/1739932938123-shelter-dog.jpg",
+    "urlType": "public",
+    "contentType": "image/jpeg",
+    "size": 381248
+  }
+}
 ```
 
----
+```json
+{
+  "data": {
+    "r2Configured": true,
+    "missingEnvVars": [],
+    "publicObjectUrlConfigured": true,
+    "missingPublicObjectUrlEnvVars": [],
+    "allowedMimeTypes": ["image/jpeg", "image/png", "image/webp"],
+    "maxImageSizeBytes": 5242880,
+    "health": {
+      "ok": true,
+      "code": "R2_OK",
+      "message": "Cloudflare R2 is available.",
+      "checkedAt": "2026-03-29T12:00:00.000Z"
+    }
+  }
+}
+```
 
-## Stack Disclaimer
+## Environment Validation
 
-This setup does **not** define the final architecture, backend language, or deployment strategy of the project.
+On startup, the server validates that all required environment variables are present. Missing variables cause an immediate exit with a clear error listing each missing var.
 
-All final technical decisions will be documented in the **Technical Approach** section of the project proposal and updated as needed.
+The `/ready` endpoint also returns `503` if any required variable is absent — useful for orchestrator readiness probes.
 
+## Testing
+
+```bash
+# Server unit tests
+cd apps/server && npm test
+
+# Web unit tests
+cd apps/web && npm test
+
+# Web E2E tests (Playwright — requires no running dev server)
+cd apps/web && npm run test:e2e
+```
+
+CI runs lint, build, unit tests, and E2E tests for every push and pull request to `main` and `develop`.
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [docs/guides/SECRETS_MANAGEMENT.md](docs/guides/SECRETS_MANAGEMENT.md) | All env vars, GitHub Secrets setup, deployment config, rotation procedures |
+| [docs/guides/SUPABASE_SETUP.md](docs/guides/SUPABASE_SETUP.md) | Database setup and schema reference |
+| [docs/guides/GOOGLE_FORMS_INTEGRATION.md](docs/guides/GOOGLE_FORMS_INTEGRATION.md) | Adoption application intake via Google Forms |
+| [docs/guides/SECURITY_ALERTS.md](docs/guides/SECURITY_ALERTS.md) | Security alert handling and procedures |
+| [docs/guides/ROLLBACK.md](docs/guides/ROLLBACK.md) | Rollback procedures for Vercel deployments |
+| [docs/api/endpoints.md](docs/api/endpoints.md) | API endpoint reference (request/response examples) |
+| [docs/api/contract-v1.md](docs/api/contract-v1.md) | Planned v1 API contract |
+| [docs/reports/section-3-4-test-results.md](docs/reports/section-3-4-test-results.md) | Unit, integration, and E2E test results (Section 3.4) |
+
+## ngrok Tunnel
+
+Expose the local frontend via a public URL for testing:
+
+```bash
+./ngrok/start-ngrok.sh
+```
+
+See [`ngrok/README.md`](ngrok/README.md) for setup instructions.
+
+## Commit and Ignore Policy
+
+**Commit:**
+- Application source code and project docs
+- Lockfiles (`apps/web/package-lock.json`, `apps/server/package-lock.json`)
+- Environment templates (`.env.example`)
+- DB schema and migrations
+
+**Do not commit:**
+- `node_modules/`, `.next/`, build artifacts, caches
+- `.env.local` or any file containing real secrets
+- Cloudflare local state (`.wrangler/`, `.dev.vars`)
+- Supabase local runtime state (`supabase/.temp/`)
+
+## License
+
+See [LICENSE](LICENSE) for details.

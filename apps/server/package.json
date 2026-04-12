@@ -1,0 +1,41 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "Fernando Sierra",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "jest --verbose",
+    "start": "node server",
+    "dev": "nodemon server",
+    "seed": "node scripts/seed.js",
+    "seed:force": "node scripts/seed.js --force",
+    "seed:append": "node scripts/seed.js --append",
+    "migrate:image-storage": "node scripts/migrateImageUrls.js",
+    "migrate:image-storage:apply": "node scripts/migrateImageUrls.js --apply",
+    "load-test": "LOAD_TEST_TARGET=http://localhost:4000 artillery run ../../tests/load/artillery.yml --output ../../tests/load/results.json",
+    "load-test:url": "artillery run ../../tests/load/artillery.yml --output ../../tests/load/results.json",
+    "load-test:report": "node ../../tests/load/generate-report.js",
+    "load-test:html": "artillery report ../../tests/load/results.json --output ../../tests/load/report.html"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.998.0",
+    "@aws-sdk/s3-request-presigner": "^3.998.0",
+    "@supabase/supabase-js": "^2.98.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "multer": "^2.0.2"
+  },
+  "devDependencies": {
+    "artillery": "^2.0.30",
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.11",
+    "supertest": "^7.2.2"
+  },
+  "overrides": {
+    "fast-xml-parser": ">=5.3.8"
+  }
+}
