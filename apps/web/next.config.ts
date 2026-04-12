@@ -24,6 +24,15 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "pub-9bda3c8e4200423ca4ec2b9ee4d6d5d3.r2.dev",
       },
+      // Facebook CDN — post images served from scontent subdomains
+      {
+        protocol: "https",
+        hostname: "**.fbcdn.net",
+      },
+      {
+        protocol: "https",
+        hostname: "**.fbsbx.com",
+      },
     ],
   },
 };
