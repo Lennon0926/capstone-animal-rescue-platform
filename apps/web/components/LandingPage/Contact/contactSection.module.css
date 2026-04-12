@@ -1,0 +1,76 @@
+.section {
+  padding: var(--space-20) var(--space-section-x);
+  background-color: var(--color-primary);
+}
+
+.inner {
+  max-width: var(--container-max-width);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.heading {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-inverse);
+  margin-bottom: var(--space-4);
+}
+
+.description {
+  font-size: var(--text-lg);
+  color: rgba(255, 255, 255, 0.8);
+  max-width: 600px;
+  margin: 0 auto var(--space-12);
+  line-height: 1.6;
+}
+
+.contactGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-8);
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.contactItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+
+.icon {
+  color: var(--color-accent);
+}
+
+.contactLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: var(--space-1);
+}
+
+.contactValue {
+  font-size: var(--text-base);
+  color: var(--color-text-inverse);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a.contactValue:hover {
+  color: var(--color-accent);
+}
+
+@media (max-width: 768px) {
+  .contactGrid {
+    grid-template-columns: 1fr;
+    gap: var(--space-10);
+  }
+
+  .heading {
+    font-size: var(--text-2xl);
+  }
+}

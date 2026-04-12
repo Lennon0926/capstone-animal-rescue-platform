@@ -118,6 +118,15 @@
   --letter-tight: -1px;
 
   --container-max-width: 1200px;
+
+  /* ================= VIDEO OVERLAYS ================= */
+
+  --overlay-dark: rgba(0, 0, 0, 0.50);
+  --overlay-medium: rgba(0, 0, 0, 0.40);
+
+  /* ================= TIMELINE ================= */
+
+  --text-timeline-year: clamp(36px, 4vw, 56px);
 }
 
 /* =========================
