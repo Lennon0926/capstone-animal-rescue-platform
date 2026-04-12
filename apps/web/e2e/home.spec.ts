@@ -161,7 +161,7 @@ test.describe("Home page (/home)", () => {
 
   test("animal cards render from API", async ({ page }) => {
     for (const name of LANDING_PAGE_ANIMALS) {
-      const card = page.getByRole("heading", { name, exact: true });
+      const card = page.getByAltText(name);
       await card.scrollIntoViewIfNeeded();
       await expect(card).toBeVisible({ timeout: 10000 });
     }
