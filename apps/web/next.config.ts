@@ -2,6 +2,9 @@ import path from "node:path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  env: {
+    NEXT_PUBLIC_IS_VERCEL: process.env.VERCEL ?? "",
+  },
   turbopack: {
     root: path.join(__dirname),
   },

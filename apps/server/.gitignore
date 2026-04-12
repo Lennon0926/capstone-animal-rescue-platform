@@ -1,1 +1,5 @@
 .vercel
+
+# Load test artifacts — raw output and HTML reports are not committed
+load-tests/results.json
+load-tests/report.html

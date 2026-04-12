@@ -112,7 +112,7 @@ export default function AnimalInfo({ animal }: AnimalInfoProps) {
             )}
 
             <div className={styles.actions}>
-              {animal.status === "available" ? (
+              {animal.status === "disponible" ? (
                 formUrl ? (
                   <a
                     href={formUrl}
