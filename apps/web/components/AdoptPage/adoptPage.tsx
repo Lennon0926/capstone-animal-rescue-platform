@@ -136,8 +136,12 @@ function FlipCard({ animal }: { animal: Animal }) {
           </div>
         </div>
 
-        {/* Back - Details */}
-        <div className={`${styles.cardFace} ${styles.cardBack}`}>
+        {/* Back - Details: inert+aria-hidden when not flipped prevents nested-interactive a11y violation */}
+        <div
+          className={`${styles.cardFace} ${styles.cardBack}`}
+          aria-hidden={!isFlipped}
+          inert={!isFlipped ? true : undefined}
+        >
           <div className={styles.cardBackContent}>
             <div className={styles.cardBackHeader}>
               <h3 className={styles.cardBackName}>{animal.name}</h3>

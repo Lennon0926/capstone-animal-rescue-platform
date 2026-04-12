@@ -7,8 +7,8 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Component {...pageProps} />
-      <Analytics />
-      <SpeedInsights />
+      {process.env.NEXT_PUBLIC_IS_VERCEL && <Analytics />}
+      {process.env.NEXT_PUBLIC_IS_VERCEL && <SpeedInsights />}
     </>
   );
 }

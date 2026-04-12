@@ -78,47 +78,69 @@ function onFormSubmit(e) {
 }
 ```
 
-### 4. Add Form Link to Frontend
+### 4. Find Entry IDs for Pre-filling
 
-Configure the form URL in the frontend environment:
+Entry IDs are the numeric identifiers Google uses to map URL parameters to specific form fields.
+
+1. Open your Google Form in the editor
+2. Click the three-dot menu (⋮) → **"Get pre-filled link"**
+3. Enter sample values in the fields you want to pre-fill and click **"Get Link"**
+4. The generated URL will contain parameters like `entry.123456789=value` — the numbers after `entry.` are your entry IDs
+
+### 5. Add Form URL and Entry IDs to Environment
 
 **`apps/web/.env.local`:**
 ```env
 NEXT_PUBLIC_GOOGLE_FORM_URL=https://docs.google.com/forms/d/e/YOUR_FORM_ID/viewform
+NEXT_PUBLIC_GOOGLE_FORM_ENTRY_ANIMAL_ID=entry.XXXXXXXXX
+NEXT_PUBLIC_GOOGLE_FORM_ENTRY_ANIMAL_NAME=entry.YYYYYYYYY
 ```
+
+- Replace `YOUR_FORM_ID` with the ID from your form's share URL.
+- Replace `entry.XXXXXXXXX` with the entry ID for the "Animal ID" field.
+- Replace `entry.YYYYYYYYY` with the entry ID for the "Animal Name" field.
 
 ## Frontend Integration
 
-Example "Apply to Adopt" button component:
+### URL Builder (`apps/web/hooks/useAdoptionFormUrl.ts`)
 
-```tsx
-// components/AdoptButton.tsx
-import React from 'react';
+Centralizes URL construction so any component can build a pre-filled form link:
 
-interface AdoptButtonProps {
-  animalName?: string;
-}
+```ts
+import { buildAdoptionFormUrl } from "@/hooks/useAdoptionFormUrl";
 
-export function AdoptButton({ animalName }: AdoptButtonProps) {
-  const baseUrl = process.env.NEXT_PUBLIC_GOOGLE_FORM_URL;
-  
-  // Pre-fill animal name if provided (replace with your entry ID)
-  const url = animalName 
-    ? `${baseUrl}?entry.YOUR_ENTRY_ID=${encodeURIComponent(animalName)}`
-    : baseUrl;
-
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
-    >
-      Apply to Adopt
-    </a>
-  );
-}
+const formUrl = buildAdoptionFormUrl(animal.aid, animal.name);
+// → "https://docs.google.com/forms/d/e/.../viewform?entry.123456789=1&entry.987654321=Max"
+// → null if NEXT_PUBLIC_GOOGLE_FORM_URL is not set
 ```
+
+### Pre-filled URL Format
+
+```
+https://docs.google.com/forms/d/e/{FORM_ID}/viewform?{ANIMAL_ID_ENTRY}={animalId}&{ANIMAL_NAME_ENTRY}={animalName}
+```
+
+**Example:**
+```
+https://docs.google.com/forms/d/e/1FAIpQLSe.../viewform?entry.123456789=42&entry.987654321=Fluffy
+```
+
+| Env variable | URL parameter | Form field | Purpose |
+|---|---|---|---|
+| `NEXT_PUBLIC_GOOGLE_FORM_ENTRY_ANIMAL_ID` | `entry.XXXXXXXXX` | Animal ID (short answer) | Links the application to the database record |
+| `NEXT_PUBLIC_GOOGLE_FORM_ENTRY_ANIMAL_NAME` | `entry.YYYYYYYYY` | Animal Name (short answer) | Lets staff immediately see which animal the applicant wants |
+
+### Fallback Behavior
+
+When `NEXT_PUBLIC_GOOGLE_FORM_URL` is not set:
+- Animal detail page shows "El formulario de adopción no está disponible en este momento."
+- Animal cards do not show the "Adoptar" button
+- No errors are thrown
+
+### Where the button appears
+
+- **Animal detail page** (`AnimalInfoPage`): shown when `animal.status === "available"`. If the env var is not set, a fallback message is displayed instead.
+- **Landing page animal cards** (`AnimalsSection`): an "Adoptar" secondary button appears beside "Conoce Más" for available animals. Hidden when env var is not configured.
 
 ## Staff Workflow
 
@@ -131,8 +153,10 @@ export function AdoptButton({ animalName }: AdoptButtonProps) {
 
 ## Environment Variables
 
-| Variable | Location | Description |
-|----------|----------|-------------|
-| `NEXT_PUBLIC_GOOGLE_FORM_URL` | `apps/web/.env.local` | Public Google Form URL |
+| Variable | Description |
+|----------|-------------|
+| `NEXT_PUBLIC_GOOGLE_FORM_URL` | Base viewform URL (strip any `?usp=...` before pasting) |
+| `NEXT_PUBLIC_GOOGLE_FORM_ENTRY_ANIMAL_ID` | Entry ID for the animal database ID field |
+| `NEXT_PUBLIC_GOOGLE_FORM_ENTRY_ANIMAL_NAME` | Entry ID for the animal name field |
 
 

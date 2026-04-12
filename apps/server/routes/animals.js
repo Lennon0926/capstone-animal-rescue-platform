@@ -9,7 +9,7 @@ const router = express.Router();
 const {
   getAnimals,
   getAnimalById,
-  getDistinctValues,
+  getFilterOptions,
   createAnimal,
   deleteAnimal,
   updateAnimalById
@@ -72,29 +72,15 @@ router.get(
 router.get(
   "/filters",
   asyncHandler(async (req, res) => {
-    const [speciesResult, statusResult, sizeResult, genderResult] = await Promise.all([
-      getDistinctValues("species"),
-      getDistinctValues("status"),
-      getDistinctValues("size"),
-      getDistinctValues("gender"),
-    ]);
+    const { data, error } = await getFilterOptions();
 
-    const errors = [speciesResult, statusResult, sizeResult, genderResult]
-      .filter((r) => r.error)
-      .map((r) => r.error);
-
-    if (errors.length > 0) {
-      throw new ApiError(500, "Failed to fetch filter options", errors.join("; "));
+    if (error) {
+      throw new ApiError(500, "Failed to fetch filter options", error);
     }
 
     res.json({
       success: true,
-      data: {
-        species: speciesResult.data,
-        status: statusResult.data,
-        size: sizeResult.data,
-        gender: genderResult.data,
-      },
+      data,
     });
   })
 );

@@ -57,10 +57,10 @@ export default function Header({
           <Image
             src="/org-logo.png"
             className={styles.logoImage}
-            width={45}
-            height={45}
+            width={50}
+            height={42}
             alt="CPAAA Logo"
-            sizes="45px"
+            sizes="50px"
           />
           <div className={styles.logo}>
             <Link href="/">Ciudadanos Pro Albergue de Animales de Aguadilla</Link>
