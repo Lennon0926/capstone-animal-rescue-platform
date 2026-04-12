@@ -165,7 +165,7 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_SERVER_PROJECT_ID }}
         run: |
           vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
-          vercel build --token="$VERCEL_TOKEN"
+          vercel build --prod --token="$VERCEL_TOKEN"
           DEPLOY_URL=$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN" | tail -1)
           echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
 
@@ -177,7 +177,7 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_WEB_PROJECT_ID }}
         run: |
           vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
-          vercel build --token="$VERCEL_TOKEN"
+          vercel build --prod --token="$VERCEL_TOKEN"
           DEPLOY_URL=$(vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN" | tail -1)
           echo "url=$DEPLOY_URL" >> "$GITHUB_OUTPUT"
 
