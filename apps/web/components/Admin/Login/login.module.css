@@ -1,4 +1,5 @@
 .container {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -6,6 +7,21 @@
   background-color: var(--color-surface);
   padding: var(--space-4);
   font-family: var(--font-sans);
+}
+
+.backButton {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-4);
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-sm);
+  transition: opacity var(--transition-normal);
+}
+
+.backButton:hover {
+  opacity: 0.8;
 }
 
 .wrapper {

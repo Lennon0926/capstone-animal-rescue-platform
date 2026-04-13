@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Eye, EyeOff } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -80,6 +81,9 @@ export default function LoginPage() {
 
   return (
     <div className={styles.container}>
+      <Link href="/" className={styles.backButton}>
+        ← Back to home
+      </Link>
       <div className={styles.wrapper}>
         <div className={styles.header}>
           <h1 className={styles.title}>Admin Login</h1>

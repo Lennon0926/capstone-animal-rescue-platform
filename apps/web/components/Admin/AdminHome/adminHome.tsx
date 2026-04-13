@@ -302,7 +302,7 @@ export default function AdminHome() {
         </div>
 
         {/* Stats Cards */}
-        <div>
+        <div className={styles.metricSection}>
           <div className={styles.statsGrid}>
             <Card className={styles.statCard}>
               <CardContent className={styles.statCardContent}>
