@@ -1,8 +1,11 @@
 # API Contract v1 (MVP)
 
-**Version:** v1  
-**Base URL:** `/api/v1`  
-**Content-Type:** `application/json`  
+> **Living reference:** For production-accurate endpoint documentation (request/response examples, validation rules, and error codes) see [`endpoints.md`](./endpoints.md).
+> This contract describes the *planned* v1 design; the implemented API uses base URL `/api/` (not `/api/v1/`).
+
+**Version:** v1
+**Base URL:** `/api/v1` *(planned — current implementation uses `/api/`)*
+**Content-Type:** `application/json`
 **Date format:** ISO-8601 (`YYYY-MM-DDTHH:mm:ssZ`)
 
 ## Authentication

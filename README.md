@@ -114,8 +114,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 NEXT_PUBLIC_GOOGLE_FORM_URL=your-google-form-url
 ```
 
-> See [docs/SECRETS_MANAGEMENT.md](docs/SECRETS_MANAGEMENT.md) for the full variable reference, optional vars, and secret rotation procedures.
-> See [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) for Supabase project setup instructions.
+> See [docs/guides/SECRETS_MANAGEMENT.md](docs/guides/SECRETS_MANAGEMENT.md) for the full variable reference, optional vars, and secret rotation procedures.
+> See [docs/guides/SUPABASE_SETUP.md](docs/guides/SUPABASE_SETUP.md) for Supabase project setup instructions.
 
 ### 4. Seed the database
 
@@ -169,8 +169,11 @@ cd apps/web && npm run dev:turbo
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/animals` | List animals with filters and pagination |
-| GET | `/api/animals/:aid` | Get a single animal by ID |
 | GET | `/api/animals/filters` | Get available filter values (species, status, etc.) |
+| GET | `/api/animals/:aid` | Get a single animal by ID |
+| POST | `/api/animals` | Create a new animal record |
+| PATCH | `/api/animals/:aid` | Partially update an existing animal |
+| DELETE | `/api/animals/:aid` | Delete an animal by ID |
 
 ### Uploads
 
@@ -178,6 +181,10 @@ cd apps/web && npm run dev:turbo
 |--------|----------|-------------|
 | GET | `/api/uploads/config` | Return upload configuration plus live Cloudflare R2 health |
 | POST | `/api/uploads/animals/:animalId/image` | Upload an animal image to Cloudflare R2 |
+
+Full request and response examples are documented in [docs/api/endpoints.md](docs/api/endpoints.md).
+
+> **API maturity note:** Authentication is not yet implemented — all endpoints are currently public. Rate limiting (#132), API versioning (#133), CORS hardening (#134), and Content-Type enforcement (#135) are open issues.
 
 **Upload details:**
 - Request: `multipart/form-data`, field name `image`
@@ -243,11 +250,14 @@ CI runs lint, build, unit tests, and E2E tests for every push and pull request t
 
 | Document | Description |
 |----------|-------------|
-| [docs/SECRETS_MANAGEMENT.md](docs/SECRETS_MANAGEMENT.md) | All env vars, GitHub Secrets setup, deployment config, rotation procedures |
-| [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) | Database setup and schema reference |
-| [docs/GOOGLE_FORMS_INTEGRATION.md](docs/GOOGLE_FORMS_INTEGRATION.md) | Adoption application intake via Google Forms |
-| [docs/SECURITY_ALERTS.md](docs/SECURITY_ALERTS.md) | Security alert handling and procedures |
-| [docs/api/contract-v1.md](docs/api/contract-v1.md) | Full API contract |
+| [docs/guides/SECRETS_MANAGEMENT.md](docs/guides/SECRETS_MANAGEMENT.md) | All env vars, GitHub Secrets setup, deployment config, rotation procedures |
+| [docs/guides/SUPABASE_SETUP.md](docs/guides/SUPABASE_SETUP.md) | Database setup and schema reference |
+| [docs/guides/GOOGLE_FORMS_INTEGRATION.md](docs/guides/GOOGLE_FORMS_INTEGRATION.md) | Adoption application intake via Google Forms |
+| [docs/guides/SECURITY_ALERTS.md](docs/guides/SECURITY_ALERTS.md) | Security alert handling and procedures |
+| [docs/guides/ROLLBACK.md](docs/guides/ROLLBACK.md) | Rollback procedures for Vercel deployments |
+| [docs/api/endpoints.md](docs/api/endpoints.md) | API endpoint reference (request/response examples) |
+| [docs/api/contract-v1.md](docs/api/contract-v1.md) | Planned v1 API contract |
+| [docs/reports/section-3-4-test-results.md](docs/reports/section-3-4-test-results.md) | Unit, integration, and E2E test results (Section 3.4) |
 
 ## ngrok Tunnel
 

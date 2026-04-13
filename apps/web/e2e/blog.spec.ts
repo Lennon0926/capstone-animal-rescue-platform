@@ -10,11 +10,11 @@ test.describe("Blog page (/blog)", () => {
   });
 
   test("blog heading is visible", async ({ page }) => {
-    await expect(page.getByRole("heading", { name: "Blog", exact: true })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Nuestras Publicaciones", exact: true })).toBeVisible();
   });
 
   test("header is visible", async ({ page }) => {
-    await expect(page.locator("header")).toBeVisible();
+    await expect(page.locator("header").first()).toBeVisible();
   });
 
   test("footer is visible", async ({ page }) => {

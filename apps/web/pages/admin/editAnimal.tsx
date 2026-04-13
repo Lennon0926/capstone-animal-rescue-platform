@@ -33,9 +33,9 @@ export default function EditAnimalPage({ animal, error }: EditAnimalPageProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<EditAnimalPageProps> = async (
-  context
-) => {
+export const getServerSideProps: GetServerSideProps<
+  EditAnimalPageProps
+> = async (context) => {
   const { id } = context.query;
 
   if (!id) {
@@ -48,7 +48,7 @@ export const getServerSideProps: GetServerSideProps<EditAnimalPageProps> = async
 
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals/${id}`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals/${id}`,
     );
 
     if (!res.ok) {

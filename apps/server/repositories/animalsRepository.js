@@ -6,6 +6,40 @@
 const { getSupabaseClient } = require("../lib/supabase");
 const { getPublicObjectUrl, normalizeObjectKey } = require("../services/r2Service");
 
+// In-memory cache for filter options — these change only when animals are
+// added/edited, so a 30-second TTL eliminates ~200 redundant DB round-trips
+// per second under load without meaningful staleness.
+let _filterOptionsCache = null;
+let _filterOptionsCachedAt = 0;
+const FILTER_OPTIONS_TTL_MS = 30_000;
+
+// In-memory cache for getAnimals() results keyed on serialized query params.
+// 10-second TTL balances freshness against DB pool pressure at 50 VU.
+// Cleared on any mutation (create/update/delete) to avoid stale listings.
+const _animalsCache = new Map();
+const ANIMALS_TTL_MS = 10_000;
+
+// Stampede protection: tracks in-flight DB promises per cache key so that
+// concurrent requests for the same query share one DB call instead of each
+// opening their own connection. Without this, a cold cache under 50 VU fires
+// 50 simultaneous Supabase connections and saturates the free-tier pool.
+const _animalsInFlight = new Map();
+
+function _animalsQueryKey(options) {
+  return JSON.stringify({
+    f: options.filters || {},
+    l: options.limit ?? 50,
+    o: options.offset ?? 0,
+    s: options.sortBy ?? "created_at",
+    d: options.sortOrder ?? "desc",
+  });
+}
+
+function _clearAnimalsCache() {
+  _animalsCache.clear();
+  _filterOptionsCache = null;
+}
+
 /**
  * Valid filter fields and their allowed operators
  */
@@ -123,8 +157,25 @@ async function getAnimals(options = {}) {
     offset = 0,
   } = options;
 
-  try {
-    const client = getSupabaseClient();
+  const cacheKey = _animalsQueryKey({ filters, limit, offset, sortBy, sortOrder });
+
+  // Cache hit — return immediately
+  const cached = _animalsCache.get(cacheKey);
+  if (cached && Date.now() - cached.cachedAt < ANIMALS_TTL_MS) {
+    return cached.value;
+  }
+
+  // Stampede protection — if a DB call for this key is already in flight,
+  // wait for it rather than opening a second connection
+  if (_animalsInFlight.has(cacheKey)) {
+    return _animalsInFlight.get(cacheKey);
+  }
+
+  // Cache miss, no in-flight — we are the first; run the DB call and let
+  // any concurrent requests for the same key attach to this promise
+  const dbCall = (async () => {
+    try {
+      const client = getSupabaseClient();
 
     // Start query with count
     let query = client
@@ -169,14 +220,22 @@ async function getAnimals(options = {}) {
       return { data: [], count: 0, error: error.message };
     }
 
-    return {
+    const result = {
       data: (data || []).map(serializeAnimalRecord),
       count: count || 0,
       error: null,
     };
-  } catch (err) {
-    return { data: [], count: 0, error: err.message };
-  }
+    _animalsCache.set(cacheKey, { value: result, cachedAt: Date.now() });
+    return result;
+    } catch (err) {
+      return { data: [], count: 0, error: err.message };
+    } finally {
+      _animalsInFlight.delete(cacheKey);
+    }
+  })();
+
+  _animalsInFlight.set(cacheKey, dbCall);
+  return dbCall;
 }
 
 /**
@@ -209,33 +268,32 @@ async function getAnimalById(aid) {
 }
 
 /**
- * Gets distinct values for a field (useful for filter dropdowns).
+ * Returns all animal filter option arrays (species, status, size, gender) in a
+ * single RPC call and caches the result for FILTER_OPTIONS_TTL_MS milliseconds.
  *
- * @param {string} field - The field to get distinct values for
- * @returns {Promise<{data: Array, error?: string}>}
+ * Replaces four separate getDistinctValues() calls that each did a full table
+ * scan. Under load this reduces ~200 DB round-trips/s to one call per 30 s.
+ *
+ * @returns {Promise<{data: {species, status, size, gender} | null, error?: string}>}
  */
-async function getDistinctValues(field) {
-  if (!VALID_FILTERS[field]) {
-    return { data: [], error: `Invalid field: ${field}` };
+async function getFilterOptions() {
+  if (_filterOptionsCache && Date.now() - _filterOptionsCachedAt < FILTER_OPTIONS_TTL_MS) {
+    return { data: _filterOptionsCache, error: null };
   }
 
   try {
     const client = getSupabaseClient();
-
-    const { data, error } = await client
-      .from("animals")
-      .select(field)
-      .not(field, "is", null);
+    const { data, error } = await client.rpc("get_animal_filter_options");
 
     if (error) {
-      return { data: [], error: error.message };
+      return { data: null, error: error.message };
     }
 
-    // Extract unique values
-    const uniqueValues = [...new Set(data.map((row) => row[field]))].filter(Boolean);
-    return { data: uniqueValues, error: null };
+    _filterOptionsCache = data;
+    _filterOptionsCachedAt = Date.now();
+    return { data, error: null };
   } catch (err) {
-    return { data: [], error: err.message };
+    return { data: null, error: err.message };
   }
 }
 
@@ -260,6 +318,7 @@ async function createAnimal(animalData) {
       return { data: null, error: error.message };
     }
 
+    _clearAnimalsCache();
     return { data: serializeAnimalRecord(data), error: null };
   } catch (err) {
     return { data: null, error: err.message };
@@ -289,9 +348,10 @@ async function deleteAnimal(aid) {
       return { data: null, error: error.message };
     }
 
+    _clearAnimalsCache();
     return { data: serializeAnimalRecord(data), error: null };
   } catch (err) {
-    return { data: null, error: err.message };  
+    return { data: null, error: err.message };
   }
 }
 
@@ -321,6 +381,7 @@ async function updateAnimalById(aid, updates) {
       return { data: null, error: error.message };
     }
 
+    _clearAnimalsCache();
     return { data: serializeAnimalRecord(data), error: null };
   } catch (err) {
     return { data: null, error: err.message };
@@ -330,7 +391,7 @@ async function updateAnimalById(aid, updates) {
 module.exports = {
   getAnimals,
   getAnimalById,
-  getDistinctValues,
+  getFilterOptions,
   createAnimal,
   deleteAnimal,
   updateAnimalById,
@@ -338,4 +399,5 @@ module.exports = {
   VALID_SORT_FIELDS,
   serializeAnimalRecord,
   normalizeAnimalImageFields,
+  clearAnimalsCache: _clearAnimalsCache,
 };

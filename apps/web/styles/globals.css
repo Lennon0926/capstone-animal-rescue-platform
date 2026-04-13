@@ -193,6 +193,15 @@
   --sidebar-border: oklch(0.922 0 0);
 
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* ================= VIDEO OVERLAYS ================= */
+
+  --overlay-dark: rgba(0, 0, 0, 0.50);
+  --overlay-medium: rgba(0, 0, 0, 0.40);
+
+  /* ================= TIMELINE ================= */
+
+  --text-timeline-year: clamp(36px, 4vw, 56px);
 }
 
 /* =========================
