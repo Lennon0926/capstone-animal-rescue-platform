@@ -19,7 +19,7 @@
 
 /* ─── Facebook-style blue header ─── */
 .header {
-  background: #1877f2;
+  background: #0d47a1;
   width: 100%;
   padding: 0 24px;
 }
@@ -71,7 +71,7 @@
 
 .headerSubtitle {
   font-size: 12px;
-  color: rgba(255,255,255,0.72);
+  color: rgba(255,255,255,0.90);
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -323,14 +323,14 @@
   font-size: 12px;
   font-weight: 600;
   color: #fff;
-  background: #1877f2;
+  background: #0d47a1;
   padding: 6px 12px;
   border-radius: 999px;
   text-decoration: none;
   transition: background 0.2s ease;
 }
 .cardLink:hover {
-  background: #1466d6;
+  background: #1254b5;
 }
 
 /* ─── Expanded text view ─── */

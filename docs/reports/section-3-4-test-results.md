@@ -1,6 +1,6 @@
 # Section 3.4 — Unit, Integration, and E2E Test Results
 
-All test suites were executed locally on 2026-04-11 against the `docs/115-test-results-documentation` branch (Node.js v24.13.1). The server suite was re-run after adding mutation endpoint coverage (POST / PATCH / DELETE) and after the test file was updated to use an `rpc`-based mock for the filters endpoint and a cache-clearing hook in `beforeEach`.
+All test suites were executed locally on 2026-04-13 against the `report-analytics-progress-report` branch (Node.js v24.13.1). The server suite was re-run after adding mutation endpoint coverage (POST / PATCH / DELETE) and after the test file was updated to use an `rpc`-based mock for the filters endpoint and a cache-clearing hook in `beforeEach`. The web suite reflects the addition of `storiesSection.test.tsx` (2 new tests) introduced by the home-page refactor in PR #141.
 
 ---
 
@@ -17,10 +17,10 @@ All test suites were executed locally on 2026-04-11 against the `docs/115-test-r
 | Suite | Tool | Spec Files | Total Tests | Passed | Failed | Skipped | Pass Rate |
 |-------|------|-----------|-------------|--------|--------|---------|-----------|
 | Server unit/integration | Jest | 8 | 97 | 97 | 0 | 0 | **100%** |
-| Web unit | Jest | 4 | 21 | 21 | 0 | 0 | **100%** |
-| E2E — Desktop Chrome | Playwright | 7 | 129 | 127 | 1 | 1 | **98.4%** |
-| E2E — Mobile Safari | Playwright | 7 | 129 | — | — | 129 | n/a ¹ |
-| **Total (excl. Mobile Safari)** | | **19** | **247** | **245** | **1** | **1** | **99.6%** |
+| Web unit | Jest | 5 | 23 | 23 | 0 | 0 | **100%** |
+| E2E — Desktop Chrome | Playwright | 7 | 135 | 133 | 1 | 1 | **98.5%** |
+| E2E — Mobile Safari | Playwright | 7 | 135 | — | — | 135 | n/a ¹ |
+| **Total (excl. Mobile Safari)** | | **20** | **255** | **253** | **1** | **1** | **99.2%** |
 
 > ¹ Mobile Safari tests are skipped locally because WebKit is not installed in this environment. The CI pipeline runs Desktop Chrome only (consistent with the configuration established in commit `c1b5778`). Mobile Safari results are excluded from pass-rate calculations.
 
@@ -60,14 +60,17 @@ All test suites were executed locally on 2026-04-11 against the `docs/115-test-r
 ## Web Jest Results (`apps/web`)
 
 **Run command:** `npm test`
-**Result:** 4 suites, 21 tests — all passed.
+**Result:** 5 suites, 23 tests — all passed.
 
 | Test File | Tests | Result |
 |-----------|-------|--------|
-| `adminImageFlows.test.tsx` | 8 | Pass |
+| `adminImageFlows.test.tsx` | 3 | Pass |
+| `storiesSection.test.tsx` | 2 | Pass |
 | `animalImageRendering.test.tsx` | 2 | Pass |
-| `animalImageUploadService.test.ts` | 24 | Pass |
-| `animalImages.test.ts` | 5 | Pass |
+| `animalImageUploadService.test.ts` | 12 | Pass |
+| `animalImages.test.ts` | 4 | Pass |
+
+`storiesSection.test.tsx` was added by the home-page refactor (PR #141) and verifies the Stories section heading renders correctly and appears after the Timeline section on the home page.
 
 ---
 
@@ -84,8 +87,8 @@ All test suites were executed locally on 2026-04-11 against the `docs/115-test-r
 | `adopt.spec.ts` | 14 | 0 | 0 | |
 | `blog.spec.ts` | 4 | 0 | 0 | |
 | `donation.spec.ts` | 4 | 0 | 0 | |
-| `home.spec.ts` | 17 | 0 | 1 | Mobile hamburger nav — skipped in Desktop Chrome project |
-| **Total** | **127** | **1** | **1** | |
+| `home.spec.ts` | 23 | 0 | 1 | Mobile hamburger nav — skipped in Desktop Chrome project |
+| **Total** | **133** | **1** | **1** | |
 
 **Failing test:** `adopt-detail.spec.ts` — *"shows adoption unavailable message when form URL is not configured"*
 This test validates the fallback UI rendered when `NEXT_PUBLIC_GOOGLE_FORM_URL` is not set. It fails in the local dev environment because the variable is configured in `.env.local`. This test passes in CI where the variable is absent by default. It is not a regression.
