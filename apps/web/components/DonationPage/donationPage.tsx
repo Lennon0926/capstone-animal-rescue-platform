@@ -1,140 +1,241 @@
+"use client";
+
+import { useState } from "react";
 import styles from "./donationPage.module.css";
 
-export default function DonationPage() {
-  const monthlyGoal = 2000;
-  const currentRaised = 1250;
-  const progressPercent = Math.round((currentRaised / monthlyGoal) * 100);
+type PaymentMethod = "ath" | "paypal" | "card";
 
-  const donationTiers = [
-    {
-      amount: "$10",
-      title: "Alimento",
-      text: "Ayuda a cubrir comida y agua para un animal rescatado.",
-    },
-    {
-      amount: "$25",
-      title: "Cuidado basico",
-      text: "Apoya vacunas, higiene y atencion veterinaria inicial.",
-    },
-    {
-      amount: "$50",
-      title: "Atencion medica",
-      text: "Contribuye a tratamientos, medicamentos y recuperacion.",
-    },
+export default function DonationPage() {
+  const stats = [
+    { value: "500+", label: "Animales rescatados" },
+    { value: "300+", label: "Adopciones exitosas" },
+    { value: "30+", label: "Años de servicio" },
   ];
+
+  const amounts = ["$10", "$25", "$50", "$100", "Otro"];
+  const [selectedAmount, setSelectedAmount] = useState("$50");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("ath");
 
   const donationUses = [
-    "Rescate y transporte de animales abandonados",
-    "Atencion veterinaria y medicamentos",
-    "Alimento, higiene y cuidado diario",
-    "Apoyo al proceso de adopcion y recuperacion",
+    "Atención veterinaria y medicinas",
+    "Alimento y suministros",
+    "Hogares temporales",
+    "Campañas de esterilización",
   ];
 
+  const openModal = () => {
+    setPaymentMethod("ath");
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
-    <main className={styles.page} aria-label="Seccion de donaciones">
+    <main className={styles.page} aria-label="Sección de donaciones">
       <section className={styles.heroSection}>
-        <div className={styles.heroInner}>
-          <div className={styles.heroContent}>
-            <p className={styles.eyebrow}>Ciudadanos Pro Albergue de Animales</p>
-            <h1 className={styles.heroTitle}>Ayudanos a salvar mas vidas</h1>
-            <p className={styles.heroText}>
-              Tu donacion apoya directamente rescate animal, atencion medica,
-              refugio temporal y procesos de adopcion responsable.
-            </p>
-
-            <ul className={styles.trustList}>
-              <li>100% destinado a los animales</li>
-              <li>Pago seguro</li>
-              <li>Impacto local en Puerto Rico</li>
-            </ul>
-
-            <div className={styles.ctaRow}>
-              <a
-                href="https://www.paypal.com/donate?token=5BAeWqvP7cLCKMnV4H6uKYb_Arfr-I08PdcS8HsHL4SX0ubZoTW6uRkrBez8VuQWn-NqN9sdZpVEHNSk"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.paypalButton}
-              >
-                Donar con PayPal
-              </a>
-
-              <a
-                href="https://stripe.com/payments/payment-links"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.stripeButton}
-              >
-                Stripe (proximamente)
-              </a>
-            </div>
-
-            <div className={styles.athCard}>
-              <span className={styles.athLabel}>ATH Movil</span>
-              <span className={styles.athNumber}>787-689-5512</span>
-            </div>
-          </div>
-
-          <aside className={styles.tiersPanel} aria-label="Niveles de donacion">
-            <h2 className={styles.tiersTitle}>Aportes sugeridos</h2>
-            <div className={styles.tiersGrid}>
-              {donationTiers.map((tier) => (
-                <article key={tier.amount} className={styles.tierCard}>
-                  <p className={styles.tierAmount}>{tier.amount}</p>
-                  <h3 className={styles.tierHeading}>{tier.title}</h3>
-                  <p className={styles.tierText}>{tier.text}</p>
-                </article>
-              ))}
-            </div>
-          </aside>
+        <div className={styles.heroCentered}>
+          <h1 className={styles.heroTitle}>Ayúdanos a Salvar Vidas</h1>
+          <p className={styles.heroText}>
+            Cada donación nos permite rescatar, alimentar y cuidar animales
+            abandonados
+          </p>
         </div>
       </section>
 
-      <section className={styles.impactSection}>
-        <div className={styles.impactInner}>
-          <div className={styles.impactIntro}>
-            <h2 className={styles.impactTitle}>Como ayuda tu donacion</h2>
-            <p className={styles.impactText}>
-              Cada contribucion nos permite seguir ayudando a animales
-              rescatados y abandonados. Tu apoyo se convierte en alimento,
-              tratamiento y nuevas oportunidades de vida.
-            </p>
-          </div>
+      <section className={styles.donationLayout}>
+        <div className={styles.statsGrid}>
+          {stats.map((stat) => (
+            <article key={stat.label} className={styles.statCard}>
+              <p className={styles.statValue}>{stat.value}</p>
+              <p className={styles.statLabel}>{stat.label}</p>
+            </article>
+          ))}
+        </div>
 
-          <div className={styles.impactList}>
+        <div className={styles.amountSection}>
+          <h2 className={styles.amountTitle}>Selecciona la cantidad</h2>
+
+          <div
+            className={styles.amountButtons}
+            role="group"
+            aria-label="Cantidad de donación"
+          >
+            {amounts.map((amount) => {
+              const isActive = amount === selectedAmount;
+
+              return (
+                <button
+                  key={amount}
+                  type="button"
+                  onClick={() => setSelectedAmount(amount)}
+                  className={`${styles.amountButton} ${
+                    isActive ? styles.amountButtonActive : ""
+                  }`}
+                  aria-pressed={isActive}
+                >
+                  {amount}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className={styles.usesCard}>
+          <h3 className={styles.usesTitle}>¿A dónde va tu donación?</h3>
+
+          <div className={styles.usesGrid}>
             {donationUses.map((item) => (
-              <div key={item} className={styles.impactItem}>
-                <span className={styles.impactBullet} aria-hidden="true">
-                  ✓
-                </span>
-                <p>{item}</p>
+              <div key={item} className={styles.useItem}>
+                <span className={styles.useBullet}>[+]</span>
+                <span>{item}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className={styles.goalCard}>
-          <div className={styles.goalHeader}>
-            <div>
-              <h3 className={styles.goalTitle}>Meta mensual de apoyo</h3>
-              <p className={styles.goalText}>
-                Ayudanos a continuar con rescates, tratamientos y adopciones.
-              </p>
-            </div>
-            <p className={styles.goalAmount}>
-              ${currentRaised.toLocaleString("en-US")} de ${monthlyGoal.toLocaleString("en-US")}
-            </p>
-          </div>
+        <div className={styles.donateAction}>
+          <button
+            type="button"
+            onClick={openModal}
+            className={styles.primaryDonateButton}
+          >
+            Donar {selectedAmount} →
+          </button>
 
-          <div className={styles.progressTrack} role="progressbar" aria-valuenow={progressPercent} aria-valuemin={0} aria-valuemax={100} aria-label="Progreso de meta mensual">
-            <div
-              className={styles.progressFill}
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-
-          <p className={styles.progressMeta}>{progressPercent}% completado este mes</p>
+          <p className={styles.paymentNote}>
+            Opens payment modal (ATH Móvil, PayPal, or Card)
+          </p>
         </div>
       </section>
+
+      {isModalOpen && (
+        <div
+          className={styles.modalOverlay}
+          onClick={closeModal}
+          aria-hidden="true"
+        >
+          <div
+            className={styles.modalCard}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="donation-modal-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={styles.modalHeader}>
+              <h2 id="donation-modal-title" className={styles.modalTitle}>
+                Donación — {selectedAmount}
+              </h2>
+
+              <button
+                type="button"
+                onClick={closeModal}
+                className={styles.modalClose}
+                aria-label="Cerrar modal"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className={styles.paymentTabs}>
+              <button
+                type="button"
+                onClick={() => setPaymentMethod("ath")}
+                className={`${styles.paymentTab} ${
+                  paymentMethod === "ath" ? styles.paymentTabActive : ""
+                }`}
+              >
+                ATH Móvil
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setPaymentMethod("paypal")}
+                className={`${styles.paymentTab} ${
+                  paymentMethod === "paypal" ? styles.paymentTabActive : ""
+                }`}
+              >
+                PayPal
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setPaymentMethod("card")}
+                className={`${styles.paymentTab} ${
+                  paymentMethod === "card" ? styles.paymentTabActive : ""
+                }`}
+              >
+                Tarjeta
+              </button>
+            </div>
+
+            <div className={styles.modalBody}>
+              {paymentMethod === "ath" && (
+                <div className={styles.paymentPanel}>
+                  <h3 className={styles.panelTitle}>Escanea con ATH Móvil</h3>
+
+                  <div className={styles.qrBox}>
+                    <img
+                      src="/ATH-movil-number.png"
+                      alt={`Código QR para donar ${selectedAmount} con ATH Móvil`}
+                      className={styles.qrImage}
+                    />
+                  </div>
+
+                  <p className={styles.panelText}>
+                    Abre la app de ATH Móvil y escanea este código QR para
+                    completar tu donación de {selectedAmount}.00
+                  </p>
+
+                  <p className={styles.panelMeta}>
+                    El código expira en 10 minutos · Transacción segura
+                  </p>
+                </div>
+              )}
+
+              {paymentMethod === "paypal" && (
+                <div className={styles.paymentPanel}>
+                  <h3 className={styles.panelTitle}>Pagar con PayPal</h3>
+                  <p className={styles.panelText}>
+                    Continúa a PayPal para completar tu donación de{" "}
+                    {selectedAmount}.
+                  </p>
+
+                  <a
+                    href="https://www.paypal.com/donate?token=xtjs1DXaBZLSUELKEMHyMNHSmylJSD4E5bDYwFPTSyEMyMzRTvcymWXT9NNX7z4JagxRtEJyY7oUWilB"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.panelAction}
+                  >
+                    Ir a PayPal
+                  </a>
+                </div>
+              )}
+
+              {paymentMethod === "card" && (
+                <div className={styles.paymentPanel}>
+                  <h3 className={styles.panelTitle}>Pagar con tarjeta</h3>
+                  <p className={styles.panelText}>
+                    Aquí puedes conectar tu formulario o enlace de Stripe para
+                    procesar la donación de {selectedAmount}.
+                  </p>
+
+                  <a
+                    href="https://stripe.com/payments/payment-links"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.panelAction}
+                  >
+                    Pagar con tarjeta
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
