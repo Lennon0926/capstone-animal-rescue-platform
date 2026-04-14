@@ -23,6 +23,9 @@ CREATE TABLE IF NOT EXISTS public.animals (
     image_url TEXT,
     image_object_key TEXT,
     tags TEXT[] DEFAULT '{}',
+    microchip_id VARCHAR(50),
+    is_sterilized BOOLEAN DEFAULT false,
+    estimated_age VARCHAR(50),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     record_id INTEGER
 );
@@ -31,6 +34,7 @@ CREATE TABLE IF NOT EXISTS public.animals (
 CREATE INDEX IF NOT EXISTS idx_animals_status ON public.animals(status);
 CREATE INDEX IF NOT EXISTS idx_animals_species ON public.animals(species);
 CREATE INDEX IF NOT EXISTS idx_animals_tags ON public.animals USING GIN(tags);
+CREATE INDEX IF NOT EXISTS idx_animals_microchip_id ON public.animals(microchip_id);
 
 COMMENT ON TABLE public.animals IS 'Animal catalog with adoption status and attributes';
 
@@ -45,6 +49,9 @@ CREATE TABLE IF NOT EXISTS public.medical_records (
     date_given TIMESTAMPTZ,
     vet_name VARCHAR(100),
     notes TEXT,
+    record_type VARCHAR(50) CHECK (record_type IN ('vacunación','desparasitación','esterilización','tratamiento','examen','cirugía')),
+    next_due_date TIMESTAMPTZ,
+    dosage VARCHAR(100),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -54,6 +61,8 @@ ALTER TABLE public.animals
     FOREIGN KEY (record_id) REFERENCES public.medical_records(record_id) ON DELETE SET NULL;
 
 CREATE INDEX IF NOT EXISTS idx_medical_records_aid ON public.medical_records(aid);
+CREATE INDEX IF NOT EXISTS idx_medical_records_record_type ON public.medical_records(record_type);
+CREATE INDEX IF NOT EXISTS idx_medical_records_next_due_date ON public.medical_records(next_due_date);
 
 COMMENT ON TABLE public.medical_records IS 'Medical treatment history for animals';
 
@@ -130,9 +139,13 @@ CREATE POLICY IF NOT EXISTS "Allow service role full access on animals"
     ON public.animals FOR ALL 
     USING (auth.role() = 'service_role');
 
--- Medical Records: Service role only
-CREATE POLICY IF NOT EXISTS "Allow service role full access on medical_records" 
-    ON public.medical_records FOR ALL 
+-- Medical Records: Public read, service role full access
+CREATE POLICY IF NOT EXISTS "Allow public read access on medical_records"
+    ON public.medical_records FOR SELECT
+    USING (true);
+
+CREATE POLICY IF NOT EXISTS "Allow service role full access on medical_records"
+    ON public.medical_records FOR ALL
     USING (auth.role() = 'service_role');
 
 -- Users: Service role only
