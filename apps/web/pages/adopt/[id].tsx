@@ -27,7 +27,6 @@ export default function AdoptAnimalPage({ animal }: AnimalInfoPageProps) {
         <>
           <HeaderSection />
           <AnimalInfo animal={animal} />
-          <FooterSection />
         </>
       )}
     </div>
