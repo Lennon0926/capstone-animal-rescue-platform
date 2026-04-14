@@ -131,7 +131,6 @@ npm run seed
 ./dev.sh
 ```
 
-
 Or start them separately:
 
 ```bash
