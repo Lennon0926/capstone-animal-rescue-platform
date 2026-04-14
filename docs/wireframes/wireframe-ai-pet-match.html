@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wireframe — AI Pet Match</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Architects Daughter', 'Comic Sans MS', cursive, sans-serif;
+      background: #e8e8e8;
+      color: #444;
+      line-height: 1.5;
+    }
+
+    /* ── Wireframe Page Wrapper ── */
+    .wireframe-page {
+      max-width: 880px;
+      margin: 40px auto;
+      background: #fff;
+      border: 2px solid #999;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .page-label {
+      background: #666;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: sans-serif;
+    }
+    .page-label .route {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      color: #ccc;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .page-label .status-tag {
+      font-size: 9px;
+      padding: 2px 8px;
+      border-radius: 3px;
+      text-transform: none;
+      letter-spacing: 0;
+      font-family: sans-serif;
+      background: #888;
+      color: #fff;
+      border: 1px dashed #ccc;
+    }
+
+    /* ── Canvas ── */
+    .wf { background: #f5f5f5; }
+
+    /* ── Header ── */
+    .wf-header {
+      background: #555;
+      color: #ddd;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      border-bottom: 2px solid #444;
+    }
+    .wf-header .logo { font-weight: 700; font-size: 13px; color: #eee; }
+    .wf-header nav { display: flex; gap: 16px; align-items: center; }
+    .wf-header nav a { color: #bbb; text-decoration: none; font-size: 11px; }
+    .wf-header .nav-donate {
+      background: #888; color: #fff !important;
+      padding: 4px 12px; border: 1px solid #777; border-radius: 2px; font-weight: 600;
+    }
+
+    /* ── Footer ── */
+    .wf-footer {
+      background: #555; color: #aaa; padding: 20px;
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 16px;
+      font-size: 10px; border-top: 2px solid #444;
+    }
+    .wf-footer h4 { color: #ddd; margin-bottom: 6px; font-size: 11px; }
+    .wf-footer ul { list-style: none; }
+    .wf-footer li { margin-bottom: 2px; }
+
+    /* ── Section ── */
+    .wf-section { padding: 28px 24px; }
+    .wf-section-alt { background: #ececec; }
+    .wf-section h2 { font-size: 18px; color: #444; margin-bottom: 4px; }
+    .wf-section h3 { font-size: 15px; color: #555; margin-bottom: 4px; }
+    .wf-section p.sub { color: #999; font-size: 12px; margin-bottom: 16px; }
+    .wf-divider { border: none; border-top: 1px dashed #bbb; margin: 0; }
+
+    /* ── Annotation ── */
+    .wf-annotation {
+      background: #eee; border-left: 4px solid #aaa;
+      padding: 8px 14px; margin: 14px 24px;
+      font-size: 11px; color: #777; border-radius: 0 2px 2px 0;
+      font-family: sans-serif; font-style: italic;
+    }
+
+    /* ── Primitives ── */
+    .wf-placeholder {
+      background: #ddd; border: 2px dashed #aaa; border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+      color: #888; font-size: 12px;
+    }
+    .wf-btn {
+      display: inline-block; padding: 6px 16px; border-radius: 2px;
+      font-size: 11px; font-weight: 600; text-align: center;
+      border: 2px solid #888; cursor: default; background: #eee; color: #555;
+    }
+    .wf-btn-primary { background: #888; color: #fff; border-color: #777; }
+    .wf-btn-secondary { background: #aaa; color: #fff; border-color: #999; }
+    .wf-btn-outline { background: transparent; border: 2px solid #999; color: #666; }
+    .wf-btn-small { padding: 4px 10px; font-size: 10px; }
+    .wf-input {
+      border: 2px solid #aaa; border-radius: 2px;
+      padding: 7px 10px; font-size: 11px;
+      background: #fff; width: 100%; color: #999; font-family: inherit;
+    }
+    .wf-select {
+      border: 2px solid #aaa; border-radius: 2px;
+      padding: 7px 10px; font-size: 11px;
+      background: #fff; color: #999; font-family: inherit;
+    }
+    .wf-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 2px;
+      font-size: 9px; font-weight: 600; background: #ccc; color: #555;
+      border: 1px solid #bbb; font-family: sans-serif;
+    }
+    .wf-tag {
+      display: inline-block; padding: 3px 10px; border-radius: 2px;
+      font-size: 10px; background: #e0e0e0; color: #666; border: 1px solid #ccc;
+    }
+    .wf-tag-active { background: #999; color: #fff; border-color: #888; }
+
+    /* ── Icon circles ── */
+    .wf-icon {
+      width: 32px; height: 32px; background: #ccc; border: 2px solid #aaa;
+      border-radius: 50%; display: inline-flex; align-items: center;
+      justify-content: center; font-size: 14px; color: #777;
+    }
+    .wf-icon-lg { width: 48px; height: 48px; font-size: 18px; }
+
+    /* ── Card ── */
+    .wf-card {
+      background: #fff; border: 2px solid #bbb; border-radius: 2px; overflow: hidden;
+    }
+    .wf-card-img {
+      background: linear-gradient(135deg, #ccc 25%, #d8d8d8 50%, #c8c8c8 75%);
+      height: 110px; display: flex; align-items: center; justify-content: center;
+      color: #999; font-size: 12px; position: relative;
+    }
+    .wf-card-img::after {
+      content: ''; position: absolute; top: 8px; left: 8px; right: 8px; bottom: 8px;
+      border: 1px dashed #bbb; pointer-events: none;
+    }
+    .wf-card-body { padding: 10px; border-top: 1px solid #ccc; }
+    .wf-card-body h4 { font-size: 12px; margin-bottom: 3px; color: #555; }
+    .wf-card-body p { font-size: 10px; color: #999; }
+
+    /* ── X mark for image placeholders ── */
+    .img-x { position: relative; overflow: hidden; }
+    .img-x::before, .img-x::after {
+      content: ''; position: absolute; background: #bbb;
+      width: 141%; height: 1px; top: 50%; left: -20%;
+    }
+    .img-x::before { transform: rotate(30deg); }
+    .img-x::after { transform: rotate(-30deg); }
+
+    /* ── Grids ── */
+    .wf-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .wf-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .wf-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+
+    /* ── Form ── */
+    .wf-form-group { margin-bottom: 12px; }
+    .wf-form-group label {
+      display: block; font-size: 11px; font-weight: 600;
+      margin-bottom: 3px; color: #555;
+    }
+    .wf-form-row { display: flex; gap: 10px; }
+    .wf-form-row > * { flex: 1; }
+
+    /* ── Hero hatching ── */
+    .wf-hero {
+      background:
+        repeating-linear-gradient(0deg, transparent, transparent 14px, #ccc 14px, #ccc 15px),
+        repeating-linear-gradient(90deg, transparent, transparent 14px, #ccc 14px, #ccc 15px);
+      background-color: #ddd;
+      position: relative;
+    }
+
+    /* ── Steps ── */
+    .step-number {
+      width: 36px; height: 36px; background: #999; color: #fff;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; margin: 0 auto 8px; border: 2px solid #777;
+    }
+
+    /* ── Preference chips (selectable) ── */
+    .pref-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .pref-chip {
+      padding: 6px 14px; border: 2px solid #bbb; border-radius: 2px;
+      font-size: 11px; color: #777; background: #f5f5f5; cursor: default;
+    }
+    .pref-chip-active {
+      border-color: #777; color: #555; background: #ddd; font-weight: 600;
+    }
+
+    /* ── Slider wireframe ── */
+    .wf-slider {
+      position: relative; height: 20px; margin: 8px 0 4px;
+    }
+    .wf-slider-track {
+      position: absolute; top: 8px; left: 0; right: 0;
+      height: 4px; background: #ccc; border-radius: 2px;
+    }
+    .wf-slider-fill {
+      position: absolute; top: 8px; left: 0; width: 60%;
+      height: 4px; background: #999; border-radius: 2px;
+    }
+    .wf-slider-thumb {
+      position: absolute; top: 2px; left: 58%;
+      width: 16px; height: 16px; background: #fff; border: 3px solid #888;
+      border-radius: 50%;
+    }
+
+    /* ── Match percentage ring ── */
+    .match-ring {
+      width: 80px; height: 80px; border-radius: 50%;
+      border: 6px solid #ccc; position: relative;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto;
+    }
+    .match-ring-fill {
+      position: absolute; inset: -6px;
+      border-radius: 50%;
+      border: 6px solid #888;
+      border-right-color: transparent;
+      border-bottom-color: transparent;
+      transform: rotate(-10deg);
+    }
+    .match-ring-text {
+      font-size: 18px; font-weight: 700; color: #555;
+    }
+
+    /* ── Animated dots (static wireframe version) ── */
+    .loading-dots {
+      display: flex; gap: 6px; justify-content: center; align-items: center;
+    }
+    .loading-dot {
+      width: 10px; height: 10px; background: #bbb; border-radius: 50%;
+      border: 1px solid #aaa;
+    }
+    .loading-dot:nth-child(2) { background: #999; }
+
+    /* ── Comparison bar ── */
+    .comp-bar {
+      height: 8px; background: #ddd; border-radius: 2px; position: relative;
+      margin-top: 3px; border: 1px solid #ccc;
+    }
+    .comp-bar-fill {
+      position: absolute; top: 0; left: 0; bottom: 0;
+      background: #999; border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- AI PET MATCH — FULL PAGE WIREFRAME                           -->
+<!-- ============================================================ -->
+<div class="wireframe-page">
+  <div class="page-label">
+    <span>AI Pet Match Page</span>
+    <span class="route">/match (proposed)</span>
+    <span class="status-tag">Not Implemented</span>
+  </div>
+  <div class="wf">
+    <div class="wf-header">
+      <span class="logo">[LOGO] CPAAA</span>
+      <nav>
+        <a>Home</a><a>Adoptar</a><a>Match</a><a>About</a><a>Blog</a>
+        <a class="nav-donate">Donar</a>
+      </nav>
+    </div>
+
+    <div class="wf-annotation">New feature: AI-powered pet matching. User inputs lifestyle preferences and desired characteristics; system returns best-matched animals from the catalog ranked by compatibility score.</div>
+
+    <!-- ─── HERO ─── -->
+    <div class="wf-hero" style="padding:32px 24px; text-align:center;">
+      <div style="position:relative; z-index:1; background:rgba(255,255,255,0.85); border:2px solid #aaa; display:inline-block; padding:20px 32px; border-radius:2px; max-width:600px;">
+        <div class="wf-icon wf-icon-lg" style="margin:0 auto 10px;">AI</div>
+        <h1 style="font-size:20px; margin-bottom:6px; color:#444;">Encuentra tu Compa&ntilde;ero Ideal</h1>
+        <p style="font-size:12px; color:#888;">Nuestro sistema inteligente analiza tus preferencias y estilo de vida para encontrar el animal perfecto para ti</p>
+      </div>
+    </div>
+
+    <!-- ─── HOW IT WORKS ─── -->
+    <div class="wf-section wf-section-alt">
+      <h2 style="text-align:center; margin-bottom:14px;">&iquest;C&oacute;mo Funciona?</h2>
+      <div class="wf-grid-3" style="max-width:600px; margin:0 auto;">
+        <div style="text-align:center;">
+          <div class="step-number">1</div>
+          <h4 style="font-size:12px; color:#555;">Describe</h4>
+          <p style="font-size:10px; color:#999;">Tu estilo de vida y preferencias</p>
+        </div>
+        <div style="text-align:center;">
+          <div class="step-number">2</div>
+          <h4 style="font-size:12px; color:#555;">Analiza</h4>
+          <p style="font-size:10px; color:#999;">IA compara con animales disponibles</p>
+        </div>
+        <div style="text-align:center;">
+          <div class="step-number">3</div>
+          <h4 style="font-size:12px; color:#555;">Conecta</h4>
+          <p style="font-size:10px; color:#999;">Conoce a tu match perfecto</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="wf-divider">
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- STATE 1: INPUT FORM                                        -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div style="padding:6px 24px 0;"><h4 style="font-size:11px; color:#999; border-bottom:1px dashed #ccc; padding-bottom:3px; font-family:sans-serif; font-style:italic;">State 1 — Preference Input Form</h4></div>
+
+    <div class="wf-section">
+      <h2>Cu&eacute;ntanos sobre ti</h2>
+      <p class="sub">Completa las preferencias para encontrar tu match ideal</p>
+
+      <!-- Animal Preferences -->
+      <fieldset style="border:2px solid #bbb; border-radius:2px; padding:16px; margin-bottom:14px;">
+        <legend style="font-size:13px; font-weight:600; padding:0 6px; color:#555;">Preferencias del Animal</legend>
+
+        <div class="wf-form-group">
+          <label>Tipo de animal</label>
+          <div class="pref-chips">
+            <span class="pref-chip pref-chip-active">Perro</span>
+            <span class="pref-chip">Gato</span>
+            <span class="pref-chip">Cualquiera</span>
+          </div>
+        </div>
+
+        <div class="wf-form-group">
+          <label>Tama&ntilde;o preferido</label>
+          <div class="pref-chips">
+            <span class="pref-chip">Peque&ntilde;o</span>
+            <span class="pref-chip pref-chip-active">Mediano</span>
+            <span class="pref-chip">Grande</span>
+            <span class="pref-chip">Cualquiera</span>
+          </div>
+        </div>
+
+        <div class="wf-form-group">
+          <label>G&eacute;nero preferido</label>
+          <div class="pref-chips">
+            <span class="pref-chip">Macho</span>
+            <span class="pref-chip">Hembra</span>
+            <span class="pref-chip pref-chip-active">Sin preferencia</span>
+          </div>
+        </div>
+
+        <div class="wf-form-group">
+          <label>Nivel de energ&iacute;a deseado</label>
+          <div class="wf-slider">
+            <div class="wf-slider-track"></div>
+            <div class="wf-slider-fill"></div>
+            <div class="wf-slider-thumb"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:9px; color:#aaa;">
+            <span>Tranquilo</span><span>Moderado</span><span>Muy activo</span>
+          </div>
+        </div>
+
+        <div class="wf-form-group">
+          <label>Caracter&iacute;sticas deseadas (selecciona varias)</label>
+          <div class="pref-chips">
+            <span class="pref-chip pref-chip-active">Amigable</span>
+            <span class="pref-chip pref-chip-active">Bueno con ni&ntilde;os</span>
+            <span class="pref-chip">Independiente</span>
+            <span class="pref-chip">Protector</span>
+            <span class="pref-chip pref-chip-active">Juguet&oacute;n</span>
+            <span class="pref-chip">Calmado</span>
+            <span class="pref-chip">Entrenado</span>
+            <span class="pref-chip">Sociable</span>
+            <span class="pref-chip">Cachorro</span>
+            <span class="pref-chip">Adulto</span>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Lifestyle -->
+      <fieldset style="border:2px solid #bbb; border-radius:2px; padding:16px; margin-bottom:14px;">
+        <legend style="font-size:13px; font-weight:600; padding:0 6px; color:#555;">Tu Estilo de Vida</legend>
+
+        <div class="wf-form-row">
+          <div class="wf-form-group">
+            <label>Tipo de vivienda</label>
+            <div class="wf-select" style="width:100%;">[ Apartamento / Casa / Finca  v ]</div>
+          </div>
+          <div class="wf-form-group">
+            <label>&iquest;Tiene patio?</label>
+            <div class="pref-chips">
+              <span class="pref-chip pref-chip-active">S&iacute;</span>
+              <span class="pref-chip">No</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="wf-form-row">
+          <div class="wf-form-group">
+            <label>&iquest;Otras mascotas en casa?</label>
+            <div class="pref-chips">
+              <span class="pref-chip">S&iacute;</span>
+              <span class="pref-chip pref-chip-active">No</span>
+            </div>
+          </div>
+          <div class="wf-form-group">
+            <label>&iquest;Ni&ntilde;os en casa?</label>
+            <div class="pref-chips">
+              <span class="pref-chip pref-chip-active">S&iacute;</span>
+              <span class="pref-chip">No</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="wf-form-group">
+          <label>Horas disponibles al d&iacute;a para la mascota</label>
+          <div class="wf-slider">
+            <div class="wf-slider-track"></div>
+            <div class="wf-slider-fill" style="width:45%;"></div>
+            <div class="wf-slider-thumb" style="left:43%;"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:9px; color:#aaa;">
+            <span>1-2 hrs</span><span>4-6 hrs</span><span>8+ hrs</span>
+          </div>
+        </div>
+
+        <div class="wf-form-group">
+          <label>Experiencia previa con mascotas</label>
+          <div class="pref-chips">
+            <span class="pref-chip">Primera vez</span>
+            <span class="pref-chip pref-chip-active">Algo de experiencia</span>
+            <span class="pref-chip">Mucha experiencia</span>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Optional text -->
+      <fieldset style="border:2px solid #bbb; border-radius:2px; padding:16px; margin-bottom:14px;">
+        <legend style="font-size:13px; font-weight:600; padding:0 6px; color:#555;">Algo m&aacute;s (Opcional)</legend>
+        <div class="wf-form-group">
+          <label>Describe en tus palabras qu&eacute; buscas</label>
+          <div class="wf-input" style="height:60px; align-items:flex-start; padding-top:8px;">
+            [Free-text input for additional preferences...]
+          </div>
+          <p style="font-size:9px; color:#aaa; margin-top:3px; font-family:sans-serif;">Ej: "Busco un perro tranquilo que pueda acompa&ntilde;arme en paseos cortos"</p>
+        </div>
+      </fieldset>
+
+      <!-- Submit -->
+      <div style="text-align:center;">
+        <span class="wf-btn wf-btn-primary" style="font-size:14px; padding:12px 40px;">
+          Encontrar mi Match &rarr;
+        </span>
+      </div>
+    </div>
+
+
+    <hr class="wf-divider">
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- STATE 2: LOADING / ANALYZING                               -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div style="padding:6px 24px 0;"><h4 style="font-size:11px; color:#999; border-bottom:1px dashed #ccc; padding-bottom:3px; font-family:sans-serif; font-style:italic;">State 2 — AI Analyzing (loading)</h4></div>
+
+    <div class="wf-section" style="text-align:center; padding:40px 24px;">
+      <div class="wf-icon wf-icon-lg" style="margin:0 auto 14px; border-style:dashed;">AI</div>
+      <h2 style="margin-bottom:8px;">Analizando compatibilidad...</h2>
+      <p style="font-size:12px; color:#999; margin-bottom:16px;">Comparando tus preferencias con nuestros animales disponibles</p>
+      <div class="loading-dots">
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+      </div>
+      <p style="font-size:10px; color:#bbb; margin-top:12px; font-family:sans-serif;">Evaluando personalidad, tama&ntilde;o, energ&iacute;a, compatibilidad...</p>
+    </div>
+
+
+    <hr class="wf-divider">
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- STATE 3: RESULTS                                           -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div style="padding:6px 24px 0;"><h4 style="font-size:11px; color:#999; border-bottom:1px dashed #ccc; padding-bottom:3px; font-family:sans-serif; font-style:italic;">State 3 — Match Results</h4></div>
+
+    <div class="wf-section">
+      <h2 style="text-align:center;">Tus Mejores Matches</h2>
+      <p class="sub" style="text-align:center;">Basado en tus preferencias y estilo de vida</p>
+
+      <!-- ── TOP MATCH (featured) ── -->
+      <div style="border:3px solid #888; border-radius:2px; padding:20px; margin-bottom:20px; background:#f9f9f9;">
+        <div style="text-align:center; margin-bottom:4px;">
+          <span class="wf-badge" style="background:#888; color:#fff; font-size:10px; padding:3px 12px; border:none;">MEJOR MATCH</span>
+        </div>
+
+        <div class="wf-grid-2" style="margin-top:14px;">
+          <!-- Animal Photo -->
+          <div>
+            <div class="wf-placeholder img-x" style="height:220px;">
+              <span style="position:relative; z-index:1; font-size:11px;">[Animal Photo]</span>
+            </div>
+          </div>
+
+          <!-- Match Details -->
+          <div>
+            <div style="display:flex; align-items:center; gap:14px; margin-bottom:12px;">
+              <div class="match-ring">
+                <div class="match-ring-fill"></div>
+                <span class="match-ring-text">94%</span>
+              </div>
+              <div>
+                <h3 style="font-size:20px; color:#444; margin-bottom:2px;">Luna</h3>
+                <span class="wf-badge">Disponible</span>
+              </div>
+            </div>
+
+            <div style="font-size:11px; color:#777; line-height:1.8; margin-bottom:10px;">
+              [paw] Perro &middot; [ruler] Mediano &middot; [user] Hembra
+            </div>
+
+            <p style="font-size:11px; color:#888; margin-bottom:12px;">
+              [AI-generated compatibility summary explaining why this animal is a great match for the user's preferences...]
+            </p>
+
+            <!-- Compatibility Breakdown -->
+            <div style="font-size:10px; color:#666;">
+              <div style="margin-bottom:6px;">
+                <div style="display:flex; justify-content:space-between;"><span>Tama&ntilde;o</span><span>100%</span></div>
+                <div class="comp-bar"><div class="comp-bar-fill" style="width:100%;"></div></div>
+              </div>
+              <div style="margin-bottom:6px;">
+                <div style="display:flex; justify-content:space-between;"><span>Personalidad</span><span>95%</span></div>
+                <div class="comp-bar"><div class="comp-bar-fill" style="width:95%;"></div></div>
+              </div>
+              <div style="margin-bottom:6px;">
+                <div style="display:flex; justify-content:space-between;"><span>Nivel de energ&iacute;a</span><span>90%</span></div>
+                <div class="comp-bar"><div class="comp-bar-fill" style="width:90%;"></div></div>
+              </div>
+              <div style="margin-bottom:6px;">
+                <div style="display:flex; justify-content:space-between;"><span>Estilo de vida</span><span>88%</span></div>
+                <div class="comp-bar"><div class="comp-bar-fill" style="width:88%;"></div></div>
+              </div>
+            </div>
+
+            <div style="margin-top:14px; display:flex; gap:8px;">
+              <span class="wf-btn wf-btn-primary" style="flex:1; text-align:center;">Conocer a Luna &rarr;</span>
+              <span class="wf-btn wf-btn-outline" style="flex:1; text-align:center;">Iniciar Adopci&oacute;n</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── OTHER MATCHES (grid) ── -->
+      <h3 style="margin-bottom:10px;">Otros matches compatibles</h3>
+      <div class="wf-grid-3">
+        <!-- Match 2 -->
+        <div class="wf-card">
+          <div class="wf-card-img img-x" style="position:relative;">
+            <span style="position:absolute; top:6px; right:6px; z-index:1; font-family:sans-serif; font-size:11px; font-weight:700; background:rgba(255,255,255,0.85); border:1px solid #aaa; padding:2px 8px; border-radius:2px; color:#555;">87%</span>
+          </div>
+          <div class="wf-card-body">
+            <h4>[Animal Name]</h4>
+            <p>[species] &middot; [size] &middot; [gender]</p>
+            <div style="margin-top:4px;">
+              <div class="comp-bar" style="margin-top:6px;"><div class="comp-bar-fill" style="width:87%;"></div></div>
+            </div>
+            <p style="font-size:9px; color:#999; margin-top:5px;">[Brief AI match reason...]</p>
+            <span class="wf-btn wf-btn-outline wf-btn-small" style="margin-top:6px; width:100%; display:block;">Ver perfil</span>
+          </div>
+        </div>
+
+        <!-- Match 3 -->
+        <div class="wf-card">
+          <div class="wf-card-img img-x" style="position:relative;">
+            <span style="position:absolute; top:6px; right:6px; z-index:1; font-family:sans-serif; font-size:11px; font-weight:700; background:rgba(255,255,255,0.85); border:1px solid #aaa; padding:2px 8px; border-radius:2px; color:#555;">82%</span>
+          </div>
+          <div class="wf-card-body">
+            <h4>[Animal Name]</h4>
+            <p>[species] &middot; [size] &middot; [gender]</p>
+            <div style="margin-top:4px;">
+              <div class="comp-bar" style="margin-top:6px;"><div class="comp-bar-fill" style="width:82%;"></div></div>
+            </div>
+            <p style="font-size:9px; color:#999; margin-top:5px;">[Brief AI match reason...]</p>
+            <span class="wf-btn wf-btn-outline wf-btn-small" style="margin-top:6px; width:100%; display:block;">Ver perfil</span>
+          </div>
+        </div>
+
+        <!-- Match 4 -->
+        <div class="wf-card">
+          <div class="wf-card-img img-x" style="position:relative;">
+            <span style="position:absolute; top:6px; right:6px; z-index:1; font-family:sans-serif; font-size:11px; font-weight:700; background:rgba(255,255,255,0.85); border:1px solid #aaa; padding:2px 8px; border-radius:2px; color:#555;">76%</span>
+          </div>
+          <div class="wf-card-body">
+            <h4>[Animal Name]</h4>
+            <p>[species] &middot; [size] &middot; [gender]</p>
+            <div style="margin-top:4px;">
+              <div class="comp-bar" style="margin-top:6px;"><div class="comp-bar-fill" style="width:76%;"></div></div>
+            </div>
+            <p style="font-size:9px; color:#999; margin-top:5px;">[Brief AI match reason...]</p>
+            <span class="wf-btn wf-btn-outline wf-btn-small" style="margin-top:6px; width:100%; display:block;">Ver perfil</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Try Again -->
+      <div style="text-align:center; margin-top:22px; padding-top:16px; border-top:1px dashed #ccc;">
+        <p style="font-size:11px; color:#999; margin-bottom:8px;">&iquest;No encontraste lo que buscas?</p>
+        <span class="wf-btn wf-btn-outline">Ajustar preferencias</span>
+      </div>
+    </div>
+
+
+    <hr class="wf-divider">
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- STATE 4: NO MATCHES                                        -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div style="padding:6px 24px 0;"><h4 style="font-size:11px; color:#999; border-bottom:1px dashed #ccc; padding-bottom:3px; font-family:sans-serif; font-style:italic;">State 4 — No Matches Found (empty state)</h4></div>
+
+    <div class="wf-section" style="text-align:center; padding:36px 24px;">
+      <div style="width:60px; height:60px; border:3px dashed #bbb; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; font-size:24px; color:#bbb;">?</div>
+      <h2 style="margin-bottom:6px;">No encontramos un match exacto</h2>
+      <p style="font-size:12px; color:#999; max-width:450px; margin:0 auto 16px;">
+        Actualmente no tenemos un animal que cumpla todas tus preferencias, pero puedes ajustar tus criterios o explorar todos los animales disponibles.
+      </p>
+      <div style="display:flex; gap:10px; justify-content:center;">
+        <span class="wf-btn wf-btn-primary">Ajustar preferencias</span>
+        <span class="wf-btn wf-btn-outline">Ver todos los animales</span>
+      </div>
+    </div>
+
+
+    <!-- ── Footer ── -->
+    <div class="wf-footer">
+      <div><h4>[LOGO] CPAAA</h4><p>Bienestar animal desde 1990</p></div>
+      <div><h4>Enlaces</h4><ul><li>Sobre Nosotros</li><li>Animales</li><li>Adopci&oacute;n</li></ul></div>
+      <div><h4>Apoyo</h4><ul><li>Donar</li></ul></div>
+      <div><h4>Contacto</h4><ul><li>info@cpaaa.org</li><li>(787)-505-8255</li><li>Aguadilla, PR</li></ul></div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer note -->
+<div style="max-width:880px; margin:30px auto; text-align:center; font-size:11px; color:#aaa; padding-bottom:40px; font-family:sans-serif;">
+  <p>Wireframe &mdash; AI Pet Match &mdash; <strong>Capstone Animal Rescue Platform</strong></p>
+  <p>4 states: Input Form &middot; Loading &middot; Results &middot; Empty State</p>
+</div>
+
+</body>
+</html>

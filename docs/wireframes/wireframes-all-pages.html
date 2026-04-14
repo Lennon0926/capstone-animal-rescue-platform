@@ -1,0 +1,1947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Huellitas Sin Hogar — Complete Wireframes</title>
+  <style>
+    /* ── Global Reset & Wireframe Font ── */
+    @import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap');
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Architects Daughter', 'Comic Sans MS', cursive, sans-serif;
+      background: #e8e8e8;
+      color: #444;
+      line-height: 1.5;
+    }
+
+    /* ── Table of Contents ── */
+    .toc {
+      max-width: 880px;
+      margin: 40px auto;
+      background: #fff;
+      border: 2px solid #aaa;
+      border-radius: 4px;
+      padding: 32px 36px;
+    }
+    .toc h1 {
+      font-size: 26px;
+      margin-bottom: 4px;
+      color: #333;
+    }
+    .toc .subtitle {
+      color: #777;
+      font-size: 13px;
+      margin-bottom: 24px;
+      border-bottom: 1px dashed #ccc;
+      padding-bottom: 14px;
+    }
+    .toc-section { margin-bottom: 20px; }
+    .toc-section h3 {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #999;
+      margin-bottom: 6px;
+    }
+    .toc-section ul { list-style: none; }
+    .toc-section li { margin-bottom: 3px; }
+    .toc-section a {
+      color: #555;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .toc-section a:hover { text-decoration: underline; }
+    .toc-section .badge {
+      display: inline-block;
+      font-size: 9px;
+      padding: 2px 7px;
+      border-radius: 3px;
+      margin-left: 8px;
+      font-weight: 600;
+      vertical-align: middle;
+      font-family: sans-serif;
+    }
+    .badge-implemented { background: #ccc; color: #444; }
+    .badge-not-implemented { background: #eee; color: #888; border: 1px dashed #aaa; }
+    .badge-stub { background: #ddd; color: #666; border: 1px solid #bbb; }
+
+    /* ── Wireframe Page Wrapper ── */
+    .wireframe-page {
+      max-width: 880px;
+      margin: 44px auto;
+      background: #fff;
+      border: 2px solid #999;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .wireframe-page .page-label {
+      background: #666;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: sans-serif;
+    }
+    .wireframe-page .page-label .route {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      color: #ccc;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .wireframe-page .page-label .status-tag {
+      font-size: 9px;
+      padding: 2px 8px;
+      border-radius: 3px;
+      text-transform: none;
+      letter-spacing: 0;
+      font-family: sans-serif;
+    }
+    .status-impl { background: #999; color: #fff; }
+    .status-stub { background: #bbb; color: #444; }
+    .status-planned { background: #888; color: #fff; border: 1px dashed #ccc; }
+
+    /* ── Wireframe Canvas ── */
+    .wf {
+      background: #f5f5f5;
+      padding: 0;
+      min-height: 200px;
+    }
+
+    /* ── Shared Wireframe Elements ── */
+    .wf-header {
+      background: #555;
+      color: #ddd;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      border-bottom: 2px solid #444;
+    }
+    .wf-header .logo { font-weight: 700; font-size: 13px; color: #eee; }
+    .wf-header nav { display: flex; gap: 16px; align-items: center; }
+    .wf-header nav a {
+      color: #bbb;
+      text-decoration: none;
+      font-size: 11px;
+    }
+    .wf-header .nav-donate {
+      background: #888;
+      color: #fff !important;
+      padding: 4px 12px;
+      border: 1px solid #777;
+      border-radius: 2px;
+      font-weight: 600;
+    }
+
+    .wf-footer {
+      background: #555;
+      color: #aaa;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 16px;
+      font-size: 10px;
+      border-top: 2px solid #444;
+    }
+    .wf-footer h4 { color: #ddd; margin-bottom: 6px; font-size: 11px; }
+    .wf-footer ul { list-style: none; }
+    .wf-footer li { margin-bottom: 2px; }
+
+    /* ── Wireframe primitives ── */
+    .wf-placeholder {
+      background: #ddd;
+      border: 2px dashed #aaa;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #888;
+      font-size: 12px;
+    }
+    .wf-btn {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 2px;
+      font-size: 11px;
+      font-weight: 600;
+      text-align: center;
+      border: 2px solid #888;
+      cursor: default;
+      background: #eee;
+      color: #555;
+    }
+    .wf-btn-primary { background: #888; color: #fff; border-color: #777; }
+    .wf-btn-secondary { background: #aaa; color: #fff; border-color: #999; }
+    .wf-btn-outline { background: transparent; border: 2px solid #999; color: #666; }
+    .wf-btn-danger { background: #999; color: #fff; border-color: #888; }
+    .wf-btn-success { background: #888; color: #fff; border-color: #777; }
+    .wf-btn-small { padding: 4px 10px; font-size: 10px; }
+    .wf-input {
+      border: 2px solid #aaa;
+      border-radius: 2px;
+      padding: 7px 10px;
+      font-size: 11px;
+      background: #fff;
+      width: 100%;
+      color: #999;
+      font-family: inherit;
+    }
+    .wf-select {
+      border: 2px solid #aaa;
+      border-radius: 2px;
+      padding: 7px 10px;
+      font-size: 11px;
+      background: #fff;
+      color: #999;
+      font-family: inherit;
+    }
+    .wf-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 2px;
+      font-size: 9px;
+      font-weight: 600;
+      background: #ccc;
+      color: #555;
+      border: 1px solid #bbb;
+      font-family: sans-serif;
+    }
+    .wf-section {
+      padding: 28px 24px;
+    }
+    .wf-section-alt {
+      background: #ececec;
+    }
+    .wf-section h2 {
+      font-size: 18px;
+      color: #444;
+      margin-bottom: 4px;
+    }
+    .wf-section h3 {
+      font-size: 15px;
+      color: #555;
+      margin-bottom: 4px;
+    }
+    .wf-section p.sub {
+      color: #999;
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+    .wf-divider {
+      border: none;
+      border-top: 1px dashed #bbb;
+      margin: 0;
+    }
+
+    /* ── Card Grids ── */
+    .wf-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .wf-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .wf-grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .wf-card {
+      background: #fff;
+      border: 2px solid #bbb;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .wf-card-img {
+      background: linear-gradient(135deg, #ccc 25%, #d8d8d8 50%, #c8c8c8 75%);
+      height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      font-size: 12px;
+      position: relative;
+    }
+    .wf-card-img::after {
+      content: '';
+      position: absolute;
+      top: 8px; left: 8px; right: 8px; bottom: 8px;
+      border: 1px dashed #bbb;
+      pointer-events: none;
+    }
+    .wf-card-body {
+      padding: 10px;
+      border-top: 1px solid #ccc;
+    }
+    .wf-card-body h4 { font-size: 12px; margin-bottom: 3px; color: #555; }
+    .wf-card-body p { font-size: 10px; color: #999; }
+
+    /* ── X mark for image placeholders ── */
+    .img-x {
+      position: relative;
+      overflow: hidden;
+    }
+    .img-x::before, .img-x::after {
+      content: '';
+      position: absolute;
+      background: #bbb;
+      width: 141%;
+      height: 1px;
+      top: 50%;
+      left: -20%;
+    }
+    .img-x::before { transform: rotate(30deg); }
+    .img-x::after { transform: rotate(-30deg); }
+
+    /* ── Table ── */
+    .wf-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+    .wf-table th {
+      background: #ddd;
+      padding: 8px 10px;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 2px solid #bbb;
+      font-size: 10px;
+      color: #555;
+    }
+    .wf-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #ddd;
+      vertical-align: middle;
+    }
+    .wf-table .thumb {
+      width: 36px;
+      height: 36px;
+      background: #ddd;
+      border: 1px solid #bbb;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    /* ── Modal Overlay ── */
+    .wf-modal-demo {
+      background: repeating-linear-gradient(
+        45deg, #d5d5d5, #d5d5d5 10px, #d0d0d0 10px, #d0d0d0 20px
+      );
+      padding: 36px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .wf-modal {
+      background: #fff;
+      border: 2px solid #999;
+      border-radius: 3px;
+      padding: 24px;
+      width: 100%;
+      max-width: 460px;
+    }
+    .wf-modal h3 { font-size: 16px; margin-bottom: 14px; color: #444; }
+
+    /* ── Tag pills ── */
+    .wf-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+    .wf-tag {
+      padding: 3px 10px;
+      border-radius: 2px;
+      font-size: 10px;
+      background: #e0e0e0;
+      color: #666;
+      border: 1px solid #ccc;
+    }
+    .wf-tag-active { background: #999; color: #fff; border-color: #888; }
+
+    /* ── Form group ── */
+    .wf-form-group { margin-bottom: 12px; }
+    .wf-form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      margin-bottom: 3px;
+      color: #555;
+    }
+    .wf-form-row { display: flex; gap: 10px; }
+    .wf-form-row > * { flex: 1; }
+
+    /* ── Tabs ── */
+    .wf-tabs {
+      display: flex;
+      border-bottom: 2px solid #bbb;
+      gap: 0;
+    }
+    .wf-tab {
+      padding: 8px 18px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #999;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      cursor: default;
+    }
+    .wf-tab-active { color: #555; border-bottom-color: #777; }
+
+    /* ── Annotation ── */
+    .wf-annotation {
+      background: #eee;
+      border-left: 4px solid #aaa;
+      padding: 8px 14px;
+      margin: 14px 24px;
+      font-size: 11px;
+      color: #777;
+      border-radius: 0 2px 2px 0;
+      font-family: sans-serif;
+      font-style: italic;
+    }
+
+    /* ── Back to top ── */
+    .back-top {
+      text-align: center;
+      padding: 10px;
+      font-size: 11px;
+      border-top: 1px dashed #ccc;
+    }
+    .back-top a { color: #777; text-decoration: none; }
+    .back-top a:hover { text-decoration: underline; }
+
+    /* ── Payment method selector ── */
+    .payment-methods {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .payment-method {
+      flex: 1;
+      border: 2px solid #bbb;
+      border-radius: 2px;
+      padding: 12px 8px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #888;
+      cursor: default;
+      background: #f5f5f5;
+    }
+    .payment-method-active {
+      border-color: #777;
+      color: #555;
+      background: #e8e8e8;
+    }
+    .payment-method .pm-label {
+      display: block;
+      margin-top: 4px;
+    }
+
+    /* ── Timeline ── */
+    .wf-timeline {
+      position: relative;
+      padding-left: 28px;
+    }
+    .wf-timeline::before {
+      content: '';
+      position: absolute;
+      left: 8px; top: 0; bottom: 0;
+      width: 2px;
+      background: #bbb;
+    }
+    .wf-timeline-item {
+      position: relative;
+      margin-bottom: 18px;
+    }
+    .wf-timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -24px; top: 4px;
+      width: 10px; height: 10px;
+      background: #999;
+      border-radius: 50%;
+      border: 2px solid #888;
+    }
+    .wf-timeline-item h4 { font-size: 12px; color: #555; }
+    .wf-timeline-item p { font-size: 10px; color: #999; }
+
+    /* ── Listings ── */
+    .wf-listing {
+      background: #fff;
+      border: 2px solid #bbb;
+      border-radius: 2px;
+      padding: 14px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .wf-listing-img {
+      width: 70px; height: 70px;
+      background: #ddd;
+      border: 1px dashed #bbb;
+      border-radius: 2px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+      font-size: 11px;
+    }
+    .wf-listing-body { flex: 1; }
+    .wf-listing-body h4 { font-size: 13px; margin-bottom: 2px; color: #555; }
+    .wf-listing-body .meta { font-size: 10px; color: #999; margin-bottom: 4px; }
+    .wf-listing-body p { font-size: 11px; color: #777; }
+
+    /* ── QR Code placeholder ── */
+    .qr-placeholder {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto;
+      background: #fff;
+      border: 2px solid #999;
+      border-radius: 2px;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      grid-template-rows: repeat(7, 1fr);
+      gap: 1px;
+      padding: 6px;
+      position: relative;
+    }
+    .qr-placeholder .qr-cell {
+      background: #666;
+      border-radius: 0;
+    }
+    .qr-placeholder .qr-cell-w {
+      background: #fff;
+    }
+
+    /* ── Wireframe cross-hatch for hero areas ── */
+    .wf-hero {
+      background:
+        repeating-linear-gradient(0deg, transparent, transparent 14px, #ccc 14px, #ccc 15px),
+        repeating-linear-gradient(90deg, transparent, transparent 14px, #ccc 14px, #ccc 15px);
+      background-color: #ddd;
+      position: relative;
+    }
+    .wf-hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(200,200,200,0.5);
+    }
+
+    /* ── Icon circles ── */
+    .wf-icon {
+      width: 32px; height: 32px;
+      background: #ccc;
+      border: 2px solid #aaa;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: #777;
+    }
+    .wf-icon-lg {
+      width: 48px; height: 48px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- TABLE OF CONTENTS                                            -->
+<!-- ============================================================ -->
+<div class="toc" id="top">
+  <h1>Wireframes — Huellitas Sin Hogar</h1>
+  <p class="subtitle">Capstone Animal Rescue Platform &middot; CPAAA &middot; Complete UI Wireframes for Report<br>
+  Branch: <code style="font-family:monospace; background:#eee; padding:1px 4px;">feature/refactor-home-page</code> &nbsp;|&nbsp; April 2026</p>
+
+  <div class="toc-section">
+    <h3>Public Pages</h3>
+    <ul>
+      <li><a href="#home">1. Home / Landing Page</a> <span class="badge badge-implemented">IMPLEMENTED</span></li>
+      <li><a href="#adopt">2. Adopt &mdash; Animal Catalog</a> <span class="badge badge-implemented">IMPLEMENTED</span></li>
+      <li><a href="#animal-detail">3. Animal Detail Page</a> <span class="badge badge-implemented">IMPLEMENTED</span></li>
+      <li><a href="#about">4. About Page</a> <span class="badge badge-implemented">IMPLEMENTED</span></li>
+      <li><a href="#blog">5. Blog Page</a> <span class="badge badge-stub">STUB</span></li>
+      <li><a href="#donation">6. Donation Page</a> <span class="badge badge-stub">STUB</span></li>
+      <li><a href="#donation-modal">7. Donation Modal (ATH M&oacute;vil / PayPal / Card)</a> <span class="badge badge-not-implemented">NOT IMPLEMENTED</span></li>
+      <li><a href="#services">8. Services Information Page (Clinic / Events)</a> <span class="badge badge-not-implemented">NOT IMPLEMENTED</span></li>
+    </ul>
+  </div>
+
+  <div class="toc-section">
+    <h3>Admin Pages</h3>
+    <ul>
+      <li><a href="#admin-animals">9. Admin &mdash; Animals List</a> <span class="badge badge-implemented">IMPLEMENTED</span></li>
+      <li><a href="#admin-create">10. Admin &mdash; Create Animal</a> <span class="badge badge-implemented">IMPLEMENTED</span></li>
+      <li><a href="#admin-edit">11. Admin &mdash; Edit Animal</a> <span class="badge badge-implemented">IMPLEMENTED</span></li>
+      <li><a href="#admin-upload">12. Admin &mdash; Image Upload</a> <span class="badge badge-implemented">IMPLEMENTED</span></li>
+      <li><a href="#admin-medical">13. Admin &mdash; Medical Records</a> <span class="badge badge-not-implemented">NOT IMPLEMENTED</span></li>
+      <li><a href="#admin-blog">14. Admin &mdash; Blog/Post Management</a> <span class="badge badge-not-implemented">NOT IMPLEMENTED</span></li>
+    </ul>
+  </div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 1. HOME / LANDING PAGE                                       -->
+<!-- ============================================================ -->
+<div class="wireframe-page" id="home">
+  <div class="page-label">
+    <span>1. Home / Landing Page</span>
+    <span class="route">/home</span>
+    <span class="status-tag status-impl">Implemented</span>
+  </div>
+  <div class="wf">
+    <!-- Header (hidden until scroll on home) -->
+    <div class="wf-header" style="opacity: 0.45;">
+      <span class="logo">[LOGO] CPAAA</span>
+      <nav>
+        <a>Home</a><a>Adoptar</a><a>About</a><a>Blog</a>
+        <a class="nav-donate">Donar</a>
+      </nav>
+    </div>
+    <div style="font-size:9px; text-align:center; background:#666; color:#aaa; padding: 2px; font-family:sans-serif; font-style:italic;">Header reveals on first scroll</div>
+
+    <!-- Hero Section -->
+    <div class="wf-hero" style="height:240px; display:flex; align-items:center; justify-content:center;">
+      <div class="wf-hero-overlay"></div>
+      <div style="position:relative; text-align:center; z-index:1; padding: 20px;">
+        <div style="font-size:10px; color:#888; margin-bottom:8px; font-family:sans-serif;">[BACKGROUND VIDEO: close-up-dog.mp4 &mdash; autoplay, muted, loop]</div>
+        <div style="background:rgba(255,255,255,0.85); border:2px solid #aaa; border-radius:2px; padding:16px 24px;">
+          <h1 style="font-size:18px; line-height:1.3; margin-bottom:6px; color:#444;">Una donaci&oacute;n <u>rescata</u>, <u>ayuda</u>, y <u>salva</u> las vidas m&aacute;s vulnerables</h1>
+          <p style="font-size:11px; color:#888;">S&eacute; parte de una de las redes de ayuda para animales sin hogar</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mission Video Section -->
+    <div class="wf-section" style="text-align:center;">
+      <h2>Nuestra Misi&oacute;n</h2>
+      <p class="sub">Video institucional de CPAAA</p>
+      <div class="wf-placeholder" style="height:160px; max-width:560px; margin:0 auto; position:relative;">
+        <div style="width:0; height:0; border-left:20px solid #999; border-top:12px solid transparent; border-bottom:12px solid transparent;"></div>
+      </div>
+      <div style="font-size:9px; color:#aaa; margin-top:4px; font-family:sans-serif;">[Embedded Video Player]</div>
+    </div>
+
+    <hr class="wf-divider">
+
+    <!-- Timeline Section -->
+    <div class="wf-section wf-section-alt">
+      <h2 style="text-align:center;">Proceso de Adopci&oacute;n</h2>
+      <p class="sub" style="text-align:center;">Pasos para darle un hogar a un animal</p>
+      <div class="wf-timeline" style="max-width:480px; margin:14px auto 0;">
+        <div class="wf-timeline-item"><h4>1. Explora</h4><p>Visita nuestra secci&oacute;n de adopci&oacute;n</p></div>
+        <div class="wf-timeline-item"><h4>2. Conoce</h4><p>Elige al animal ideal para tu familia</p></div>
+        <div class="wf-timeline-item"><h4>3. Aplica</h4><p>Llena el formulario de adopci&oacute;n (Google Forms)</p></div>
+        <div class="wf-timeline-item"><h4>4. Adopta</h4><p>Completa el proceso y dale un hogar</p></div>
+      </div>
+    </div>
+
+    <hr class="wf-divider">
+
+    <!-- Stories Section -->
+    <div class="wf-section">
+      <h2 style="text-align:center;">Historias de &Eacute;xito</h2>
+      <p class="sub" style="text-align:center;">Animales que encontraron un hogar</p>
+      <div class="wf-grid-3">
+        <div class="wf-card"><div class="wf-card-img img-x">[image]</div><div class="wf-card-body"><h4>Story Title</h4><p>Parallax scroll overlay</p></div></div>
+        <div class="wf-card"><div class="wf-card-img img-x">[image]</div><div class="wf-card-body"><h4>Story Title</h4><p>Parallax scroll overlay</p></div></div>
+        <div class="wf-card"><div class="wf-card-img img-x">[image]</div><div class="wf-card-body"><h4>Story Title</h4><p>Parallax scroll overlay</p></div></div>
+      </div>
+    </div>
+
+    <hr class="wf-divider">
+
+    <!-- Get Involved Section -->
+    <div class="wf-section wf-section-alt" style="text-align:center;">
+      <h2>&iquest;C&oacute;mo Puedo Ayudar?</h2>
+      <p class="sub">M&uacute;ltiples formas de contribuir</p>
+      <div class="wf-grid-3" style="max-width:540px; margin:0 auto;">
+        <div style="text-align:center;">
+          <div class="wf-icon wf-icon-lg" style="margin:0 auto 6px;">H</div>
+          <h4 style="font-size:12px; color:#555;">Adoptar</h4>
+        </div>
+        <div style="text-align:center;">
+          <div class="wf-icon wf-icon-lg" style="margin:0 auto 6px;">$</div>
+          <h4 style="font-size:12px; color:#555;">Donar</h4>
+        </div>
+        <div style="text-align:center;">
+          <div class="wf-icon wf-icon-lg" style="margin:0 auto 6px;">V</div>
+          <h4 style="font-size:12px; color:#555;">Voluntariado</h4>
+        </div>
+      </div>
+    </div>
+
+    <hr class="wf-divider">
+
+    <!-- Animals Showcase (3 featured) -->
+    <div class="wf-section">
+      <h2 style="text-align:center;">Animales Destacados</h2>
+      <p class="sub" style="text-align:center;">3 animales disponibles para adopci&oacute;n</p>
+      <div class="wf-grid-3">
+        <div class="wf-card">
+          <div class="wf-card-img img-x">[photo]</div>
+          <div class="wf-card-body">
+            <h4>[Animal Name]</h4>
+            <p>[species] &middot; [size] &middot; [gender]</p>
+            <span class="wf-btn wf-btn-outline wf-btn-small" style="margin-top:5px;">Conocer M&aacute;s</span>
+          </div>
+        </div>
+        <div class="wf-card">
+          <div class="wf-card-img img-x">[photo]</div>
+          <div class="wf-card-body">
+            <h4>[Animal Name]</h4>
+            <p>[species] &middot; [size] &middot; [gender]</p>
+            <span class="wf-btn wf-btn-outline wf-btn-small" style="margin-top:5px;">Conocer M&aacute;s</span>
+          </div>
+        </div>
+        <div class="wf-card">
+          <div class="wf-card-img img-x">[photo]</div>
+          <div class="wf-card-body">
+            <h4>[Animal Name]</h4>
+            <p>[species] &middot; [size] &middot; [gender]</p>
+            <span class="wf-btn wf-btn-outline wf-btn-small" style="margin-top:5px;">Conocer M&aacute;s</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="wf-divider">
+
+    <!-- Contact Section -->
+    <div class="wf-section wf-section-alt">
+      <h2 style="text-align:center;">Contacto</h2>
+      <div class="wf-grid-3" style="margin-top:12px;">
+        <div style="text-align:center; font-size:11px;">
+          <div class="wf-icon" style="margin:0 auto 4px;">T</div>
+          <strong>Tel&eacute;fono</strong><br>787-505-8255
+        </div>
+        <div style="text-align:center; font-size:11px;">
+          <div class="wf-icon" style="margin:0 auto 4px;">@</div>
+          <strong>Email</strong><br>info@cpaaa.org
+        </div>
+        <div style="text-align:center; font-size:11px;">
+          <div class="wf-icon" style="margin:0 auto 4px;">P</div>
+          <strong>Direcci&oacute;n</strong><br>Box 4152, Aguadilla, PR 00605
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="wf-footer">
+      <div><h4>[LOGO] CPAAA</h4><p>Bienestar animal desde 1990</p></div>
+      <div><h4>Enlaces</h4><ul><li>Sobre Nosotros</li><li>Animales</li><li>Adopci&oacute;n</li></ul></div>
+      <div><h4>Apoyo</h4><ul><li>Donar</li></ul></div>
+      <div><h4>Contacto</h4><ul><li>info@cpaaa.org</li><li>(787)-505-8255</li><li>Aguadilla, PR</li></ul></div>
+    </div>
+  </div>
+  <div class="back-top"><a href="#top">&uarr; Back to Table of Contents</a></div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 2. ADOPT &mdash; ANIMAL CATALOG                              -->
+<!-- ============================================================ -->
+<div class="wireframe-page" id="adopt">
+  <div class="page-label">
+    <span>2. Adopt &mdash; Animal Catalog</span>
+    <span class="route">/adopt</span>
+    <span class="status-tag status-impl">Implemented</span>
+  </div>
+  <div class="wf">
+    <div class="wf-header">
+      <span class="logo">[LOGO] CPAAA</span>
+      <nav><a>Home</a><a>Adoptar</a><a>About</a><a>Blog</a><a class="nav-donate">Donar</a></nav>
+    </div>
+
+    <div class="wf-section">
+      <!-- Search Bar -->
+      <div style="margin-bottom:12px;">
+        <div class="wf-input" style="display:flex; align-items:center; gap:8px; padding:9px 12px;">
+          <span style="color:#aaa;">[Q]</span> <span style="color:#bbb;">Buscar animales...</span>
+        </div>
+      </div>
+
+      <!-- Filter Tags (multi-select) -->
+      <div class="wf-tags">
+        <span class="wf-tag wf-tag-active">Perro</span>
+        <span class="wf-tag">Gato</span>
+        <span class="wf-tag">Disponible</span>
+        <span class="wf-tag">Peque&ntilde;o</span>
+        <span class="wf-tag">Mediano</span>
+        <span class="wf-tag">Grande</span>
+        <span class="wf-tag">Macho</span>
+        <span class="wf-tag">Hembra</span>
+        <span class="wf-tag">Amigable</span>
+        <span class="wf-tag">Cachorro</span>
+      </div>
+
+      <!-- Flip Card Grid -->
+      <div class="wf-grid-4">
+        <!-- Card Front -->
+        <div class="wf-card">
+          <div class="wf-card-img img-x" style="position:relative;">
+            <span style="position:absolute; bottom:6px; left:8px; font-size:12px; font-weight:700; color:#666; z-index:1;">Luna</span>
+            <span style="position:absolute; top:4px; right:4px; font-size:8px; background:#eee; border:1px solid #bbb; padding:1px 4px; z-index:1; font-family:sans-serif;">flip</span>
+          </div>
+        </div>
+        <!-- Card Back (flipped state) -->
+        <div class="wf-card" style="border-style:dashed;">
+          <div class="wf-card-body" style="padding:12px;">
+            <h4 style="font-size:13px; margin-bottom:3px;">Max</h4>
+            <span class="wf-badge">Disponible</span>
+            <div style="font-size:10px; color:#888; margin-top:6px; line-height:1.8;">
+              [paw] Perro<br>[ruler] Mediano<br>[user] Macho
+            </div>
+            <p style="font-size:10px; color:#999; margin:6px 0;">Description text...</p>
+            <div class="wf-tags" style="margin-bottom:6px;">
+              <span class="wf-tag" style="font-size:8px;">Amigable</span>
+              <span class="wf-tag" style="font-size:8px;">Cachorro</span>
+            </div>
+            <span class="wf-btn wf-btn-secondary wf-btn-small" style="width:100%; display:block;">Conocer M&aacute;s</span>
+          </div>
+        </div>
+        <!-- More cards -->
+        <div class="wf-card"><div class="wf-card-img img-x"><span style="font-size:10px; z-index:1; position:relative;">[photo]</span></div></div>
+        <div class="wf-card"><div class="wf-card-img img-x"><span style="font-size:10px; z-index:1; position:relative;">[photo]</span></div></div>
+        <div class="wf-card"><div class="wf-card-img img-x"></div></div>
+        <div class="wf-card"><div class="wf-card-img img-x"></div></div>
+        <div class="wf-card"><div class="wf-card-img img-x"></div></div>
+        <div class="wf-card"><div class="wf-card-img img-x"></div></div>
+      </div>
+
+      <!-- Load More -->
+      <div style="text-align:center; margin-top:18px;">
+        <span class="wf-btn wf-btn-outline">Cargar M&aacute;s  v</span>
+      </div>
+    </div>
+
+    <div class="wf-footer">
+      <div><h4>[LOGO] CPAAA</h4></div><div></div><div></div><div></div>
+    </div>
+  </div>
+  <div class="back-top"><a href="#top">&uarr; Back to Table of Contents</a></div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 3. ANIMAL DETAIL PAGE                                        -->
+<!-- ============================================================ -->
+<div class="wireframe-page" id="animal-detail">
+  <div class="page-label">
+    <span>3. Animal Detail Page</span>
+    <span class="route">/adopt/[id]</span>
+    <span class="status-tag status-impl">Implemented</span>
+  </div>
+  <div class="wf">
+    <div class="wf-header">
+      <span class="logo">[LOGO] CPAAA</span>
+      <nav><a>Home</a><a>Adoptar</a><a>About</a><a>Blog</a><a class="nav-donate">Donar</a></nav>
+    </div>
+
+    <div class="wf-section">
+      <div style="margin-bottom:12px;">
+        <span style="color:#888; font-size:12px;">&larr; Volver a Animales</span>
+      </div>
+
+      <div class="wf-grid-2">
+        <!-- Image -->
+        <div class="wf-placeholder img-x" style="height:300px;">
+          <span style="position:relative; z-index:1; font-size:11px;">[Animal Photo 600x600]</span>
+        </div>
+
+        <!-- Details -->
+        <div style="padding:6px 0;">
+          <h1 style="font-size:22px; margin-bottom:4px; color:#444;">Luna</h1>
+          <span class="wf-badge" style="font-size:10px; padding:4px 12px;">Disponible</span>
+
+          <div style="margin-top:16px; font-size:12px; color:#666; line-height:2;">
+            <p><strong>Especie:</strong> ___________</p>
+            <p><strong>Tama&ntilde;o:</strong> ___________</p>
+            <p><strong>G&eacute;nero:</strong> ___________</p>
+          </div>
+
+          <p style="margin-top:12px; font-size:11px; color:#888; line-height:1.6;">
+            [Animal description paragraph goes here. Multiple sentences describing personality and traits.]
+          </p>
+
+          <div style="margin-top:12px;">
+            <strong style="font-size:11px; color:#666;">Etiquetas:</strong>
+            <div class="wf-tags" style="margin-top:3px;">
+              <span class="wf-tag">[tag]</span>
+              <span class="wf-tag">[tag]</span>
+              <span class="wf-tag">[tag]</span>
+            </div>
+          </div>
+
+          <div style="margin-top:18px;">
+            <span class="wf-btn wf-btn-primary" style="font-size:13px; padding:10px 24px;">
+              Iniciar Proceso de Adopci&oacute;n &rarr;
+            </span>
+            <p style="font-size:9px; color:#aaa; margin-top:5px; font-family:sans-serif; font-style:italic;">Opens pre-filled Google Form</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wf-footer">
+      <div><h4>[LOGO] CPAAA</h4></div><div></div><div></div><div></div>
+    </div>
+  </div>
+  <div class="back-top"><a href="#top">&uarr; Back to Table of Contents</a></div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 4. ABOUT PAGE                                                -->
+<!-- ============================================================ -->
+<div class="wireframe-page" id="about">
+  <div class="page-label">
+    <span>4. About Page</span>
+    <span class="route">/about</span>
+    <span class="status-tag status-impl">Implemented</span>
+  </div>
+  <div class="wf">
+    <div class="wf-header">
+      <span class="logo">[LOGO] CPAAA</span>
+      <nav><a>Home</a><a>Adoptar</a><a>About</a><a>Blog</a><a class="nav-donate">Donar</a></nav>
+    </div>
+
+    <!-- Hero -->
+    <div class="wf-hero" style="padding:36px 24px; text-align:center;">
+      <div style="position:relative; z-index:1; background:rgba(255,255,255,0.8); border:2px solid #aaa; display:inline-block; padding:18px 28px; border-radius:2px;">
+        <p style="font-size:10px; color:#999; text-transform:uppercase; letter-spacing:2px; margin-bottom:4px;">Desde 1990 Protegiendo Vidas</p>
+        <h1 style="font-size:18px; margin-bottom:6px; color:#444;">Ciudadanos Pro Albergue de Animales de Aguadilla</h1>
+        <p style="font-size:11px; color:#888; max-width:500px;">Grupo de voluntarios trabajando por el bienestar de animales maltratados o abandonados.</p>
+      </div>
+    </div>
+
+    <!-- Mission & Vision -->
+    <div class="wf-section wf-section-alt">
+      <h2 style="text-align:center;">Nuestra Raz&oacute;n de Ser</h2>
+      <p class="sub" style="text-align:center;">Guiados por nuestros valores</p>
+      <div class="wf-grid-2">
+        <div class="wf-card" style="padding:16px;">
+          <div class="wf-icon" style="margin-bottom:8px;">M</div>
+          <h3 style="font-size:14px;">Nuestra Misi&oacute;n</h3>
+          <p style="font-size:10px; color:#888; margin-top:5px;">[Mission statement text block...]</p>
+        </div>
+        <div class="wf-card" style="padding:16px;">
+          <div class="wf-icon" style="margin-bottom:8px;">V</div>
+          <h3 style="font-size:14px;">Nuestra Visi&oacute;n</h3>
+          <p style="font-size:10px; color:#888; margin-top:5px;">[Vision statement text block...]</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Our Story -->
+    <div class="wf-section">
+      <div class="wf-grid-2">
+        <div>
+          <h2>Nuestra Historia</h2>
+          <p style="font-size:11px; color:#888; margin-top:6px; line-height:1.7;">[History paragraph 1...]</p>
+          <p style="font-size:11px; color:#888; margin-top:6px; line-height:1.7;">[History paragraph 2...]</p>
+          <div style="margin-top:10px; display:flex; align-items:center; gap:8px; background:#e8e8e8; border:1px solid #ccc; padding:8px 12px; border-radius:2px; font-size:11px; color:#666;">
+            [calendar icon] M&aacute;s de 30 a&ntilde;os ayudando animales
+          </div>
+        </div>
+        <div class="wf-placeholder img-x" style="height:180px;">
+          <span style="position:relative; z-index:1; font-size:10px;">[Historia Image]</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Values -->
+    <div class="wf-section wf-section-alt">
+      <h2 style="text-align:center;">Nuestros Valores</h2>
+      <div class="wf-grid-3" style="margin-top:12px;">
+        <div class="wf-card" style="padding:14px; text-align:center;">
+          <div class="wf-icon" style="margin:0 auto 6px;">P</div>
+          <h4 style="font-size:12px;">Protecci&oacute;n</h4>
+          <p style="font-size:10px; color:#999; margin-top:3px;">Ley 154</p>
+        </div>
+        <div class="wf-card" style="padding:14px; text-align:center;">
+          <div class="wf-icon" style="margin:0 auto 6px;">C</div>
+          <h4 style="font-size:12px;">Compasi&oacute;n</h4>
+          <p style="font-size:10px; color:#999; margin-top:3px;">Amor y empat&iacute;a</p>
+        </div>
+        <div class="wf-card" style="padding:14px; text-align:center;">
+          <div class="wf-icon" style="margin:0 auto 6px;">K</div>
+          <h4 style="font-size:12px;">Compromiso</h4>
+          <p style="font-size:10px; color:#999; margin-top:3px;">Calidad de vida</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gallery -->
+    <div class="wf-section">
+      <h2 style="text-align:center;">Nuestra Comunidad en Acci&oacute;n</h2>
+      <p class="sub" style="text-align:center;">Ferias, programas y actividades</p>
+      <div style="display:grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 80px); gap:6px;">
+        <div class="wf-placeholder img-x" style="font-size:8px;"><span style="position:relative;z-index:1;">img-1</span></div>
+        <div class="wf-placeholder img-x" style="font-size:8px;"><span style="position:relative;z-index:1;">img-2</span></div>
+        <div class="wf-placeholder img-x" style="font-size:8px;"><span style="position:relative;z-index:1;">img-3</span></div>
+        <div class="wf-placeholder img-x" style="font-size:8px;"><span style="position:relative;z-index:1;">img-4</span></div>
+        <div class="wf-placeholder img-x" style="font-size:8px;"><span style="position:relative;z-index:1;">img-5</span></div>
+        <div class="wf-placeholder img-x" style="font-size:8px;"><span style="position:relative;z-index:1;">img-6</span></div>
+        <div class="wf-placeholder img-x" style="font-size:8px;"><span style="position:relative;z-index:1;">img-7</span></div>
+        <div style="background:#eee; border-radius:2px;"></div>
+      </div>
+    </div>
+
+    <!-- Team -->
+    <div class="wf-section wf-section-alt">
+      <h2 style="text-align:center;">Nuestro Equipo</h2>
+      <div class="wf-grid-3" style="margin-top:12px;">
+        <div class="wf-card" style="text-align:center; padding:14px;">
+          <div style="width:50px; height:50px; background:#ddd; border:2px solid #bbb; border-radius:50%; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#999;">[avatar]</div>
+          <h4 style="font-size:12px;">Voluntarios CPAAA</h4>
+          <p style="font-size:9px; color:#999;">Equipo de Rescate</p>
+        </div>
+        <div class="wf-card" style="text-align:center; padding:14px;">
+          <div style="width:50px; height:50px; background:#ddd; border:2px solid #bbb; border-radius:50%; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#999;">[avatar]</div>
+          <h4 style="font-size:12px;">Hogares Temporeros</h4>
+          <p style="font-size:9px; color:#999;">Red de Apoyo</p>
+        </div>
+        <div class="wf-card" style="text-align:center; padding:14px;">
+          <div style="width:50px; height:50px; background:#ddd; border:2px solid #bbb; border-radius:50%; margin:0 auto 6px; display:flex; align-items:center; justify-content:center; font-size:10px; color:#999;">[avatar]</div>
+          <h4 style="font-size:12px;">Comunidad</h4>
+          <p style="font-size:9px; color:#999;">Colaboradores</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact + CTA -->
+    <div class="wf-section">
+      <h2 style="text-align:center;">Cont&aacute;ctenos</h2>
+      <div class="wf-grid-3" style="margin-top:12px;">
+        <div style="text-align:center; font-size:11px;"><div class="wf-icon" style="margin:0 auto 4px;">T</div>787-505-8255</div>
+        <div style="text-align:center; font-size:11px;"><div class="wf-icon" style="margin:0 auto 4px;">@</div>info@cpaaa.org</div>
+        <div style="text-align:center; font-size:11px;"><div class="wf-icon" style="margin:0 auto 4px;">P</div>Aguadilla, PR</div>
+      </div>
+      <div style="text-align:center; margin-top:10px;"><div class="wf-icon" style="margin:0 auto;">f</div><br><span style="font-size:10px; color:#999;">Facebook</span></div>
+    </div>
+    <div style="background:#888; padding:20px; text-align:center; color:#eee;">
+      <h3 style="font-size:16px;">T&uacute; Tambi&eacute;n Puedes Hacer la Diferencia</h3>
+      <p style="font-size:11px; margin-top:3px; opacity:0.8;">Act&iacute;vate, esteriliza tus mascotas, contribuye</p>
+      <span class="wf-btn" style="background:#ddd; color:#555; border-color:#ccc; margin-top:8px;">Ay&uacute;danos a Ayudar &rarr;</span>
+    </div>
+
+    <div class="wf-footer"><div><h4>[LOGO] CPAAA</h4></div><div></div><div></div><div></div></div>
+  </div>
+  <div class="back-top"><a href="#top">&uarr; Back to Table of Contents</a></div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 5. BLOG PAGE                                                 -->
+<!-- ============================================================ -->
+<div class="wireframe-page" id="blog">
+  <div class="page-label">
+    <span>5. Blog Page</span>
+    <span class="route">/blog</span>
+    <span class="status-tag status-stub">Stub &mdash; Needs Implementation</span>
+  </div>
+  <div class="wf">
+    <div class="wf-header">
+      <span class="logo">[LOGO] CPAAA</span>
+      <nav><a>Home</a><a>Adoptar</a><a>About</a><a>Blog</a><a class="nav-donate">Donar</a></nav>
+    </div>
+
+    <div class="wf-annotation">Currently a stub. Proposed wireframe below shows intended design.</div>
+
+    <div class="wf-section">
+      <h1 style="font-size:20px; margin-bottom:3px; color:#444;">Blog & Noticias</h1>
+      <p class="sub">&Uacute;ltimas publicaciones de CPAAA</p>
+
+      <!-- Category Filters -->
+      <div class="wf-tags" style="margin-bottom:16px;">
+        <span class="wf-tag wf-tag-active">Todos</span>
+        <span class="wf-tag">Rescates</span>
+        <span class="wf-tag">Eventos</span>
+        <span class="wf-tag">Adopciones</span>
+        <span class="wf-tag">Educaci&oacute;n</span>
+      </div>
+
+      <!-- Blog Cards -->
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div class="wf-listing">
+          <div class="wf-listing-img img-x"><span style="position:relative;z-index:1;font-size:8px;">[img]</span></div>
+          <div class="wf-listing-body">
+            <h4>Feria de Mascotas en Aguadilla 2026</h4>
+            <div class="meta">[date] 12 Abr 2026 &middot; <span class="wf-tag" style="font-size:8px;">Eventos</span></div>
+            <p>&Uacute;nete a nuestra pr&oacute;xima feria de mascotas...</p>
+          </div>
+        </div>
+        <div class="wf-listing">
+          <div class="wf-listing-img img-x"><span style="position:relative;z-index:1;font-size:8px;">[img]</span></div>
+          <div class="wf-listing-body">
+            <h4>Historia de &eacute;xito: Max encuentra un hogar</h4>
+            <div class="meta">[date] 5 Abr 2026 &middot; <span class="wf-tag" style="font-size:8px;">Adopciones</span></div>
+            <p>Despu&eacute;s de meses de espera, Max encontr&oacute; una familia amorosa...</p>
+          </div>
+        </div>
+        <div class="wf-listing">
+          <div class="wf-listing-img img-x"><span style="position:relative;z-index:1;font-size:8px;">[img]</span></div>
+          <div class="wf-listing-body">
+            <h4>Jornada de esterilizaci&oacute;n gratuita</h4>
+            <div class="meta">[date] 28 Mar 2026 &middot; <span class="wf-tag" style="font-size:8px;">Educaci&oacute;n</span></div>
+            <p>M&aacute;s de 50 mascotas atendidas por veterinarios voluntarios...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Facebook Note -->
+      <div style="margin-top:18px; background:#e8e8e8; border:2px dashed #bbb; border-radius:2px; padding:12px; text-align:center;">
+        <p style="font-size:12px; color:#666; font-weight:600;">[Facebook Integration]</p>
+        <p style="font-size:10px; color:#999;">Posts from CPAAA Facebook page auto-embedded</p>
+      </div>
+    </div>
+
+    <div class="wf-footer"><div><h4>[LOGO] CPAAA</h4></div><div></div><div></div><div></div></div>
+  </div>
+  <div class="back-top"><a href="#top">&uarr; Back to Table of Contents</a></div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 6. DONATION PAGE                                             -->
+<!-- ============================================================ -->
+<div class="wireframe-page" id="donation">
+  <div class="page-label">
+    <span>6. Donation Page</span>
+    <span class="route">/donation</span>
+    <span class="status-tag status-stub">Stub &mdash; Needs Implementation</span>
+  </div>
+  <div class="wf">
+    <div class="wf-header">
+      <span class="logo">[LOGO] CPAAA</span>
+      <nav><a>Home</a><a>Adoptar</a><a>About</a><a>Blog</a><a class="nav-donate">Donar</a></nav>
+    </div>
+
+    <div class="wf-annotation">Currently a stub. Proposed wireframe below shows intended design.</div>
+
+    <!-- Hero banner -->
+    <div style="background:#999; padding:32px 24px; text-align:center; color:#eee;">
+      <h1 style="font-size:20px; margin-bottom:4px;">Ay&uacute;danos a Salvar Vidas</h1>
+      <p style="font-size:12px; opacity:0.85;">Cada donaci&oacute;n nos permite rescatar, alimentar y cuidar animales abandonados</p>
+    </div>
+
+    <div class="wf-section">
+      <!-- Impact Stats -->
+      <div class="wf-grid-3" style="margin-bottom:22px;">
+        <div class="wf-card" style="padding:16px; text-align:center;">
+          <div style="font-size:24px; font-weight:700; color:#666;">500+</div>
+          <p style="font-size:11px; color:#999;">Animales rescatados</p>
+        </div>
+        <div class="wf-card" style="padding:16px; text-align:center;">
+          <div style="font-size:24px; font-weight:700; color:#666;">300+</div>
+          <p style="font-size:11px; color:#999;">Adopciones exitosas</p>
+        </div>
+        <div class="wf-card" style="padding:16px; text-align:center;">
+          <div style="font-size:24px; font-weight:700; color:#666;">30+</div>
+          <p style="font-size:11px; color:#999;">A&ntilde;os de servicio</p>
+        </div>
+      </div>
+
+      <!-- Donation Amount Selector -->
+      <h3 style="text-align:center; margin-bottom:10px;">Selecciona la cantidad</h3>
+      <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:14px;">
+        <span class="wf-btn wf-btn-outline" style="min-width:60px;">$10</span>
+        <span class="wf-btn wf-btn-outline" style="min-width:60px;">$25</span>
+        <span class="wf-btn wf-btn-primary" style="min-width:60px;">$50</span>
+        <span class="wf-btn wf-btn-outline" style="min-width:60px;">$100</span>
+        <span class="wf-btn wf-btn-outline" style="min-width:60px;">Otro</span>
+      </div>
+
+      <!-- What your donation covers -->
+      <div style="background:#ececec; border:2px solid #ccc; border-radius:2px; padding:16px; margin-bottom:18px;">
+        <h4 style="font-size:13px; margin-bottom:8px; text-align:center;">&iquest;A d&oacute;nde va tu donaci&oacute;n?</h4>
+        <div class="wf-grid-2" style="font-size:11px; color:#777;">
+          <div>[+] Atenci&oacute;n veterinaria y medicinas</div>
+          <div>[+] Alimento y suministros</div>
+          <div>[+] Hogares temporales</div>
+          <div>[+] Campa&ntilde;as de esterilizaci&oacute;n</div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div style="text-align:center;">
+        <span class="wf-btn wf-btn-primary" style="font-size:14px; padding:12px 36px;">
+          Donar $50 &rarr;
+        </span>
+        <p style="font-size:9px; color:#aaa; margin-top:6px; font-family:sans-serif; font-style:italic;">Opens payment modal (ATH M&oacute;vil, PayPal, or Card)</p>
+      </div>
+    </div>
+
+    <div class="wf-footer"><div><h4>[LOGO] CPAAA</h4></div><div></div><div></div><div></div></div>
+  </div>
+  <div class="back-top"><a href="#top">&uarr; Back to Table of Contents</a></div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 7. DONATION MODAL                                            -->
+<!-- ============================================================ -->
+<div class="wireframe-page" id="donation-modal">
+  <div class="page-label">
+    <span>7. Donation Modal (ATH M&oacute;vil / PayPal / Card)</span>
+    <span class="route">Modal overlay on /donation</span>
+    <span class="status-tag status-planned">Not Implemented</span>
+  </div>
+  <div class="wf">
+    <div class="wf-annotation">This modal appears when the user clicks "Donar" on the Donation page. Three payment methods: ATH M&oacute;vil (QR code), PayPal, and Credit/Debit Card.</div>
+
+    <!-- ===== ATH M&oacute;vil View (QR CODE) ===== -->
+    <div style="padding:10px 24px 0;"><h4 style="font-size:12px; color:#888; border-bottom:1px dashed #ccc; padding-bottom:4px;">ATH M&oacute;vil View (QR Code):</h4></div>
+    <div class="wf-modal-demo">
+      <div class="wf-modal">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h3 style="margin-bottom:0;">Donaci&oacute;n &mdash; $50</h3>
+          <span style="font-size:16px; color:#aaa; cursor:default; border:1px solid #ccc; width:24px; height:24px; display:flex; align-items:center; justify-content:center; border-radius:2px;">X</span>
+        </div>
+
+        <!-- Payment Method Tabs -->
+        <div class="payment-methods">
+          <div class="payment-method payment-method-active">
+            <span class="pm-label">ATH M&oacute;vil</span>
+          </div>
+          <div class="payment-method">
+            <span class="pm-label">PayPal</span>
+          </div>
+          <div class="payment-method">
+            <span class="pm-label">Tarjeta</span>
+          </div>
+        </div>
+
+        <!-- ATH Movil QR Code -->
+        <div style="background:#f5f5f5; border:2px solid #ccc; border-radius:2px; padding:20px; text-align:center;">
+          <p style="font-size:12px; color:#555; margin-bottom:14px; font-weight:600;">Escanea con ATH M&oacute;vil</p>
+
+          <!-- QR Code Wireframe -->
+          <div style="width:150px; height:150px; margin:0 auto; background:#fff; border:3px solid #888; border-radius:2px; padding:8px; position:relative;">
+            <!-- Top-left finder -->
+            <div style="position:absolute; top:8px; left:8px; width:30px; height:30px; border:4px solid #666; background:#fff;">
+              <div style="width:12px; height:12px; background:#666; margin:5px auto;"></div>
+            </div>
+            <!-- Top-right finder -->
+            <div style="position:absolute; top:8px; right:8px; width:30px; height:30px; border:4px solid #666; background:#fff;">
+              <div style="width:12px; height:12px; background:#666; margin:5px auto;"></div>
+            </div>
+            <!-- Bottom-left finder -->
+            <div style="position:absolute; bottom:8px; left:8px; width:30px; height:30px; border:4px solid #666; background:#fff;">
+              <div style="width:12px; height:12px; background:#666; margin:5px auto;"></div>
+            </div>
+            <!-- QR data pattern -->
+            <div style="position:absolute; top:42px; left:42px; right:12px; bottom:12px; display:grid; grid-template-columns: repeat(6,1fr); grid-template-rows: repeat(6,1fr); gap:2px;">
+              <div style="background:#666;"></div><div style="background:#fff;"></div><div style="background:#666;"></div><div style="background:#666;"></div><div style="background:#fff;"></div><div style="background:#666;"></div>
+              <div style="background:#fff;"></div><div style="background:#666;"></div><div style="background:#fff;"></div><div style="background:#666;"></div><div style="background:#666;"></div><div style="background:#fff;"></div>
+              <div style="background:#666;"></div><div style="background:#666;"></div><div style="background:#fff;"></div><div style="background:#fff;"></div><div style="background:#666;"></div><div style="background:#666;"></div>
+              <div style="background:#fff;"></div><div style="background:#666;"></div><div style="background:#666;"></div><div style="background:#666;"></div><div style="background:#fff;"></div><div style="background:#fff;"></div>
+              <div style="background:#666;"></div><div style="background:#fff;"></div><div style="background:#fff;"></div><div style="background:#666;"></div><div style="background:#666;"></div><div style="background:#666;"></div>
+              <div style="background:#fff;"></div><div style="background:#666;"></div><div style="background:#666;"></div><div style="background:#fff;"></div><div style="background:#fff;"></div><div style="background:#666;"></div>
+            </div>
+          </div>
+
+          <p style="font-size:11px; color:#888; margin-top:14px;">Abre la app de ATH M&oacute;vil y escanea este c&oacute;digo QR para completar tu donaci&oacute;n de <strong>$50.00</strong></p>
+          <p style="font-size:9px; color:#aaa; margin-top:8px; font-family:sans-serif;">El c&oacute;digo expira en 10 minutos &middot; Transacci&oacute;n segura</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PayPal View ===== -->
+    <div style="padding:14px 24px 0;"><h4 style="font-size:12px; color:#888; border-bottom:1px dashed #ccc; padding-bottom:4px;">PayPal View:</h4></div>
+    <div class="wf-modal-demo">
+      <div class="wf-modal">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h3 style="margin-bottom:0;">Donaci&oacute;n &mdash; $50</h3>
+          <span style="font-size:16px; color:#aaa; border:1px solid #ccc; width:24px; height:24px; display:flex; align-items:center; justify-content:center; border-radius:2px;">X</span>
+        </div>
+        <div class="payment-methods">
+          <div class="payment-method"><span class="pm-label">ATH M&oacute;vil</span></div>
+          <div class="payment-method payment-method-active"><span class="pm-label">PayPal</span></div>
+          <div class="payment-method"><span class="pm-label">Tarjeta</span></div>
+        </div>
+        <div style="background:#f5f5f5; border:2px solid #ccc; border-radius:2px; padding:20px; text-align:center;">
+          <div class="wf-icon wf-icon-lg" style="margin:0 auto 10px; font-size:16px;">PP</div>
+          <p style="font-size:12px; color:#666; margin-bottom:12px;">Ser&aacute;s redirigido a PayPal para completar tu donaci&oacute;n de forma segura.</p>
+          <span class="wf-btn wf-btn-primary" style="padding:10px 24px; font-size:13px;">
+            Continuar con PayPal
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Credit/Debit Card View ===== -->
+    <div style="padding:14px 24px 0;"><h4 style="font-size:12px; color:#888; border-bottom:1px dashed #ccc; padding-bottom:4px;">Credit/Debit Card View:</h4></div>
+    <div class="wf-modal-demo">
+      <div class="wf-modal">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h3 style="margin-bottom:0;">Donaci&oacute;n &mdash; $50</h3>
+          <span style="font-size:16px; color:#aaa; border:1px solid #ccc; width:24px; height:24px; display:flex; align-items:center; justify-content:center; border-radius:2px;">X</span>
+        </div>
+        <div class="payment-methods">
+          <div class="payment-method"><span class="pm-label">ATH M&oacute;vil</span></div>
+          <div class="payment-method"><span class="pm-label">PayPal</span></div>
+          <div class="payment-method payment-method-active"><span class="pm-label">Tarjeta</span></div>
+        </div>
+        <div style="background:#f5f5f5; border:2px solid #ccc; border-radius:2px; padding:16px;">
+          <div class="wf-form-group">
+            <label>N&uacute;mero de tarjeta</label>
+            <div class="wf-input">0000  0000  0000  0000</div>
+          </div>
+          <div class="wf-form-row">
+            <div class="wf-form-group">
+              <label>Fecha exp.</label>
+              <div class="wf-input">MM / YY</div>
+            </div>
+            <div class="wf-form-group">
+              <label>CVV</label>
+              <div class="wf-input">***</div>
+            </div>
+          </div>
+          <div class="wf-form-group">
+            <label>Nombre en la tarjeta</label>
+            <div class="wf-input">____________________</div>
+          </div>
+          <div class="wf-form-group">
+            <label>Email (para recibo)</label>
+            <div class="wf-input">____________________</div>
+          </div>
+        </div>
+        <span class="wf-btn wf-btn-primary" style="width:100%; display:block; font-size:13px; padding:10px; margin-top:12px;">
+          Pagar $50 con Tarjeta
+        </span>
+        <p style="text-align:center; font-size:9px; color:#aaa; margin-top:6px; font-family:sans-serif;">[lock icon] Pago seguro &middot; Visa, Mastercard, AMEX</p>
+      </div>
+    </div>
+  </div>
+  <div class="back-top"><a href="#top">&uarr; Back to Table of Contents</a></div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 8. SERVICES INFORMATION PAGE                                 -->
+<!-- ============================================================ -->
+<div class="wireframe-page" id="services">
+  <div class="page-label">
+    <span>8. Services Information Page (Clinic / Events)</span>
+    <span class="route">/services (proposed)</span>
+    <span class="status-tag status-planned">Not Implemented</span>
+  </div>
+  <div class="wf">
+    <div class="wf-header">
+      <span class="logo">[LOGO] CPAAA</span>
+      <nav><a>Home</a><a>Adoptar</a><a>About</a><a>Servicios</a><a>Blog</a><a class="nav-donate">Donar</a></nav>
+    </div>
+
+    <div class="wf-annotation">New page: Displays clinic services, upcoming events, and spay/neuter program info.</div>
+
+    <!-- Hero -->
+    <div style="background:#888; padding:28px 24px; text-align:center; color:#eee;">
+      <h1 style="font-size:20px; margin-bottom:4px;">Nuestros Servicios</h1>
+      <p style="font-size:12px; opacity:0.85;">Cl&iacute;nicas veterinarias, eventos comunitarios y programas de esterilizaci&oacute;n</p>
+    </div>
+
+    <!-- Tabs -->
+    <div style="padding: 0 24px; padding-top:14px;">
+      <div class="wf-tabs">
+        <div class="wf-tab wf-tab-active">Cl&iacute;nicas</div>
+        <div class="wf-tab">Eventos</div>
+        <div class="wf-tab">Esterilizaci&oacute;n</div>
+        <div class="wf-tab">Educaci&oacute;n</div>
+      </div>
+    </div>
+
+    <!-- Clinic Listings -->
+    <div class="wf-section">
+      <h2>Pr&oacute;ximas Cl&iacute;nicas Veterinarias</h2>
+      <p class="sub">Servicios de salud gratuitos o de bajo costo</p>
+
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div class="wf-listing">
+          <div class="wf-listing-img">[clinic icon]</div>
+          <div class="wf-listing-body">
+            <h4>Cl&iacute;nica de Vacunaci&oacute;n &mdash; Aguadilla</h4>
+            <div class="meta">[date] 20 Abr 2026 &middot; [pin] Plaza del Mercado &middot; [clock] 8:00 AM - 2:00 PM</div>
+            <p>Vacunaci&oacute;n contra rabia, parvovirus y desparasitaci&oacute;n gratuita.</p>
+            <div style="margin-top:5px;">
+              <span class="wf-badge">Cupos Disponibles</span>
+              <span class="wf-btn wf-btn-secondary wf-btn-small" style="margin-left:6px;">Reservar Turno</span>
+            </div>
+          </div>
+        </div>
+        <div class="wf-listing">
+          <div class="wf-listing-img">[clinic icon]</div>
+          <div class="wf-listing-body">
+            <h4>Cl&iacute;nica de Esterilizaci&oacute;n &mdash; Isabela</h4>
+            <div class="meta">[date] 27 Abr 2026 &middot; [pin] Centro Comunal &middot; [clock] 7:00 AM - 12:00 PM</div>
+            <p>Esterilizaci&oacute;n y castraci&oacute;n gratuita. Requiere cita previa.</p>
+            <div style="margin-top:5px;">
+              <span class="wf-badge" style="border-style:dashed;">Pocos Cupos</span>
+              <span class="wf-btn wf-btn-secondary wf-btn-small" style="margin-left:6px;">Reservar Turno</span>
+            </div>
+          </div>
+        </div>
+        <div class="wf-listing">
+          <div class="wf-listing-img">[event icon]</div>
+          <div class="wf-listing-body">
+            <h4>Feria de Adopci&oacute;n &mdash; Aguadilla Mall</h4>
+            <div class="meta">[date] 3 May 2026 &middot; [pin] Aguadilla Mall &middot; [clock] 10:00 AM - 5:00 PM</div>
+            <p>Conoce a nuestros animales disponibles. Actividades para toda la familia.</p>
+            <div style="margin-top:5px;">
+              <span class="wf-badge">Evento Abierto</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="wf-divider">
+
+    <!-- Past Events Archive -->
+    <div class="wf-section wf-section-alt">
+      <h2>Eventos Anteriores</h2>
+      <p class="sub">Galer&iacute;a de actividades pasadas</p>
+      <div class="wf-grid-4">
+        <div class="wf-card"><div class="wf-card-img img-x" style="height:70px;"><span style="font-size:8px;position:relative;z-index:1;">[img]</span></div><div class="wf-card-body"><p style="font-size:9px;">Feria 2025</p></div></div>
+        <div class="wf-card"><div class="wf-card-img img-x" style="height:70px;"><span style="font-size:8px;position:relative;z-index:1;">[img]</span></div><div class="wf-card-body"><p style="font-size:9px;">Cl&iacute;nica Feb</p></div></div>
+        <div class="wf-card"><div class="wf-card-img img-x" style="height:70px;"><span style="font-size:8px;position:relative;z-index:1;">[img]</span></div><div class="wf-card-body"><p style="font-size:9px;">Rescate Dic</p></div></div>
+        <div class="wf-card"><div class="wf-card-img img-x" style="height:70px;"><span style="font-size:8px;position:relative;z-index:1;">[img]</span></div><div class="wf-card-body"><p style="font-size:9px;">Taller Edu</p></div></div>
+      </div>
+    </div>
+
+    <div class="wf-footer"><div><h4>[LOGO] CPAAA</h4></div><div></div><div></div><div></div></div>
+  </div>
+  <div class="back-top"><a href="#top">&uarr; Back to Table of Contents</a></div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 9. ADMIN &mdash; ANIMALS LIST                                -->
+<!-- ============================================================ -->
+<div class="wireframe-page" id="admin-animals">
+  <div class="page-label">
+    <span>9. Admin &mdash; Animals List</span>
+    <span class="route">/admin/animals</span>
+    <span class="status-tag status-impl">Implemented</span>
+  </div>
+  <div class="wf">
+    <div class="wf-section">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;">
+        <div>
+          <h1 style="font-size:20px; color:#444;">Gesti&oacute;n de Animales</h1>
+          <p style="font-size:11px; color:#999;">Total: <strong>47</strong> &middot; Filtrados: 47</p>
+        </div>
+        <span class="wf-btn wf-btn-success">+ Crear Nuevo Animal</span>
+      </div>
+
+      <!-- Search -->
+      <div style="margin-bottom:14px;">
+        <div class="wf-input" style="display:flex; align-items:center; gap:8px;">
+          <span style="color:#aaa;">[Q]</span> <span style="color:#bbb;">Buscar por nombre, especie, tama&ntilde;o, g&eacute;nero o estado...</span>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <table class="wf-table">
+        <thead>
+          <tr>
+            <th>Nombre &uarr;&darr;</th>
+            <th>Especie &uarr;&darr;</th>
+            <th>G&eacute;nero &uarr;&darr;</th>
+            <th>Tama&ntilde;o &uarr;&darr;</th>
+            <th>Estado &uarr;&darr;</th>
+            <th>Img</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600;">Luna</td>
+            <td>Perro</td>
+            <td>Hembra</td>
+            <td>Mediano</td>
+            <td><span class="wf-badge">Disponible</span></td>
+            <td><span class="thumb"></span></td>
+            <td><span class="wf-btn wf-btn-secondary wf-btn-small">Editar</span> <span class="wf-btn wf-btn-danger wf-btn-small">Eliminar</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Max</td>
+            <td>Perro</td>
+            <td>Macho</td>
+            <td>Grande</td>
+            <td><span class="wf-badge" style="background:#ddd;">Adoptado</span></td>
+            <td><span class="thumb"></span></td>
+            <td><span class="wf-btn wf-btn-secondary wf-btn-small">Editar</span> <span class="wf-btn wf-btn-danger wf-btn-small">Eliminar</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Mia</td>
+            <td>Gato</td>
+            <td>Hembra</td>
+            <td>Peque&ntilde;o</td>
+            <td><span class="wf-badge" style="border-style:dashed;">Pendiente</span></td>
+            <td><span class="thumb"></span></td>
+            <td><span class="wf-btn wf-btn-secondary wf-btn-small">Editar</span> <span class="wf-btn wf-btn-danger wf-btn-small">Eliminar</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Rocky</td>
+            <td>Perro</td>
+            <td>Macho</td>
+            <td>Grande</td>
+            <td><span class="wf-badge" style="background:#bbb; color:#fff;">At. M&eacute;dica</span></td>
+            <td><span class="thumb"></span></td>
+            <td><span class="wf-btn wf-btn-secondary wf-btn-small">Editar</span> <span class="wf-btn wf-btn-danger wf-btn-small">Eliminar</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Pagination -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; font-size:11px;">
+        <span class="wf-btn wf-btn-outline wf-btn-small" style="opacity:0.4;">&larr; Anterior</span>
+        <span>P&aacute;gina <strong>1</strong> de <strong>5</strong></span>
+        <span class="wf-btn wf-btn-outline wf-btn-small">Siguiente &rarr;</span>
+      </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div style="padding:6px 24px; font-size:10px; color:#999; font-style:italic; font-family:sans-serif;">Delete confirmation modal:</div>
+    <div class="wf-modal-demo" style="padding:18px 24px;">
+      <div class="wf-modal" style="max-width:380px;">
+        <h3 style="font-size:15px;">Confirmar Eliminaci&oacute;n</h3>
+        <p style="font-size:12px; color:#777;">&iquest;Est&aacute;s seguro de eliminar a <strong>[name]</strong>? No se puede deshacer.</p>
+        <div style="display:flex; gap:8px; margin-top:14px;">
+          <span class="wf-btn wf-btn-outline" style="flex:1; text-align:center;">Cancelar</span>
+          <span class="wf-btn wf-btn-danger" style="flex:1; text-align:center;">Eliminar</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="back-top"><a href="#top">&uarr; Back to Table of Contents</a></div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 10. ADMIN &mdash; CREATE ANIMAL                              -->
+<!-- ============================================================ -->
+<div class="wireframe-page" id="admin-create">
+  <div class="page-label">
+    <span>10. Admin &mdash; Create Animal</span>
+    <span class="route">/admin/createAnimal</span>
+    <span class="status-tag status-impl">Implemented</span>
+  </div>
+  <div class="wf">
+    <div class="wf-section">
+      <div style="margin-bottom:12px;">
+        <span style="color:#888; font-size:12px;">&larr; Volver a la Lista</span>
+      </div>
+      <h1 style="font-size:20px; margin-bottom:16px; color:#444;">Crear Nuevo Animal</h1>
+
+      <!-- Storage Status -->
+      <div style="background:#ddd; color:#555; padding:7px 12px; border:1px solid #bbb; border-radius:2px; font-size:10px; margin-bottom:14px; font-family:sans-serif;">
+        [check] Almacenamiento de im&aacute;genes disponible
+      </div>
+
+      <!-- Basic Info -->
+      <fieldset style="border:2px solid #bbb; border-radius:2px; padding:16px; margin-bottom:14px;">
+        <legend style="font-size:13px; font-weight:600; padding:0 6px; color:#555;">Informaci&oacute;n B&aacute;sica</legend>
+        <div class="wf-form-group">
+          <label>Nombre *</label>
+          <div class="wf-input">____________________</div>
+        </div>
+        <div class="wf-form-group">
+          <label>Descripci&oacute;n *</label>
+          <div class="wf-input" style="height:70px;">____________________</div>
+        </div>
+        <div class="wf-form-row">
+          <div class="wf-form-group"><label>Especie *</label><div class="wf-select" style="width:100%;">[ Perro / Gato       v ]</div></div>
+          <div class="wf-form-group"><label>Tama&ntilde;o *</label><div class="wf-select" style="width:100%;">[ Peq / Med / Gra    v ]</div></div>
+        </div>
+        <div class="wf-form-row">
+          <div class="wf-form-group"><label>G&eacute;nero *</label><div class="wf-select" style="width:100%;">[ M / H / Desc       v ]</div></div>
+          <div class="wf-form-group"><label>Estado *</label><div class="wf-select" style="width:100%;">[ Disponible         v ]</div></div>
+        </div>
+      </fieldset>
+
+      <!-- Image -->
+      <fieldset style="border:2px solid #bbb; border-radius:2px; padding:16px; margin-bottom:14px;">
+        <legend style="font-size:13px; font-weight:600; padding:0 6px; color:#555;">Foto del Animal</legend>
+        <div class="wf-form-group">
+          <label>Selecciona una imagen *</label>
+          <p style="font-size:9px; color:#999; margin-bottom:4px; font-family:sans-serif;">JPEG, PNG, WEBP. Max 5 MB.</p>
+          <div class="wf-input" style="border-style:dashed;">[Choose file...]</div>
+        </div>
+        <div class="wf-placeholder img-x" style="height:100px; margin-top:8px;">
+          <span style="position:relative;z-index:1;font-size:10px;">[Image Preview]</span>
+        </div>
+      </fieldset>
+
+      <!-- Tags -->
+      <fieldset style="border:2px solid #bbb; border-radius:2px; padding:16px; margin-bottom:14px;">
+        <legend style="font-size:13px; font-weight:600; padding:0 6px; color:#555;">Etiquetas (Opcional)</legend>
+        <div style="display:flex; gap:6px;">
+          <div class="wf-input" style="flex:1;">____________________</div>
+          <span class="wf-btn wf-btn-secondary wf-btn-small">+</span>
+        </div>
+        <div class="wf-tags" style="margin-top:8px;">
+          <span class="wf-tag">[tag] x</span>
+          <span class="wf-tag">[tag] x</span>
+        </div>
+      </fieldset>
+
+      <div style="text-align:center;">
+        <span class="wf-btn wf-btn-primary" style="font-size:13px; padding:10px 36px;">Crear Animal</span>
+      </div>
+    </div>
+  </div>
+  <div class="back-top"><a href="#top">&uarr; Back to Table of Contents</a></div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 11. ADMIN &mdash; EDIT ANIMAL                                -->
+<!-- ============================================================ -->
+<div class="wireframe-page" id="admin-edit">
+  <div class="page-label">
+    <span>11. Admin &mdash; Edit Animal</span>
+    <span class="route">/admin/editAnimal?id={aid}</span>
+    <span class="status-tag status-impl">Implemented</span>
+  </div>
+  <div class="wf">
+    <div class="wf-section">
+      <div style="margin-bottom:12px;">
+        <span style="color:#888; font-size:12px;">&larr; Volver a la Lista</span>
+      </div>
+      <h1 style="font-size:20px; margin-bottom:16px; color:#444;">Editar Animal &mdash; <span style="color:#777;">[Luna]</span></h1>
+
+      <!-- Pre-filled form -->
+      <fieldset style="border:2px solid #bbb; border-radius:2px; padding:16px; margin-bottom:14px;">
+        <legend style="font-size:13px; font-weight:600; padding:0 6px; color:#555;">Informaci&oacute;n B&aacute;sica</legend>
+        <div class="wf-form-group"><label>Nombre *</label><div class="wf-input">Luna</div></div>
+        <div class="wf-form-group"><label>Descripci&oacute;n *</label><div class="wf-input" style="height:50px;">[Pre-filled description...]</div></div>
+        <div class="wf-form-row">
+          <div class="wf-form-group"><label>Especie</label><div class="wf-select" style="width:100%;">Perro</div></div>
+          <div class="wf-form-group"><label>Tama&ntilde;o</label><div class="wf-select" style="width:100%;">Mediano</div></div>
+        </div>
+        <div class="wf-form-row">
+          <div class="wf-form-group"><label>G&eacute;nero</label><div class="wf-select" style="width:100%;">Hembra</div></div>
+          <div class="wf-form-group"><label>Estado</label><div class="wf-select" style="width:100%;">Disponible</div></div>
+        </div>
+      </fieldset>
+
+      <!-- Current Image + Replace -->
+      <fieldset style="border:2px solid #bbb; border-radius:2px; padding:16px; margin-bottom:14px;">
+        <legend style="font-size:13px; font-weight:600; padding:0 6px; color:#555;">Foto del Animal</legend>
+        <div class="wf-grid-2">
+          <div>
+            <p style="font-size:10px; color:#999; margin-bottom:4px;">Imagen actual:</p>
+            <div class="wf-placeholder img-x" style="height:100px;"><span style="position:relative;z-index:1;font-size:10px;">[Current]</span></div>
+          </div>
+          <div>
+            <p style="font-size:10px; color:#999; margin-bottom:4px;">Reemplazar:</p>
+            <div class="wf-input" style="border-style:dashed;">[Choose new file...]</div>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Tags -->
+      <fieldset style="border:2px solid #bbb; border-radius:2px; padding:16px; margin-bottom:14px;">
+        <legend style="font-size:13px; font-weight:600; padding:0 6px; color:#555;">Etiquetas</legend>
+        <div class="wf-tags">
+          <span class="wf-tag">[tag] x</span>
+          <span class="wf-tag">[tag] x</span>
+          <span class="wf-tag">[tag] x</span>
+        </div>
+        <div style="display:flex; gap:6px; margin-top:6px;">
+          <div class="wf-input" style="flex:1;">____________________</div>
+          <span class="wf-btn wf-btn-secondary wf-btn-small">+</span>
+        </div>
+      </fieldset>
+
+      <div style="text-align:center;">
+        <span class="wf-btn wf-btn-primary" style="font-size:13px; padding:10px 36px;">Guardar Cambios</span>
+      </div>
+    </div>
+  </div>
+  <div class="back-top"><a href="#top">&uarr; Back to Table of Contents</a></div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 12. ADMIN &mdash; IMAGE UPLOAD                               -->
+<!-- ============================================================ -->
+<div class="wireframe-page" id="admin-upload">
+  <div class="page-label">
+    <span>12. Admin &mdash; Image Upload</span>
+    <span class="route">/admin/upload</span>
+    <span class="status-tag status-impl">Implemented</span>
+  </div>
+  <div class="wf">
+    <div class="wf-section">
+      <h1 style="font-size:20px; margin-bottom:3px; color:#444;">Gesti&oacute;n de Im&aacute;genes</h1>
+      <p class="sub">Subir y gestionar fotos &mdash; Cloudflare R2</p>
+
+      <div style="background:#ddd; color:#555; padding:7px 12px; border:1px solid #bbb; border-radius:2px; font-size:10px; margin-bottom:14px; font-family:sans-serif;">
+        [check] Almacenamiento R2 conectado
+      </div>
+
+      <div class="wf-form-group">
+        <label>Seleccionar Animal</label>
+        <div class="wf-select" style="width:100%;">[ Selecciona un animal...  v ]</div>
+      </div>
+
+      <!-- Drop Zone -->
+      <div class="wf-placeholder" style="height:140px; border-width:3px; margin:14px 0;">
+        <div style="text-align:center;">
+          <div style="font-size:10px; color:#999; margin-bottom:6px; font-family:sans-serif;">[upload icon]</div>
+          <p style="font-size:12px; color:#777;">Arrastra una imagen aqu&iacute; o haz clic</p>
+          <p style="font-size:9px; color:#aaa;">JPEG, PNG, WEBP &middot; Max 5 MB</p>
+        </div>
+      </div>
+
+      <div class="wf-grid-2">
+        <div class="wf-placeholder img-x" style="height:120px;"><span style="position:relative;z-index:1;font-size:10px;">[Preview]</span></div>
+        <div style="display:flex; flex-direction:column; justify-content:center; gap:8px;">
+          <span class="wf-btn wf-btn-primary" style="text-align:center;">Subir Imagen</span>
+          <span class="wf-btn wf-btn-outline" style="text-align:center;">Cancelar</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="back-top"><a href="#top">&uarr; Back to Table of Contents</a></div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 13. ADMIN &mdash; MEDICAL RECORDS                            -->
+<!-- ============================================================ -->
+<div class="wireframe-page" id="admin-medical">
+  <div class="page-label">
+    <span>13. Admin &mdash; Medical Records</span>
+    <span class="route">/admin/medical (proposed)</span>
+    <span class="status-tag status-planned">Not Implemented</span>
+  </div>
+  <div class="wf">
+    <div class="wf-annotation">New admin view: Manage medical treatment records. DB table <code style="font-family:monospace;">medical_records</code> exists (record_id, aid, medicine_name, date_given, vet_name, notes).</div>
+
+    <div class="wf-section">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;">
+        <div>
+          <h1 style="font-size:20px; color:#444;">Registros M&eacute;dicos</h1>
+          <p style="font-size:11px; color:#999;">Historial de tratamientos veterinarios</p>
+        </div>
+        <span class="wf-btn wf-btn-success">+ Nuevo Registro</span>
+      </div>
+
+      <!-- Filters -->
+      <div class="wf-form-row" style="margin-bottom:14px;">
+        <div class="wf-input" style="display:flex; align-items:center; gap:6px; flex:2;">
+          <span style="color:#aaa;">[Q]</span> <span style="color:#bbb;">Buscar por animal, medicina, veterinario...</span>
+        </div>
+        <div class="wf-select" style="flex:1;">[ Filtrar animal  v ]</div>
+        <div class="wf-select" style="flex:1;">[ Rango fechas  v ]</div>
+      </div>
+
+      <!-- Table -->
+      <table class="wf-table">
+        <thead>
+          <tr><th>ID</th><th>Animal</th><th>Medicina</th><th>Fecha</th><th>Veterinario</th><th>Notas</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>#001</td>
+            <td style="font-weight:600;">Luna <span style="font-size:9px; color:#aaa;">(AID:12)</span></td>
+            <td>Vacuna Rabia</td>
+            <td>10 Abr 2026</td>
+            <td>Dr. Rivera</td>
+            <td style="max-width:130px; font-size:10px; color:#888;">Sin complicaciones</td>
+            <td><span class="wf-btn wf-btn-secondary wf-btn-small">Editar</span> <span class="wf-btn wf-btn-danger wf-btn-small">Eliminar</span></td>
+          </tr>
+          <tr>
+            <td>#002</td>
+            <td style="font-weight:600;">Max <span style="font-size:9px; color:#aaa;">(AID:8)</span></td>
+            <td>Desparasitaci&oacute;n</td>
+            <td>8 Abr 2026</td>
+            <td>Dra. L&oacute;pez</td>
+            <td style="max-width:130px; font-size:10px; color:#888;">Dosis seg&uacute;n peso</td>
+            <td><span class="wf-btn wf-btn-secondary wf-btn-small">Editar</span> <span class="wf-btn wf-btn-danger wf-btn-small">Eliminar</span></td>
+          </tr>
+          <tr>
+            <td>#003</td>
+            <td style="font-weight:600;">Rocky <span style="font-size:9px; color:#aaa;">(AID:15)</span></td>
+            <td>Antibi&oacute;tico</td>
+            <td>5 Abr 2026</td>
+            <td>Dr. Rivera</td>
+            <td style="max-width:130px; font-size:10px; color:#888;">Control en 2 semanas</td>
+            <td><span class="wf-btn wf-btn-secondary wf-btn-small">Editar</span> <span class="wf-btn wf-btn-danger wf-btn-small">Eliminar</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; font-size:11px;">
+        <span class="wf-btn wf-btn-outline wf-btn-small" style="opacity:0.4;">&larr; Anterior</span>
+        <span>P&aacute;gina <strong>1</strong> de <strong>3</strong></span>
+        <span class="wf-btn wf-btn-outline wf-btn-small">Siguiente &rarr;</span>
+      </div>
+    </div>
+
+    <hr class="wf-divider">
+
+    <!-- Add/Edit Modal -->
+    <div style="padding:6px 24px; font-size:10px; color:#999; font-style:italic; font-family:sans-serif;">Add/Edit Medical Record form:</div>
+    <div class="wf-modal-demo" style="padding:18px 24px;">
+      <div class="wf-modal" style="max-width:500px;">
+        <h3>Nuevo Registro M&eacute;dico</h3>
+        <div class="wf-form-group">
+          <label>Animal *</label>
+          <div class="wf-select" style="width:100%;">[ Seleccionar animal...  v ]</div>
+        </div>
+        <div class="wf-form-group">
+          <label>Nombre de Medicina *</label>
+          <div class="wf-input">____________________</div>
+        </div>
+        <div class="wf-form-row">
+          <div class="wf-form-group"><label>Fecha Administrada *</label><div class="wf-input">DD / MM / YYYY</div></div>
+          <div class="wf-form-group"><label>Veterinario</label><div class="wf-input">____________________</div></div>
+        </div>
+        <div class="wf-form-group">
+          <label>Notas</label>
+          <div class="wf-input" style="height:50px;">____________________</div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:14px;">
+          <span class="wf-btn wf-btn-outline" style="flex:1; text-align:center;">Cancelar</span>
+          <span class="wf-btn wf-btn-primary" style="flex:1; text-align:center;">Guardar Registro</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="back-top"><a href="#top">&uarr; Back to Table of Contents</a></div>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- 14. ADMIN &mdash; BLOG/POST MANAGEMENT                      -->
+<!-- ============================================================ -->
+<div class="wireframe-page" id="admin-blog">
+  <div class="page-label">
+    <span>14. Admin &mdash; Blog/Post Management</span>
+    <span class="route">/admin/blog (proposed)</span>
+    <span class="status-tag status-planned">Not Implemented</span>
+  </div>
+  <div class="wf">
+    <div class="wf-annotation">New admin view: Create, edit, publish and manage blog posts. Currently only a stub public blog page exists.</div>
+
+    <div class="wf-section">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;">
+        <div>
+          <h1 style="font-size:20px; color:#444;">Gesti&oacute;n de Blog</h1>
+          <p style="font-size:11px; color:#999;">Crear y administrar publicaciones</p>
+        </div>
+        <span class="wf-btn wf-btn-success">+ Nueva Publicaci&oacute;n</span>
+      </div>
+
+      <!-- Tabs -->
+      <div class="wf-tabs" style="margin-bottom:14px;">
+        <div class="wf-tab wf-tab-active">Todas (12)</div>
+        <div class="wf-tab">Publicadas (8)</div>
+        <div class="wf-tab">Borradores (4)</div>
+      </div>
+
+      <!-- Search -->
+      <div style="margin-bottom:14px;">
+        <div class="wf-input" style="display:flex; align-items:center; gap:6px;">
+          <span style="color:#aaa;">[Q]</span> <span style="color:#bbb;">Buscar publicaciones...</span>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <table class="wf-table">
+        <thead>
+          <tr><th>T&iacute;tulo</th><th>Categor&iacute;a</th><th>Estado</th><th>Fecha</th><th>Autor</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600;">Feria de Mascotas 2026</td>
+            <td><span class="wf-tag" style="font-size:8px;">Eventos</span></td>
+            <td><span class="wf-badge">Publicado</span></td>
+            <td>12 Abr</td>
+            <td>Admin</td>
+            <td><span class="wf-btn wf-btn-secondary wf-btn-small">Editar</span> <span class="wf-btn wf-btn-danger wf-btn-small">Eliminar</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Max encuentra un hogar</td>
+            <td><span class="wf-tag" style="font-size:8px;">Adopciones</span></td>
+            <td><span class="wf-badge">Publicado</span></td>
+            <td>5 Abr</td>
+            <td>Admin</td>
+            <td><span class="wf-btn wf-btn-secondary wf-btn-small">Editar</span> <span class="wf-btn wf-btn-danger wf-btn-small">Eliminar</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Campa&ntilde;a esterilizaci&oacute;n Mayo</td>
+            <td><span class="wf-tag" style="font-size:8px;">Educaci&oacute;n</span></td>
+            <td><span class="wf-badge" style="border-style:dashed;">Borrador</span></td>
+            <td>13 Abr</td>
+            <td>Admin</td>
+            <td><span class="wf-btn wf-btn-secondary wf-btn-small">Editar</span> <span class="wf-btn wf-btn-danger wf-btn-small">Eliminar</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px; font-size:11px;">
+        <span class="wf-btn wf-btn-outline wf-btn-small" style="opacity:0.4;">&larr; Anterior</span>
+        <span>P&aacute;gina <strong>1</strong> de <strong>2</strong></span>
+        <span class="wf-btn wf-btn-outline wf-btn-small">Siguiente &rarr;</span>
+      </div>
+    </div>
+
+    <hr class="wf-divider">
+
+    <!-- Blog Post Editor -->
+    <div style="padding:6px 24px; font-size:10px; color:#999; font-style:italic; font-family:sans-serif;">Blog Post Editor (Create/Edit view):</div>
+    <div class="wf-section">
+      <h2 style="font-size:16px; margin-bottom:12px;">Editor de Publicaci&oacute;n</h2>
+
+      <div class="wf-form-group">
+        <label>T&iacute;tulo *</label>
+        <div class="wf-input" style="font-size:14px; padding:10px;">____________________</div>
+      </div>
+
+      <div class="wf-form-row">
+        <div class="wf-form-group"><label>Categor&iacute;a</label><div class="wf-select" style="width:100%;">[ Rescates / Eventos / ...  v ]</div></div>
+        <div class="wf-form-group"><label>Estado</label><div class="wf-select" style="width:100%;">[ Borrador / Publicado  v ]</div></div>
+      </div>
+
+      <div class="wf-form-group">
+        <label>Imagen de portada</label>
+        <div class="wf-input" style="border-style:dashed;">[Seleccionar imagen...]</div>
+      </div>
+
+      <div class="wf-form-group">
+        <label>Contenido *</label>
+        <!-- Rich text toolbar -->
+        <div style="background:#ddd; padding:5px 8px; border:2px solid #aaa; border-bottom:none; border-radius:2px 2px 0 0; font-size:10px; display:flex; gap:10px; color:#666;">
+          <span><b>B</b></span><span><i>I</i></span><span><u>U</u></span><span>|</span><span>H1</span><span>H2</span><span>|</span><span>[link]</span><span>[img]</span>
+        </div>
+        <div class="wf-input" style="height:140px; border-radius:0 0 2px 2px; border-top:none; align-items:flex-start; padding-top:8px;">
+          [Rich text editor content area...]
+        </div>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-top:14px;">
+        <span class="wf-btn wf-btn-outline" style="flex:1; text-align:center;">Guardar Borrador</span>
+        <span class="wf-btn wf-btn-primary" style="flex:1; text-align:center;">Publicar</span>
+      </div>
+    </div>
+  </div>
+  <div class="back-top"><a href="#top">&uarr; Back to Table of Contents</a></div>
+</div>
+
+
+<!-- Footer -->
+<div style="max-width:880px; margin:36px auto; text-align:center; font-size:11px; color:#aaa; padding-bottom:50px; font-family:sans-serif;">
+  <p>Wireframes &mdash; <strong>Capstone Animal Rescue Platform</strong> &mdash; Huellitas Sin Hogar / CPAAA</p>
+  <p>14 wireframes &middot; 8 implemented &middot; 2 stubs &middot; 4 proposed</p>
+  <p style="margin-top:6px;"><a href="#top" style="color:#888; text-decoration:none;">&uarr; Back to Top</a></p>
+</div>
+
+</body>
+</html>
