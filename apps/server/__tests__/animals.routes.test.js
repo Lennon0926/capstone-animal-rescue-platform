@@ -1,6 +1,5 @@
 const request = require("supertest");
 
-
 const MOCK_ANIMALS = [
   {
     aid: 1,
