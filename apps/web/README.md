@@ -2,6 +2,7 @@
 
 The animal rescue platform frontend, built with Next.js (Pages Router), React, TypeScript, and Tailwind CSS.
 
+
 ## Pages
 
 | Route | Description |
