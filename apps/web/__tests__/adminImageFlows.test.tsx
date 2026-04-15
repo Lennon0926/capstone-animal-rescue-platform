@@ -141,6 +141,14 @@ const sampleAnimalWithMedicalRecords: Animal = {
   ],
 };
 
+const legacyEnglishAnimalWithMedicalRecords: Animal = {
+  ...sampleAnimalWithMedicalRecords,
+  species: "dog",
+  size: "medium",
+  gender: "male",
+  status: "available",
+};
+
 beforeEach(() => {
   jest.clearAllMocks();
   process.env.NEXT_PUBLIC_API_BASE_URL = "http://localhost:4000";
@@ -294,7 +302,7 @@ describe("admin image flow gating", () => {
     });
   });
 
-  it("renders and submits editable medical records in the edit form", async () => {
+  it("normalizes legacy English enum values and submits editable medical records in the edit form", async () => {
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
       json: () =>
@@ -322,9 +330,15 @@ describe("admin image flow gating", () => {
         }),
     });
 
-    render(<EditAnimalForm animal={sampleAnimalWithMedicalRecords} />);
+    render(<EditAnimalForm animal={legacyEnglishAnimalWithMedicalRecords} />);
 
     expect(screen.getByDisplayValue("Primary vaccine")).toBeTruthy();
+    expect((screen.getByLabelText(/Especie/i) as HTMLSelectElement).value).toBe("perro");
+    expect((screen.getByLabelText(/Tamaño/i) as HTMLSelectElement).value).toBe("mediano");
+    expect((screen.getByLabelText(/Género/i) as HTMLSelectElement).value).toBe("macho");
+    expect((screen.getByLabelText(/Estado/i) as HTMLSelectElement).value).toBe(
+      "disponible"
+    );
 
     fillMedicalRecordFields(0, {
       notes: "Updated vaccine note",
@@ -352,6 +366,12 @@ describe("admin image flow gating", () => {
     const body = JSON.parse(
       ((global.fetch as jest.Mock).mock.calls[0][1] as { body: string }).body
     );
+    expect(body).toMatchObject({
+      species: "perro",
+      size: "mediano",
+      gender: "macho",
+      status: "disponible",
+    });
     expect(body.medical_records).toEqual([
       {
         record_id: 31,

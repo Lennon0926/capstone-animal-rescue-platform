@@ -24,6 +24,7 @@ import {
   type MedicalRecordFormData,
   updateMedicalRecordAtIndex,
 } from "@/utils/medicalRecords";
+import { normalizeAdminAnimalFormValues } from "@/utils/adminAnimalFormValues";
 
 interface EditAnimalFormProps {
   animal?: Animal;
@@ -43,7 +44,9 @@ type UpdateAnimalResponse = {
 
 export default function EditAnimalForm({ animal, onSave, error, notFound }: EditAnimalFormProps) {
   const router = useRouter();
-  const [formData, setFormData] = useState<Animal>(animal || ({} as Animal));
+  const [formData, setFormData] = useState<Animal>(
+    animal ? normalizeAdminAnimalFormValues(animal) : ({} as Animal)
+  );
   const [medicalRecordsData, setMedicalRecordsData] = useState<MedicalRecordFormData[]>(
     getInitialMedicalRecords(animal)
   );
@@ -59,7 +62,7 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
 
   useEffect(() => {
     if (animal) {
-      setFormData(animal);
+      setFormData(normalizeAdminAnimalFormValues(animal));
       setMedicalRecordsData(getInitialMedicalRecords(animal));
       setErrorMessage("");
       setSuccessMessage("");
@@ -340,7 +343,7 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
       }
 
       const result = (await response.json()) as UpdateAnimalResponse;
-      const updatedAnimal = result.data || formData;
+      const updatedAnimal = normalizeAdminAnimalFormValues(result.data || formData);
 
       setSuccessMessage("¡Animal actualizado exitosamente!");
       setSelectedFile(null);
@@ -348,7 +351,7 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
       setMedicalRecordsData(getInitialMedicalRecords(updatedAnimal));
 
       if (onSave && result.data) {
-        onSave(result.data);
+        onSave(updatedAnimal);
       }
     } catch (nextError) {
       setErrorMessage(
