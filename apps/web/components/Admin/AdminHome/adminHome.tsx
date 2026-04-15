@@ -5,7 +5,6 @@ import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -26,8 +25,26 @@ import {
 import { supabase } from "@/lib/supabase"
 import styles from "./adminHome.module.css"
 
+type ChartPoint = {
+  month: string
+  dogs: number
+  cats: number
+}
+
+type CustomTooltipEntry = {
+  color?: string
+  name?: string
+  value?: number | string
+}
+
+type CustomTooltipProps = {
+  active?: boolean
+  payload?: CustomTooltipEntry[]
+  label?: string
+}
+
 // Custom Tooltip Component
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     const monthName = new Date(label + "-01").toLocaleDateString("es-ES", {
       month: "long",
@@ -38,7 +55,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       <div className={styles.customTooltip}>
         <p className={styles.tooltipLabel}>{monthName}</p>
         <div className={styles.tooltipContent}>
-          {payload.map((entry: any, index: number) => (
+          {payload.map((entry, index: number) => (
             <div key={index} className={styles.tooltipItem}>
               <span 
                 className={styles.tooltipDot} 
@@ -69,8 +86,8 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export default function AdminHome() {
-  const [chartData, setChartData] = React.useState<any[]>([])
-  const [adoptedChartData, setAdoptedChartData] = React.useState<any[]>([])
+  const [chartData, setChartData] = React.useState<ChartPoint[]>([])
+  const [adoptedChartData, setAdoptedChartData] = React.useState<ChartPoint[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [timeRange, setTimeRange] = React.useState("3m")
   const [adoptedTimeRange, setAdoptedTimeRange] = React.useState("3m")
@@ -203,7 +220,7 @@ export default function AdminHome() {
     if (!latestMonthStr) return []
 
     const [latestYear, latestMonth] = latestMonthStr.split("-").map(Number)
-    let currentDate = new Date(latestYear, latestMonth - 1, 1)
+    const currentDate = new Date(latestYear, latestMonth - 1, 1)
 
     // Generate all months in the range (going backwards)
     const allMonths: { [key: string]: { dogs: number; cats: number } } = {}
@@ -249,7 +266,7 @@ export default function AdminHome() {
     if (!latestMonthStr) return []
 
     const [latestYear, latestMonth] = latestMonthStr.split("-").map(Number)
-    let currentDate = new Date(latestYear, latestMonth - 1, 1)
+    const currentDate = new Date(latestYear, latestMonth - 1, 1)
 
     // Generate all months in the range (going backwards)
     const allMonths: { [key: string]: { dogs: number; cats: number } } = {}

@@ -32,7 +32,7 @@ export function useAuthRequired(): AuthState {
 
         setUser(session.user);
         setIsLoading(false);
-      } catch (err) {
+      } catch {
         router.push('/admin/login');
       }
     };
