@@ -29,3 +29,25 @@ export const MOCK_ANIMALS = Array.from({ length: 13 }, (_, i) => ({
   created_at: "2024-01-01T00:00:00Z",
   record_id: null as number | null,
 }));
+
+export const MOCK_MEDICAL_RECORDS_BY_AID: Record<number, Array<{
+  record_id: number;
+  aid: number;
+  record_type: string;
+  date_given?: string;
+  vet_name?: string;
+  notes?: string;
+  created_at: string;
+}>> = {
+  1: [
+    {
+      record_id: 101,
+      aid: 1,
+      record_type: "vacunación",
+      date_given: "2026-04-14T10:00:00.000Z",
+      vet_name: "Dr. Rivera",
+      notes: "Primary vaccine",
+      created_at: "2026-04-14T10:00:00.000Z",
+    },
+  ],
+};

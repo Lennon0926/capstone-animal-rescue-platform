@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getAnimalImageUrl } from "@/utils/animalImages";
 import type { Animal } from "@/types/animal";
 import { buildAdoptionFormUrl } from "@/hooks/useAdoptionFormUrl";
+import { getMedicalRecordSummary } from "@/utils/medicalRecords";
 
 type AnimalInfoProps = {
   animal: Animal;
@@ -45,6 +46,7 @@ function getStatusClass(status: string) {
 
 export default function AnimalInfo({ animal }: AnimalInfoProps) {
   const formUrl = buildAdoptionFormUrl(animal.aid, animal.name);
+  const medicalRecords = animal.medical_records || [];
 
   return (
     <section className={styles.section}>
@@ -97,6 +99,42 @@ export default function AnimalInfo({ animal }: AnimalInfoProps) {
             </div>
 
             <p className={styles.description}>{animal.description}</p>
+
+            {medicalRecords.length > 0 && (
+              <section className={styles.medicalRecordsSection} aria-labelledby="medical-records-title">
+                <h2 id="medical-records-title" className={styles.sectionTitle}>
+                  Registros médicos
+                </h2>
+                <div className={styles.medicalRecordsList}>
+                  {medicalRecords.map((medicalRecord, index) => {
+                    const summary = getMedicalRecordSummary(medicalRecord);
+
+                    return (
+                      <article
+                        key={medicalRecord.record_id || `${animal.aid}-medical-record-${index}`}
+                        className={styles.medicalRecordCard}
+                      >
+                        <div className={styles.medicalRecordHeader}>
+                          <h3 className={styles.medicalRecordType}>
+                            {medicalRecord.record_type
+                              ? capitalize(medicalRecord.record_type)
+                              : `Registro ${index + 1}`}
+                          </h3>
+                          {summary ? (
+                            <p className={styles.medicalRecordMeta}>{summary}</p>
+                          ) : null}
+                        </div>
+                        {medicalRecord.notes ? (
+                          <p className={styles.medicalRecordNotes}>
+                            <strong>Descripción:</strong> {medicalRecord.notes}
+                          </p>
+                        ) : null}
+                      </article>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
 
             {animal.tags && animal.tags.length > 0 && (
               <div className={styles.tagsSection}>

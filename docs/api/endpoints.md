@@ -302,7 +302,18 @@ GET /api/animals/1
     "description": "Friendly and energetic dog",
     "image_url": "https://cdn.example.com/animals/1/luna.jpg",
     "tags": ["friendly", "energetic"],
-    "created_at": "2026-02-20T14:30:00.000Z"
+    "created_at": "2026-02-20T14:30:00.000Z",
+    "medical_records": [
+      {
+        "record_id": 44,
+        "aid": 1,
+        "record_type": "vacunación",
+        "date_given": "2026-04-14T10:00:00.000Z",
+        "vet_name": "Dr. Rivera",
+        "notes": "Initial intake vaccination",
+        "created_at": "2026-04-14T10:00:00.000Z"
+      }
+    ]
   }
 }
 ```
@@ -349,6 +360,16 @@ Creates a new animal record.
 | `status`           | string   | Yes      | `disponible`, `adoptado`, `pendiente`, `en hogar temporal`, or `atención médica` |
 | `image_object_key` | string   | No       | R2 object key for the animal's image |
 | `tags`             | string[] | No       | Array of tag strings |
+| `medical_records`  | object[] | No       | Optional initial medical records created after the animal row is inserted |
+
+**Optional `medical_records[]` fields**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `record_type` | string | No | `vacunación`, `desparasitación`, `esterilización`, `tratamiento`, `examen`, or `cirugía` |
+| `date_given` | string | No | ISO-8601 timestamp for the medical action |
+| `vet_name` | string | No | Veterinarian name (max 100 chars) |
+| `notes` | string | No | Freeform notes for the initial medical record |
 
 > **Note:** `image_url` is read-only and cannot be set directly. Use `image_object_key` instead.
 
@@ -364,7 +385,21 @@ curl -X POST http://localhost:4000/api/animals \
     "gender": "hembra",
     "status": "disponible",
     "description": "Friendly and energetic dog",
-    "tags": ["friendly", "energetic"]
+    "tags": ["friendly", "energetic"],
+    "medical_records": [
+      {
+        "record_type": "vacunación",
+        "date_given": "2026-04-14T10:00:00.000Z",
+        "vet_name": "Dr. Rivera",
+        "notes": "Initial intake vaccination"
+      },
+      {
+        "record_type": "examen",
+        "date_given": "2026-04-15T11:30:00.000Z",
+        "vet_name": "Dr. Soto",
+        "notes": "Initial wellness exam"
+      }
+    ]
   }'
 ```
 
@@ -382,10 +417,17 @@ curl -X POST http://localhost:4000/api/animals \
     "status": "disponible",
     "description": "Friendly and energetic dog",
     "tags": ["friendly", "energetic"],
-    "created_at": "2026-02-20T14:30:00.000Z"
-  }
+    "created_at": "2026-02-20T14:30:00.000Z",
+    "record_id": null
+  },
+  "medicalRecordsAttempted": true,
+  "medicalRecordsRequested": 2,
+  "medicalRecordsCreatedCount": 2,
+  "medicalRecordCreated": true
 }
 ```
+
+If the animal is created successfully but one or more medical-record inserts fail, the endpoint still returns `201` with `success: true`, the created animal in `data`, `medicalRecordsAttempted: true`, `medicalRecordsRequested`, `medicalRecordsCreatedCount`, `medicalRecordCreated: false`, and a `warnings` array describing each failed medical-record insert.
 
 **Error `400`**
 
@@ -424,13 +466,39 @@ Partially updates an existing animal. At least one valid field must be provided.
 | `image_object_key` | string   | R2 object key for the animal's image |
 | `record_id`        | any      | External record identifier |
 | `tags`             | string[] | Array of tag strings |
+| `medical_records`  | object[] | Complete replacement set of medical records for the animal |
+
+**Optional `medical_records[]` fields**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `record_id` | integer | Existing medical record ID to update. Omit to create a new record. |
+| `record_type` | string | `vacunación`, `desparasitación`, `esterilización`, `tratamiento`, `examen`, or `cirugía` |
+| `date_given` | string | ISO-8601 timestamp for the medical action |
+| `vet_name` | string | Veterinarian name (max 100 chars) |
+| `notes` | string | Freeform notes for the medical record |
 
 **Request Example**
 
 ```bash
 curl -X PATCH http://localhost:4000/api/animals/1 \
   -H "Content-Type: application/json" \
-  -d '{ "status": "adoptado" }'
+  -d '{
+    "status": "adoptado",
+    "medical_records": [
+      {
+        "record_id": 44,
+        "record_type": "vacunación",
+        "date_given": "2026-04-14T10:00:00.000Z",
+        "vet_name": "Dr. Rivera",
+        "notes": "Updated vaccine note"
+      },
+      {
+        "record_type": "examen",
+        "notes": "Follow-up exam"
+      }
+    ]
+  }'
 ```
 
 **Response `200`**
@@ -447,10 +515,28 @@ curl -X PATCH http://localhost:4000/api/animals/1 \
     "status": "adoptado",
     "description": "Friendly and energetic dog",
     "tags": ["friendly", "energetic"],
-    "created_at": "2026-02-20T14:30:00.000Z"
+    "created_at": "2026-02-20T14:30:00.000Z",
+    "medical_records": [
+      {
+        "record_id": 44,
+        "aid": 1,
+        "record_type": "vacunación",
+        "date_given": "2026-04-14T10:00:00.000Z",
+        "vet_name": "Dr. Rivera",
+        "notes": "Updated vaccine note"
+      },
+      {
+        "record_id": 45,
+        "aid": 1,
+        "record_type": "examen",
+        "notes": "Follow-up exam"
+      }
+    ]
   }
 }
 ```
+
+When `medical_records` is provided on `PATCH`, the submitted array becomes the new full set of medical records for that animal. Existing records omitted from the array are removed.
 
 **Error `400`**
 

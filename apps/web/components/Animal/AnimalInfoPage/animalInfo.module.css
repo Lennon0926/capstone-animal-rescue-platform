@@ -44,6 +44,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
+  min-width: 0;
 }
 
 .title {
@@ -102,6 +103,70 @@
 .description {
   font-size: var(--text-lg);
   line-height: 1.6;
+  color: var(--color-text);
+}
+
+.medicalRecordsSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.medicalRecordsList {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-3);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  padding-bottom: var(--space-2);
+  -webkit-overflow-scrolling: touch;
+}
+
+.medicalRecordCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 0 0 min(24rem, calc(100vw - 8rem));
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  scroll-snap-align: start;
+}
+
+.medicalRecordHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.medicalRecordType {
+  margin: 0;
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.medicalRecordMeta {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.medicalRecordNotes {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: 1.5;
   color: var(--color-text);
 }
 
@@ -169,6 +234,10 @@
 
   .title {
     font-size: var(--text-2xl);
+  }
+
+  .medicalRecordCard {
+    flex-basis: min(22rem, calc(100vw - 3rem));
   }
 
 }

@@ -203,4 +203,74 @@ describe("image object key middleware validation", () => {
 
     expect(next.mock.calls[0][0].message).toMatch(/image_url is read-only/i);
   });
+
+  it("accepts medical_records on update", () => {
+    const req = {
+      body: {
+        medical_records: [
+          {
+            record_id: 10,
+            record_type: "Vacunación",
+            date_given: "2026-04-14T10:00:00.000Z",
+            vet_name: "Dr. Rivera",
+            notes: "Updated vaccine note",
+          },
+          {
+            record_type: "Examen",
+            notes: "New exam note",
+          },
+        ],
+      },
+    };
+    const next = jest.fn();
+
+    validateUpdateAnimal(req, {}, next);
+
+    expect(next).toHaveBeenCalledWith();
+    expect(req.validatedBody.medical_records).toEqual([
+      {
+        record_id: 10,
+        record_type: "vacunación",
+        date_given: "2026-04-14T10:00:00.000Z",
+        vet_name: "Dr. Rivera",
+        notes: "Updated vaccine note",
+      },
+      {
+        record_type: "examen",
+        notes: "New exam note",
+      },
+    ]);
+  });
+
+  it("accepts an empty medical_records array on update", () => {
+    const req = {
+      body: {
+        medical_records: [],
+      },
+    };
+    const next = jest.fn();
+
+    validateUpdateAnimal(req, {}, next);
+
+    expect(next).toHaveBeenCalledWith();
+    expect(req.validatedBody.medical_records).toEqual([]);
+  });
+
+  it("rejects invalid medical_records.record_id on update", () => {
+    const req = {
+      body: {
+        medical_records: [
+          {
+            record_id: "abc",
+            record_type: "vacunación",
+          },
+        ],
+      },
+    };
+    const next = jest.fn();
+
+    validateUpdateAnimal(req, {}, next);
+
+    expect(next.mock.calls[0][0].message).toMatch(/medical_records\[0\]\.record_id/i);
+  });
 });
