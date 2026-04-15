@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import styles from "./donationModal.module.css";
@@ -23,8 +24,6 @@ export default function DonationModal({
     if (!isOpen) {
       return;
     }
-
-    setPaymentMethod("ath");
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -119,10 +118,13 @@ export default function DonationModal({
               <h3 className={styles.panelTitle}>Escanea con ATH Móvil</h3>
 
               <div className={styles.qrBox}>
-                <img
+                <Image
                   src="/ATH-movil-number.png"
                   alt={`Código QR para donar ${selectedAmount} con ATH Móvil`}
                   className={styles.qrImage}
+                  width={220}
+                  height={220}
+                  sizes="220px"
                 />
               </div>
 
