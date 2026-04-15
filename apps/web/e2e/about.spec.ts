@@ -158,9 +158,11 @@ test.describe("About page (/about)", () => {
     await expect(heading).toBeVisible();
   });
 
-  test("CTA Ayúdanos a Ayudar link points to /donation", async ({ page }) => {
-    const link = page.getByRole("link", { name: /Ayúdanos a Ayudar/i });
-    await link.scrollIntoViewIfNeeded();
-    await expect(link).toHaveAttribute("href", "/donation");
+  test("CTA Ayúdanos a Ayudar opens donation modal", async ({ page }) => {
+    const button = page.getByRole("button", { name: /Ayúdanos a Ayudar/i });
+    await button.scrollIntoViewIfNeeded();
+    await button.click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Donación — $10" })).toBeVisible();
   });
 });

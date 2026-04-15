@@ -11,7 +11,6 @@ The animal rescue platform frontend, built with Next.js (Pages Router), React, T
 | `/adopt/[id]` | Animal detail page |
 | `/about` | Organization info — mission, history, values, team, contact |
 | `/blog` | Blog |
-| `/donation` | Donation page |
 
 ## Development
 
@@ -53,4 +52,3 @@ E2E tests live in `e2e/` and use a lightweight mock API server (port 4001) so no
 | `e2e/adopt.spec.ts` | `/adopt` |
 | `e2e/adopt-detail.spec.ts` | `/adopt/[id]` |
 | `e2e/blog.spec.ts` | `/blog` |
-| `e2e/donation.spec.ts` | `/donation` |

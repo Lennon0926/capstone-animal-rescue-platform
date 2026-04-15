@@ -19,7 +19,7 @@ test.describe("Home page (/home)", () => {
     await expect(nav.getByRole("link", { name: "Adoptar", exact: true })).toBeVisible();
     await expect(nav.getByRole("link", { name: "About", exact: true })).toBeVisible();
     await expect(nav.getByRole("link", { name: "Blog", exact: true })).toBeVisible();
-    await expect(nav.getByRole("link", { name: "Donar", exact: true })).toBeVisible();
+    await expect(nav.getByRole("button", { name: "Donar", exact: true })).toBeVisible();
   });
 
   test("mobile hamburger opens nav", async ({ page, viewport }) => {
@@ -40,10 +40,12 @@ test.describe("Home page (/home)", () => {
     await expect(page.getByText(/Ayudamos a animales abandonados/i)).toBeVisible();
   });
 
-  test("hero Dona Ahora link points to /donation", async ({ page }) => {
-    const link = page.getByRole("link", { name: "Dona Ahora", exact: true });
-    await expect(link).toBeVisible();
-    await expect(link).toHaveAttribute("href", "/donation");
+  test("hero Dona Ahora opens donation modal with first amount", async ({ page }) => {
+    const button = page.getByRole("button", { name: "Dona Ahora", exact: true });
+    await expect(button).toBeVisible();
+    await button.click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Donación — $10" })).toBeVisible();
   });
 
   // --- OurMissionSection ---
@@ -103,10 +105,11 @@ test.describe("Home page (/home)", () => {
     await expect(heading).toBeVisible();
   });
 
-  test("donation banner Donar Ahora link points to /donation", async ({ page }) => {
-    const link = page.getByRole("link", { name: "Donar Ahora", exact: true });
-    await link.scrollIntoViewIfNeeded();
-    await expect(link).toHaveAttribute("href", "/donation");
+  test("donation banner Donar Ahora opens donation modal", async ({ page }) => {
+    const button = page.getByRole("button", { name: "Donar Ahora", exact: true });
+    await button.scrollIntoViewIfNeeded();
+    await button.click();
+    await expect(page.getByRole("dialog")).toBeVisible();
   });
 
   test("donation banner benefits text is visible", async ({ page }) => {
@@ -130,6 +133,6 @@ test.describe("Home page (/home)", () => {
     await footer.scrollIntoViewIfNeeded();
     await expect(footer.getByRole("link", { name: "Sobre Nosotros", exact: true })).toBeVisible();
     await expect(footer.getByRole("link", { name: "Animales Disponibles", exact: true })).toBeVisible();
-    await expect(footer.getByRole("link", { name: "Donar", exact: true })).toBeVisible();
+    await expect(footer.getByRole("button", { name: "Donar", exact: true })).toBeVisible();
   });
 });

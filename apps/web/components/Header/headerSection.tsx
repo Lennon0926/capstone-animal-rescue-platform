@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import DonationModalTrigger from "../DonationPage/DonationModalTrigger";
 import styles from "./headerSection.module.css";
 
 export default function Header() {
@@ -27,9 +28,9 @@ export default function Header() {
           <Link href="/adopt">Adoptar</Link>
           <Link href="/about">About</Link>
           <Link href="/blog">Blog</Link>
-          <Link href="/donation" className={styles.donateButton}>
+          <DonationModalTrigger className={styles.donateButton}>
             Donar
-          </Link>
+          </DonationModalTrigger>
         </nav>
 
         <button
@@ -47,9 +48,12 @@ export default function Header() {
           <Link href="/adopt">Adoptar</Link>
           <Link href="/about">About</Link>
           <Link href="/blog">Blog</Link>
-          <Link href="/donation" className={styles.donateButtonMobile}>
+          <DonationModalTrigger
+            className={styles.donateButtonMobile}
+            onOpen={() => setIsOpen(false)}
+          >
             Donar
-          </Link>
+          </DonationModalTrigger>
         </nav>
       )}
     </header>

@@ -1,6 +1,6 @@
 import styles from "./donationBanner.module.css";
 import { CheckCircle } from "lucide-react";
-import Link from "next/link";
+import DonationModalTrigger from "../../DonationPage/DonationModalTrigger";
 
 export default function DonationBanner() {
   return (
@@ -30,9 +30,9 @@ export default function DonationBanner() {
         </div>
 
         <div className={styles.actions}>
-          <Link href="/donation" className={styles.primaryButton}>
+          <DonationModalTrigger className={styles.primaryButton}>
             Donar Ahora
-          </Link>
+          </DonationModalTrigger>
         </div>
 
       </div>
