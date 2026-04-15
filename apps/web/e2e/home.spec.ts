@@ -227,4 +227,4 @@ test.describe("Home page (/home)", () => {
     ).toBeVisible();
     await expect(footer.getByRole("link", { name: "Donar", exact: true })).toBeVisible();
   });
-});
+});})

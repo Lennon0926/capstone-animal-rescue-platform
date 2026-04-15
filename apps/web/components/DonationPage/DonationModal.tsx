@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import styles from "./donationModal.module.css";
 
 type PaymentMethod = "ath" | "paypal" | "card";
@@ -46,7 +47,11 @@ export default function DonationModal({
     return null;
   }
 
-  return (
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  const modalContent = (
     <div className={styles.modalOverlay} onClick={onClose} aria-hidden="true">
       <div
         className={styles.modalCard}
@@ -169,4 +174,6 @@ export default function DonationModal({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
