@@ -1,4 +1,5 @@
 import { GetServerSideProps } from "next";
+import Head from "next/head";
 import AnimalInfo from "@/components/Animal/AnimalInfoPage/animalInfo";
 import HeaderSection from "@/components/Header/headerSection";
 import FooterSection from "@/components/Footer/footerSection";
@@ -14,15 +15,21 @@ type AnimalInfoPageProps = {
 };
 
 export default function AdoptAnimalPage({ animal }: AnimalInfoPageProps) {
-  if (!animal) {
-    return <div>No se encontró el animal.</div>;
-  }
-
   return (
     <div>
-      <HeaderSection />
-      <AnimalInfo animal={animal} />
-      <FooterSection />
+      <Head>
+        <title>{animal ? `${animal.name} | Huellitas Sin Hogar` : "Animal | Huellitas Sin Hogar"}</title>
+        <meta name="description" content={animal ? `Adopta a ${animal.name} en Huellitas Sin Hogar. ${animal.description ?? ""}`.trim() : "Conoce a los animales disponibles para adopción en Huellitas Sin Hogar."} />
+      </Head>
+      {!animal ? (
+        <div>No se encontró el animal.</div>
+      ) : (
+        <>
+          <HeaderSection />
+          <AnimalInfo animal={animal} />
+          <FooterSection />
+        </>
+      )}
     </div>
   );
 }

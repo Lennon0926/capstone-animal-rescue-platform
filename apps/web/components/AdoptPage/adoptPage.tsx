@@ -116,7 +116,12 @@ function FlipCard({ animal }: { animal: Animal }) {
         <div className={`${styles.cardFace} ${styles.cardFront}`}>
           <div className={styles.imageWrapper}>
             <Image
-              src={getAnimalImageUrl(animal.image_url, animal.species, animal.aid)}
+              src={getAnimalImageUrl(
+                animal.image_url,
+                animal.species,
+                animal.aid,
+                animal.image_object_key,
+              )}
               alt={animal.name}
               fill
               sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 25vw"
@@ -131,8 +136,12 @@ function FlipCard({ animal }: { animal: Animal }) {
           </div>
         </div>
 
-        {/* Back - Details */}
-        <div className={`${styles.cardFace} ${styles.cardBack}`}>
+        {/* Back - Details: inert+aria-hidden when not flipped prevents nested-interactive a11y violation */}
+        <div
+          className={`${styles.cardFace} ${styles.cardBack}`}
+          aria-hidden={!isFlipped}
+          inert={!isFlipped ? true : undefined}
+        >
           <div className={styles.cardBackContent}>
             <div className={styles.cardBackHeader}>
               <h3 className={styles.cardBackName}>{animal.name}</h3>

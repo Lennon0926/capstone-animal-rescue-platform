@@ -32,6 +32,7 @@ export default function DonationSection() {
             priority
             width={500}
             height={500}
+            sizes="(max-width: 900px) 100vw, 35vw"
           />
         </div>
       </div>

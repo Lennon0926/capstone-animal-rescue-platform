@@ -1,3 +1,4 @@
+import Head from "next/head";
 import HeaderSection from "@/components/Header/headerSection";
 import FooterSection from "@/components/Footer/footerSection";
 import AnimalImageUploadForm from "@/components/Animal/animalImageUploadForm";
@@ -5,6 +6,9 @@ import AnimalImageUploadForm from "@/components/Animal/animalImageUploadForm";
 export default function UploadPage() {
   return (
     <>
+      <Head>
+        <title>Subir Imágenes | Huellitas Sin Hogar</title>
+      </Head>
       <HeaderSection />
       <main
         style={{

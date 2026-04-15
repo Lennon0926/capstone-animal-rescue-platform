@@ -3,7 +3,10 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const express = require("express");
 
-dotenv.config({ path: path.resolve(__dirname, ".env.local") });
+dotenv.config({
+  path: path.resolve(__dirname, ".env.local"),
+  quiet: process.env.NODE_ENV === "test",
+});
 const { validateEnv } = require("./validateEnv");
 
 validateEnv();

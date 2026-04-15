@@ -19,7 +19,6 @@ This document describes all required environment variables, how to configure the
 | `R2_BUCKET_NAME` | Yes | Name of the R2 bucket for image uploads |
 | `R2_PUBLIC_BASE_URL` | No | Public CDN URL for R2 objects (e.g., `https://cdn.example.com`) |
 | `R2_MAX_IMAGE_SIZE_BYTES` | No | Upload size limit in bytes (default: `5242880` = 5 MB) |
-| `R2_SIGNED_READ_URL_TTL_SECONDS` | No | Signed URL TTL when no public URL is set (default: `3600`) |
 
 ### Frontend (`apps/web`)
 

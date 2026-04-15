@@ -2,6 +2,7 @@
 
 A full-stack web application for animal rescue coordination, built with Next.js and Express.
 
+
 ## Project Structure
 
 ```
@@ -91,8 +92,8 @@ R2_PUBLIC_BASE_URL=
 # Optional: Override upload size limit in bytes (default: 5 MB)
 R2_MAX_IMAGE_SIZE_BYTES=5242880
 
-# Optional: Signed URL TTL in seconds when R2_PUBLIC_BASE_URL is not set (default: 1 hour)
-R2_SIGNED_READ_URL_TTL_SECONDS=3600
+# Optional: Cache TTL for live R2 health probes in milliseconds (default: 30000)
+R2_HEALTHCHECK_CACHE_TTL_MS=30000
 ```
 
 **Web** (`apps/web/.env.local`):
@@ -113,8 +114,8 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 NEXT_PUBLIC_GOOGLE_FORM_URL=your-google-form-url
 ```
 
-> See [docs/SECRETS_MANAGEMENT.md](docs/SECRETS_MANAGEMENT.md) for the full variable reference, optional vars, and secret rotation procedures.
-> See [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) for Supabase project setup instructions.
+> See [docs/guides/SECRETS_MANAGEMENT.md](docs/guides/SECRETS_MANAGEMENT.md) for the full variable reference, optional vars, and secret rotation procedures.
+> See [docs/guides/SUPABASE_SETUP.md](docs/guides/SUPABASE_SETUP.md) for Supabase project setup instructions.
 
 ### 4. Seed the database
 
@@ -140,6 +141,14 @@ cd apps/server && npm run dev
 cd apps/web && npm run dev
 ```
 
+Optional experimental frontend command:
+
+```bash
+cd apps/web && npm run dev:turbo
+```
+
+`npm run dev` uses webpack as the stable default for local development. `npm run dev:turbo` keeps Turbopack available as an opt-in path for troubleshooting or comparison.
+
 - API: `http://localhost:4000`
 - Frontend: `http://localhost:3000`
 
@@ -159,20 +168,30 @@ cd apps/web && npm run dev
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/animals` | List animals with filters and pagination |
-| GET | `/api/animals/:aid` | Get a single animal by ID |
 | GET | `/api/animals/filters` | Get available filter values (species, status, etc.) |
+| GET | `/api/animals/:aid` | Get a single animal by ID |
+| POST | `/api/animals` | Create a new animal record |
+| PATCH | `/api/animals/:aid` | Partially update an existing animal |
+| DELETE | `/api/animals/:aid` | Delete an animal by ID |
 
 ### Uploads
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
+| GET | `/api/uploads/config` | Return upload configuration plus live Cloudflare R2 health |
 | POST | `/api/uploads/animals/:animalId/image` | Upload an animal image to Cloudflare R2 |
+
+Full request and response examples are documented in [docs/api/endpoints.md](docs/api/endpoints.md).
+
+> **API maturity note:** Authentication is not yet implemented — all endpoints are currently public. Rate limiting (#132), API versioning (#133), CORS hardening (#134), and Content-Type enforcement (#135) are open issues.
 
 **Upload details:**
 - Request: `multipart/form-data`, field name `image`
 - Allowed types: `image/jpeg`, `image/png`, `image/webp`
 - Max size: 5 MB (override with `R2_MAX_IMAGE_SIZE_BYTES`)
-- Returns: object key and a public or signed URL
+- `GET /api/uploads/config` returns `r2Configured`, `publicObjectUrlConfigured`, upload limits, and `health` with `{ ok, code, message, checkedAt }`
+- Upload failures caused by Cloudflare R2 availability or authorization issues now return `503` with structured error codes such as `R2_UNAUTHORIZED` or `R2_UNAVAILABLE`
+- Returns: object key and a public URL
 
 ```json
 {
@@ -182,6 +201,25 @@ cd apps/web && npm run dev
     "urlType": "public",
     "contentType": "image/jpeg",
     "size": 381248
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "r2Configured": true,
+    "missingEnvVars": [],
+    "publicObjectUrlConfigured": true,
+    "missingPublicObjectUrlEnvVars": [],
+    "allowedMimeTypes": ["image/jpeg", "image/png", "image/webp"],
+    "maxImageSizeBytes": 5242880,
+    "health": {
+      "ok": true,
+      "code": "R2_OK",
+      "message": "Cloudflare R2 is available.",
+      "checkedAt": "2026-03-29T12:00:00.000Z"
+    }
   }
 }
 ```
@@ -211,11 +249,14 @@ CI runs lint, build, unit tests, and E2E tests for every push and pull request t
 
 | Document | Description |
 |----------|-------------|
-| [docs/SECRETS_MANAGEMENT.md](docs/SECRETS_MANAGEMENT.md) | All env vars, GitHub Secrets setup, deployment config, rotation procedures |
-| [docs/SUPABASE_SETUP.md](docs/SUPABASE_SETUP.md) | Database setup and schema reference |
-| [docs/GOOGLE_FORMS_INTEGRATION.md](docs/GOOGLE_FORMS_INTEGRATION.md) | Adoption application intake via Google Forms |
-| [docs/SECURITY_ALERTS.md](docs/SECURITY_ALERTS.md) | Security alert handling and procedures |
-| [docs/api/contract-v1.md](docs/api/contract-v1.md) | Full API contract |
+| [docs/guides/SECRETS_MANAGEMENT.md](docs/guides/SECRETS_MANAGEMENT.md) | All env vars, GitHub Secrets setup, deployment config, rotation procedures |
+| [docs/guides/SUPABASE_SETUP.md](docs/guides/SUPABASE_SETUP.md) | Database setup and schema reference |
+| [docs/guides/GOOGLE_FORMS_INTEGRATION.md](docs/guides/GOOGLE_FORMS_INTEGRATION.md) | Adoption application intake via Google Forms |
+| [docs/guides/SECURITY_ALERTS.md](docs/guides/SECURITY_ALERTS.md) | Security alert handling and procedures |
+| [docs/guides/ROLLBACK.md](docs/guides/ROLLBACK.md) | Rollback procedures for Vercel deployments |
+| [docs/api/endpoints.md](docs/api/endpoints.md) | API endpoint reference (request/response examples) |
+| [docs/api/contract-v1.md](docs/api/contract-v1.md) | Planned v1 API contract |
+| [docs/reports/section-3-4-test-results.md](docs/reports/section-3-4-test-results.md) | Unit, integration, and E2E test results (Section 3.4) |
 
 ## ngrok Tunnel
 

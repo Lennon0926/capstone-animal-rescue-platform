@@ -149,6 +149,12 @@
   transform: translateY(-2px);
 }
 
+.formUnavailable {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
 /* ================= MOBILE ================= */
 
 @media (max-width: 900px) {

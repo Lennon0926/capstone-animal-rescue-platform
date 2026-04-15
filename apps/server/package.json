@@ -13,8 +13,12 @@
     "seed": "node scripts/seed.js",
     "seed:force": "node scripts/seed.js --force",
     "seed:append": "node scripts/seed.js --append",
-    "migrate:image-urls": "node scripts/migrateImageUrls.js",
-    "migrate:image-urls:apply": "node scripts/migrateImageUrls.js --apply"
+    "migrate:image-storage": "node scripts/migrateImageUrls.js",
+    "migrate:image-storage:apply": "node scripts/migrateImageUrls.js --apply",
+    "load-test": "LOAD_TEST_TARGET=http://localhost:4000 artillery run ../../tests/load/artillery.yml --output ../../tests/load/results.json",
+    "load-test:url": "artillery run ../../tests/load/artillery.yml --output ../../tests/load/results.json",
+    "load-test:report": "node ../../tests/load/generate-report.js",
+    "load-test:html": "artillery report ../../tests/load/results.json --output ../../tests/load/report.html"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.998.0",
@@ -26,6 +30,7 @@
     "multer": "^2.0.2"
   },
   "devDependencies": {
+    "artillery": "^2.0.30",
     "jest": "^30.2.0",
     "nodemon": "^3.1.11",
     "supertest": "^7.2.2"

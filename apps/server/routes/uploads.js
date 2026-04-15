@@ -11,9 +11,12 @@ const {
   ALLOWED_MIME_TYPES,
   ANIMAL_ID_PATTERN,
   maxImageSizeBytes,
-  signedReadUrlTtlSeconds,
   isR2Configured,
   missingR2EnvVars,
+  isPublicObjectUrlConfigured,
+  missingPublicObjectUrlEnvVars,
+  checkR2Health,
+  isR2DependencyError,
   uploadAnimalImage,
 } = require("../services/r2Service");
 
@@ -39,16 +42,24 @@ const getErrorPayload = (code, message, details) => ({
  * GET /api/uploads/config
  * Returns current R2 upload configuration status.
  */
-router.get("/config", (req, res) => {
-  res.json({
-    data: {
-      r2Configured: isR2Configured,
-      missingEnvVars: isR2Configured ? [] : missingR2EnvVars,
-      allowedMimeTypes: ALLOWED_MIME_TYPES_ARRAY,
-      maxImageSizeBytes,
-      signedReadUrlTtlSeconds,
-    },
-  });
+router.get("/config", async (req, res, next) => {
+  try {
+    const health = await checkR2Health();
+
+    res.json({
+      data: {
+        r2Configured: isR2Configured,
+        missingEnvVars: isR2Configured ? [] : missingR2EnvVars,
+        publicObjectUrlConfigured: isPublicObjectUrlConfigured,
+        missingPublicObjectUrlEnvVars,
+        allowedMimeTypes: ALLOWED_MIME_TYPES_ARRAY,
+        maxImageSizeBytes,
+        health,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
 });
 
 /**
@@ -106,6 +117,18 @@ router.post(
         );
     }
 
+    if (!isPublicObjectUrlConfigured) {
+      return res
+        .status(500)
+        .json(
+          getErrorPayload(
+            "R2_PUBLIC_URL_NOT_CONFIGURED",
+            "R2_PUBLIC_BASE_URL must be configured for persistent animal image uploads.",
+            { missingEnvVars: missingPublicObjectUrlEnvVars }
+          )
+        );
+    }
+
     try {
       const result = await uploadAnimalImage(
         animalId,
@@ -116,6 +139,12 @@ router.post(
 
       return res.status(201).json({ data: result });
     } catch (error) {
+      if (isR2DependencyError(error)) {
+        return res
+          .status(error.statusCode)
+          .json(getErrorPayload(error.code, error.message));
+      }
+
       return next(error);
     }
   }

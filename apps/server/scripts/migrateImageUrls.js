@@ -1,11 +1,9 @@
 /**
- * Migration Script: Fix broken image_url values in the animals table.
+ * Migration Script: Normalize animal image storage fields.
  *
- * Handles two cases:
- *  1. Plain objectKey  — e.g. "animals/14/file.png" (no protocol)
- *  2. Expired signed URL — e.g. "https://account.r2.cloudflarestorage.com/animals/2/file.jpeg?X-Amz-..."
- *
- * Both are rewritten to the public R2 URL using R2_PUBLIC_BASE_URL.
+ * Backfills `image_object_key` from existing R2-backed `image_url` values and
+ * recomputes the legacy `image_url` column using R2_PUBLIC_BASE_URL so API
+ * consumers continue to receive a stable, renderable URL during transition.
  *
  * Usage:
  *   node scripts/migrateImageUrls.js          # dry-run (prints changes, writes nothing)
@@ -13,114 +11,154 @@
  */
 
 const path = require("path");
-require("dotenv").config({ path: path.resolve(__dirname, "..", ".env.local") });
-
+require("dotenv").config({
+  path: path.resolve(__dirname, "..", ".env.local"),
+  quiet: true,
+});
 const { getSupabaseClient } = require("../lib/supabase");
+const {
+  extractObjectKeyFromImageReference,
+  getPublicObjectUrl,
+  isPublicObjectUrlConfigured,
+  normalizeObjectKey,
+} = require("../services/r2Service");
 
-const R2_PUBLIC_BASE_URL = (process.env.R2_PUBLIC_BASE_URL || "").replace(/\/+$/, "");
 const DRY_RUN = !process.argv.includes("--apply");
 
-if (!R2_PUBLIC_BASE_URL) {
-  console.error("ERROR: R2_PUBLIC_BASE_URL is not set in .env.local");
-  process.exit(1);
-}
-
-/**
- * Extracts the R2 object key from a broken image_url value.
- * Returns null if the URL is already a valid public URL.
- */
-function extractObjectKey(imageUrl) {
-  if (!imageUrl || imageUrl.trim() === "") return null;
-
-  // Case 1: expired signed URL from r2.cloudflarestorage.com
-  if (imageUrl.includes("r2.cloudflarestorage.com") && imageUrl.includes("X-Amz-")) {
-    try {
-      const url = new URL(imageUrl);
-      return url.pathname.replace(/^\//, "");
-    } catch {
-      return null;
-    }
+function normalizeText(value) {
+  if (typeof value !== "string") {
+    return null;
   }
 
-  // Case 2: plain objectKey (no protocol prefix)
-  if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
-    return imageUrl.replace(/^\//, "");
-  }
-
-  // Already a valid absolute URL — no fix needed
-  return null;
+  const trimmed = value.trim();
+  return trimmed ? trimmed : null;
 }
 
-async function run() {
+function buildImageStorageUpdate(animal) {
+  const currentImageUrl = normalizeText(animal.image_url);
+  const currentImageObjectKey = normalizeObjectKey(animal.image_object_key);
+  const derivedImageObjectKey =
+    currentImageObjectKey || extractObjectKeyFromImageReference(currentImageUrl);
+
+  if (!derivedImageObjectKey) {
+    return null;
+  }
+
+  const derivedImageUrl = getPublicObjectUrl(derivedImageObjectKey);
+  if (!derivedImageUrl) {
+    throw new Error(
+      "R2_PUBLIC_BASE_URL must be configured before running the image storage migration."
+    );
+  }
+
+  if (
+    currentImageObjectKey === derivedImageObjectKey &&
+    currentImageUrl === derivedImageUrl
+  ) {
+    return null;
+  }
+
+  return {
+    aid: animal.aid,
+    name: animal.name,
+    oldImageUrl: currentImageUrl,
+    oldImageObjectKey: currentImageObjectKey,
+    image_object_key: derivedImageObjectKey,
+    image_url: derivedImageUrl,
+  };
+}
+
+async function run({ apply = !DRY_RUN } = {}) {
+  if (!isPublicObjectUrlConfigured) {
+    throw new Error(
+      "R2_PUBLIC_BASE_URL is not configured. Set it in apps/server/.env.local before running this migration."
+    );
+  }
+
   const supabase = getSupabaseClient();
 
   const { data: animals, error } = await supabase
     .from("animals")
-    .select("aid, name, image_url");
+    .select("aid, name, image_url, image_object_key");
 
   if (error) {
-    console.error("Failed to fetch animals:", error.message);
-    process.exit(1);
+    if (
+      /image_object_key/i.test(error.message || "") &&
+      /(column|schema cache)/i.test(error.message || "")
+    ) {
+      throw new Error(
+        "The animals.image_object_key column does not exist yet. Apply the SQL migration before running the data backfill."
+      );
+    }
+
+    throw new Error(`Failed to fetch animals: ${error.message}`);
   }
 
-  const toFix = animals
-    .map((animal) => {
-      const objectKey = extractObjectKey(animal.image_url);
-      if (!objectKey) return null;
-      return {
-        aid: animal.aid,
-        name: animal.name,
-        oldUrl: animal.image_url,
-        newUrl: `${R2_PUBLIC_BASE_URL}/${objectKey}`,
-      };
-    })
+  const toUpdate = animals
+    .map(buildImageStorageUpdate)
     .filter(Boolean);
 
-  if (toFix.length === 0) {
-    console.log("No broken image URLs found. Nothing to do.");
-    return;
+  if (toUpdate.length === 0) {
+    console.log("No animal image storage updates are needed.");
+    return { updated: 0, failed: 0, dryRun: !apply, items: [] };
   }
 
-  console.log(`Found ${toFix.length} animal(s) with broken image URLs:\n`);
-  for (const item of toFix) {
+  console.log(`Found ${toUpdate.length} animal(s) needing image storage normalization:\n`);
+  for (const item of toUpdate) {
     console.log(`  [aid=${item.aid}] ${item.name}`);
-    console.log(`    OLD: ${item.oldUrl}`);
-    console.log(`    NEW: ${item.newUrl}`);
+    console.log(`    OLD image_object_key: ${item.oldImageObjectKey || "(empty)"}`);
+    console.log(`    OLD image_url: ${item.oldImageUrl || "(empty)"}`);
+    console.log(`    NEW image_object_key: ${item.image_object_key}`);
+    console.log(`    NEW image_url: ${item.image_url}`);
     console.log();
   }
 
-  if (DRY_RUN) {
+  if (!apply) {
     console.log("Dry-run mode — no changes written. Re-run with --apply to update the DB.");
-    return;
+    return { updated: 0, failed: 0, dryRun: true, items: toUpdate };
   }
 
   console.log("Applying updates...\n");
-  let successCount = 0;
-  let failCount = 0;
+  let updated = 0;
+  let failed = 0;
 
-  for (const item of toFix) {
+  for (const item of toUpdate) {
     const { error: updateError } = await supabase
       .from("animals")
-      .update({ image_url: item.newUrl })
+      .update({
+        image_object_key: item.image_object_key,
+        image_url: item.image_url,
+      })
       .eq("aid", item.aid);
 
     if (updateError) {
       console.error(`  FAILED [aid=${item.aid}]: ${updateError.message}`);
-      failCount++;
-    } else {
-      console.log(`  UPDATED [aid=${item.aid}] ${item.name}`);
-      successCount++;
+      failed++;
+      continue;
     }
+
+    console.log(`  UPDATED [aid=${item.aid}] ${item.name}`);
+    updated++;
   }
 
-  console.log(`\nDone. ${successCount} updated, ${failCount} failed.`);
+  console.log(`\nDone. ${updated} updated, ${failed} failed.`);
 
-  if (failCount > 0) {
-    process.exit(1);
+  if (failed > 0) {
+    throw new Error("One or more animal image storage updates failed.");
   }
+
+  return { updated, failed, dryRun: false, items: toUpdate };
 }
 
-run().catch((err) => {
-  console.error("Unexpected error:", err);
-  process.exit(1);
-});
+if (require.main === module) {
+  run()
+    .catch((error) => {
+      console.error(error.message || error);
+      process.exit(1);
+    });
+}
+
+module.exports = {
+  buildImageStorageUpdate,
+  run,
+};

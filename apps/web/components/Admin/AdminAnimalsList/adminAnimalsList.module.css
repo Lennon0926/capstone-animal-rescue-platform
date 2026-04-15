@@ -239,11 +239,11 @@
 
 .editButton {
   color: var(--color-text-inverse);
-  background-color: var(--color-secondary);
+  background-color: #1a7a6e; /* darkened from --color-secondary for WCAG AA contrast (5.2:1) */
 }
 
 .editButton:hover {
-  background-color: var(--color-secondary-hover);
+  background-color: #155f55;
   color: var(--color-text-inverse);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(42, 157, 143, 0.2);
