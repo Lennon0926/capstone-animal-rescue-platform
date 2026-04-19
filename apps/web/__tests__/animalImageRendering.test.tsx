@@ -22,6 +22,7 @@ jest.mock("next/image", () => ({
   ),
 }));
 
+
 jest.mock("next/link", () => ({
   __esModule: true,
   default: ({
