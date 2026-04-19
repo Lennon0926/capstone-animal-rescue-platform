@@ -2,6 +2,7 @@ import { GetServerSideProps } from "next";
 import Head from "next/head";
 import AnimalInfo from "@/components/Animal/AnimalInfoPage/animalInfo";
 import HeaderSection from "@/components/Header/headerSection";
+import FooterSection from "@/components/Footer/footerSection";
 import type { Animal } from "@/types/animal";
 
 type ApiResponse = {
@@ -26,6 +27,7 @@ export default function AdoptAnimalPage({ animal }: AnimalInfoPageProps) {
         <>
           <HeaderSection />
           <AnimalInfo animal={animal} />
+          <FooterSection />
         </>
       )}
     </div>

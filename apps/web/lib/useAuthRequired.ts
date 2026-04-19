@@ -10,10 +10,18 @@ interface AuthState {
 
 export function useAuthRequired(): AuthState {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
+  const bypassAuth =
+    process.env.NEXT_PUBLIC_E2E_BYPASS_AUTH === 'true' ||
+    process.env.NODE_ENV === 'test';
+  const [isLoading, setIsLoading] = useState(!bypassAuth);
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
+    if (bypassAuth) {
+      setIsLoading(false);
+      return;
+    }
+
     const checkAuth = async () => {
       try {
         const {
@@ -50,7 +58,7 @@ export function useAuthRequired(): AuthState {
     return () => {
       subscription?.unsubscribe();
     };
-  }, [router]);
+  }, [router, bypassAuth]);
 
   return { isLoading, user };
 }
