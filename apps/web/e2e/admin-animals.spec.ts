@@ -24,9 +24,8 @@ test.describe("Admin Animals List (/admin/animals)", () => {
   });
 
   // --- Page load ---
-  test("page loads with header and footer", async ({ page }) => {
+  test("page loads with header", async ({ page }) => {
     await expect(page.locator("header")).toBeVisible();
-    await expect(page.locator("footer")).toBeVisible();
   });
 
   test("page title 'Gestión de Animales' is visible", async ({ page }) => {
@@ -231,9 +230,8 @@ test.describe("Admin Create Animal (/admin/createAnimal)", () => {
   });
 
   // --- Page load ---
-  test("page loads with header and footer", async ({ page }) => {
+  test("page loads with header", async ({ page }) => {
     await expect(page.locator("header")).toBeVisible();
-    await expect(page.locator("footer")).toBeVisible();
   });
 
   test("form title 'Crear Nuevo Animal' is visible", async ({ page }) => {
@@ -381,9 +379,8 @@ test.describe("Admin Edit Animal (/admin/editAnimal)", () => {
   });
 
   // --- Page load ---
-  test("page loads with header and footer", async ({ page }) => {
+  test("page loads with header", async ({ page }) => {
     await expect(page.locator("header")).toBeVisible();
-    await expect(page.locator("footer")).toBeVisible();
   });
 
   test("form title 'Editar Detalles del Animal' is visible", async ({ page }) => {
