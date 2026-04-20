@@ -445,7 +445,9 @@ If the animal is created successfully but one or more medical-record inserts fai
 
 ### PATCH `/api/animals/:aid`
 
-Partially updates an existing animal. At least one valid field must be provided.
+Partially updates an existing animal. At least one valid field must be provided. When
+`medical_records` is included, the animal update and medical-record replacement are
+applied atomically.
 
 **Path Parameters**
 
@@ -474,9 +476,9 @@ Partially updates an existing animal. At least one valid field must be provided.
 |-------|------|-------------|
 | `record_id` | integer | Existing medical record ID to update. Omit to create a new record. |
 | `record_type` | string | `vacunación`, `desparasitación`, `esterilización`, `tratamiento`, `examen`, or `cirugía` |
-| `date_given` | string | ISO-8601 timestamp for the medical action |
-| `vet_name` | string | Veterinarian name (max 100 chars) |
-| `notes` | string | Freeform notes for the medical record |
+| `date_given` | string \| null | ISO-8601 timestamp for the medical action. Send `""` or `null` to clear an existing value. |
+| `vet_name` | string \| null | Veterinarian name (max 100 chars). Send `""` or `null` to clear an existing value. |
+| `notes` | string \| null | Freeform notes for the medical record. Send `""` or `null` to clear an existing value. |
 
 **Request Example**
 
@@ -536,7 +538,11 @@ curl -X PATCH http://localhost:4000/api/animals/1 \
 }
 ```
 
-When `medical_records` is provided on `PATCH`, the submitted array becomes the new full set of medical records for that animal. Existing records omitted from the array are removed.
+When `medical_records` is provided on `PATCH`, the submitted array becomes the new
+full set of medical records for that animal. Existing records omitted from the array
+are removed. Sending `""` or `null` for `date_given`, `vet_name`, or `notes` clears
+that stored value. The animal update and medical-record replacement either both
+commit or both fail.
 
 **Error `400`**
 

@@ -242,6 +242,60 @@ describe("image object key middleware validation", () => {
     ]);
   });
 
+  it("normalizes blank optional medical record fields to null on update", () => {
+    const req = {
+      body: {
+        medical_records: [
+          {
+            record_id: 10,
+            record_type: "Vacunación",
+            date_given: "",
+            vet_name: "",
+            notes: "",
+          },
+        ],
+      },
+    };
+    const next = jest.fn();
+
+    validateUpdateAnimal(req, {}, next);
+
+    expect(next).toHaveBeenCalledWith();
+    expect(req.validatedBody.medical_records).toEqual([
+      {
+        record_id: 10,
+        record_type: "vacunación",
+        date_given: null,
+        vet_name: null,
+        notes: null,
+      },
+    ]);
+  });
+
+  it("preserves omission semantics for optional medical record fields on update", () => {
+    const req = {
+      body: {
+        medical_records: [
+          {
+            record_id: 10,
+            record_type: "Vacunación",
+          },
+        ],
+      },
+    };
+    const next = jest.fn();
+
+    validateUpdateAnimal(req, {}, next);
+
+    expect(next).toHaveBeenCalledWith();
+    expect(req.validatedBody.medical_records).toEqual([
+      {
+        record_id: 10,
+        record_type: "vacunación",
+      },
+    ]);
+  });
+
   it("accepts an empty medical_records array on update", () => {
     const req = {
       body: {

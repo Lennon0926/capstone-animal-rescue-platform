@@ -604,62 +604,25 @@ describe("PATCH /api/animals/:aid", () => {
 
   it("updates medical records alongside the animal", async () => {
     const updatedAnimal = { ...MOCK_ANIMALS[0], description: "Updated description" };
-    const existingMedicalRecords = [
-      {
-        record_id: 21,
-        aid: 1,
-        record_type: "vacunación",
-        notes: "Old note",
-      },
-      {
-        record_id: 22,
-        aid: 1,
-        record_type: "examen",
-        notes: "Delete me",
-      },
-    ];
-    let medicalRecordSelectCallCount = 0;
-
-    mockFrom.mockImplementation((table) => {
-      if (table === "animals") {
-        return buildChainableMock({ data: updatedAnimal, error: null });
-      }
-
-      if (table === "medical_records") {
-        medicalRecordSelectCallCount += 1;
-
-        if (medicalRecordSelectCallCount === 1) {
-          return buildChainableMock({ data: existingMedicalRecords, error: null });
-        }
-
-        if (medicalRecordSelectCallCount === 2) {
-          return buildChainableMock({ data: {}, error: null });
-        }
-
-        if (medicalRecordSelectCallCount === 3) {
-          return buildChainableMock({
-            data: {
-              record_id: 21,
-              aid: 1,
-              record_type: "vacunación",
-              notes: "Updated note",
-            },
-            error: null,
-          });
-        }
-
-        return buildChainableMock({
-          data: {
+    mockRpc.mockResolvedValue({
+      data: {
+        animal: updatedAnimal,
+        medical_records: [
+          {
+            record_id: 21,
+            aid: 1,
+            record_type: "vacunación",
+            notes: "Updated note",
+          },
+          {
             record_id: 23,
             aid: 1,
             record_type: "tratamiento",
             notes: "New record",
           },
-          error: null,
-        });
-      }
-
-      return buildChainableMock({ data: null, error: { message: "Unknown table" } });
+        ],
+      },
+      error: null,
     });
 
     const res = await request(getApp())
@@ -686,6 +649,58 @@ describe("PATCH /api/animals/:aid", () => {
       expect.objectContaining({ record_id: 21, notes: "Updated note" }),
       expect.objectContaining({ record_id: 23, notes: "New record" }),
     ]);
+    expect(mockRpc).toHaveBeenCalledWith("patch_animal_with_medical_records", {
+      p_aid: 1,
+      p_animal_updates: {
+        description: "Updated description",
+      },
+      p_medical_records: [
+        {
+          record_id: 21,
+          record_type: "vacunación",
+          notes: "Updated note",
+        },
+        {
+          record_type: "tratamiento",
+          notes: "New record",
+        },
+      ],
+    });
+  });
+
+  it("returns 500 when the transactional medical record sync fails", async () => {
+    mockRpc.mockResolvedValue({
+      data: null,
+      error: { message: "Medical record 999 does not belong to animal 1." },
+    });
+
+    const res = await request(getApp())
+      .patch("/api/animals/1")
+      .send({
+        description: "Updated description",
+        medical_records: [
+          {
+            record_id: 999,
+            record_type: "vacunación",
+          },
+        ],
+      });
+
+    expect(res.status).toBe(500);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/failed to update animal/i);
+    expect(mockRpc).toHaveBeenCalledWith("patch_animal_with_medical_records", {
+      p_aid: 1,
+      p_animal_updates: {
+        description: "Updated description",
+      },
+      p_medical_records: [
+        {
+          record_id: 999,
+          record_type: "vacunación",
+        },
+      ],
+    });
   });
 
   it("returns 404 when animal is not found", async () => {

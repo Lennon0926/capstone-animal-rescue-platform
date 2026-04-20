@@ -145,6 +145,8 @@ export const buildMedicalRecordsPayload = (
 
   for (let index = 0; index < medicalRecords.length; index += 1) {
     const medicalRecord = medicalRecords[index];
+    const shouldEmitNullClearsForOptionalFields =
+      allowRecordId && Boolean(medicalRecord.record_id);
 
     if (!hasMedicalRecordValues(medicalRecord)) {
       continue;
@@ -170,14 +172,20 @@ export const buildMedicalRecordsPayload = (
       }
 
       payload.date_given = parsedDate.toISOString();
+    } else if (shouldEmitNullClearsForOptionalFields) {
+      payload.date_given = null;
     }
 
     if (medicalRecord.vet_name.trim()) {
       payload.vet_name = medicalRecord.vet_name.trim();
+    } else if (shouldEmitNullClearsForOptionalFields) {
+      payload.vet_name = null;
     }
 
     if (medicalRecord.notes.trim()) {
       payload.notes = medicalRecord.notes.trim();
+    } else if (shouldEmitNullClearsForOptionalFields) {
+      payload.notes = null;
     }
 
     medicalRecordsPayload.push(payload);

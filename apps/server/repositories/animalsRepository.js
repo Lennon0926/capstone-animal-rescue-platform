@@ -515,97 +515,75 @@ async function updateAnimalById(aid, updates) {
   }
 }
 
-async function syncMedicalRecordsByAnimalId(aid, medicalRecords) {
+function serializePatchedAnimalResponse(data) {
+  if (!data || typeof data !== "object" || Array.isArray(data) || !data.animal) {
+    throw new Error("patch_animal_with_medical_records returned an invalid response.");
+  }
+
+  return {
+    ...serializeAnimalRecord(data.animal),
+    medical_records: Array.isArray(data.medical_records)
+      ? data.medical_records.map(serializeMedicalRecord)
+      : [],
+  };
+}
+
+function buildMedicalRecordRpcPayload(medicalRecord) {
+  const { record_id, ...medicalRecordFields } = medicalRecord;
+  const normalizedMedicalRecord = normalizeMedicalRecordFields(medicalRecordFields);
+
+  if (record_id !== undefined) {
+    normalizedMedicalRecord.record_id = record_id;
+  }
+
+  return normalizedMedicalRecord;
+}
+
+async function updateAnimalWithMedicalRecordsTransactionById(
+  aid,
+  animalUpdates,
+  medicalRecords
+) {
   try {
     const client = getSupabaseClient();
-    const existingMedicalRecordsResult = await getMedicalRecordsByAnimalId(aid);
+    const normalizedAnimalUpdates = normalizeAnimalImageFields(animalUpdates);
+    const normalizedMedicalRecords = medicalRecords.map(buildMedicalRecordRpcPayload);
 
-    if (existingMedicalRecordsResult.error) {
-      return { data: [], error: existingMedicalRecordsResult.error };
-    }
+    const { data, error } = await client.rpc("patch_animal_with_medical_records", {
+      p_aid: aid,
+      p_animal_updates: normalizedAnimalUpdates,
+      p_medical_records: normalizedMedicalRecords,
+    });
 
-    const existingMedicalRecords = existingMedicalRecordsResult.data;
-    const existingRecordIds = new Set(
-      existingMedicalRecords.map((medicalRecord) => medicalRecord.record_id)
-    );
-    const submittedRecordIds = new Set(
-      medicalRecords
-        .map((medicalRecord) => medicalRecord.record_id)
-        .filter((recordId) => Number.isInteger(recordId) && recordId > 0)
-    );
-
-    for (const recordId of submittedRecordIds) {
-      if (!existingRecordIds.has(recordId)) {
-        return {
-          data: [],
-          error: `Medical record ${recordId} does not belong to animal ${aid}.`,
-        };
-      }
-    }
-
-    const medicalRecordIdsToDelete = existingMedicalRecords
-      .filter((medicalRecord) => !submittedRecordIds.has(medicalRecord.record_id))
-      .map((medicalRecord) => medicalRecord.record_id);
-
-    for (const recordId of medicalRecordIdsToDelete) {
-      const { error } = await client
-        .from("medical_records")
-        .delete()
-        .eq("record_id", recordId)
-        .eq("aid", aid);
-
-      if (error) {
-        return { data: [], error: error.message };
-      }
-    }
-
-    const syncedMedicalRecords = [];
-
-    for (const medicalRecord of medicalRecords) {
-      const { record_id, ...medicalRecordFields } = medicalRecord;
-      const normalizedMedicalRecord = normalizeMedicalRecordFields(medicalRecordFields);
-
-      if (record_id) {
-        const { data, error } = await client
-          .from("medical_records")
-          .update(normalizedMedicalRecord)
-          .eq("record_id", record_id)
-          .eq("aid", aid)
-          .select("record_id, aid, record_type, date_given, vet_name, notes, created_at")
-          .single();
-
-        if (error) {
-          return { data: [], error: error.message };
-        }
-
-        syncedMedicalRecords.push(serializeMedicalRecord(data));
-        continue;
+    if (error) {
+      if (error.message === "Animal not found") {
+        return { data: null, error: "Animal not found" };
       }
 
-      const { data, error } = await client
-        .from("medical_records")
-        .insert({
-          ...normalizedMedicalRecord,
-          aid,
-        })
-        .select("record_id, aid, record_type, date_given, vet_name, notes, created_at")
-        .single();
-
-      if (error) {
-        return { data: [], error: error.message };
-      }
-
-      syncedMedicalRecords.push(serializeMedicalRecord(data));
+      return { data: null, error: error.message };
     }
 
-    return { data: syncedMedicalRecords, error: null };
+    _clearAnimalsCache();
+
+    return {
+      data: serializePatchedAnimalResponse(data),
+      error: null,
+    };
   } catch (err) {
-    return { data: [], error: err.message };
+    return { data: null, error: err.message };
   }
 }
 
 async function updateAnimalWithMedicalRecordsById(aid, updates) {
   const { medical_records, ...animalUpdates } = updates;
+
+  if (medical_records !== undefined) {
+    return updateAnimalWithMedicalRecordsTransactionById(
+      aid,
+      animalUpdates,
+      medical_records
+    );
+  }
 
   const animalResult =
     Object.keys(animalUpdates).length > 0
@@ -616,10 +594,7 @@ async function updateAnimalWithMedicalRecordsById(aid, updates) {
     return { data: null, error: animalResult.error };
   }
 
-  const medicalRecordsResult =
-    medical_records !== undefined
-      ? await syncMedicalRecordsByAnimalId(aid, medical_records)
-      : await getMedicalRecordsByAnimalId(aid);
+  const medicalRecordsResult = await getMedicalRecordsByAnimalId(aid);
 
   if (medicalRecordsResult.error) {
     return { data: null, error: medicalRecordsResult.error };

@@ -150,7 +150,10 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse) {
         const nextMedicalRecords = medical_records
           .filter((medicalRecord: Record<string, unknown>) =>
             Object.entries(medicalRecord).some(
-              ([key, value]) => key !== "record_id" && typeof value === "string" && value.trim() !== ""
+              ([key, value]) =>
+                key !== "record_id" &&
+                (value === null ||
+                  (typeof value === "string" && value.trim() !== ""))
             )
           )
           .map((medicalRecord: Record<string, unknown>) => {
@@ -169,15 +172,21 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse) {
               date_given:
                 typeof medicalRecord.date_given === "string"
                   ? medicalRecord.date_given
-                  : undefined,
+                  : medicalRecord.date_given === null
+                    ? null
+                    : undefined,
               vet_name:
                 typeof medicalRecord.vet_name === "string"
                   ? medicalRecord.vet_name
-                  : undefined,
+                  : medicalRecord.vet_name === null
+                    ? null
+                    : undefined,
               notes:
                 typeof medicalRecord.notes === "string"
                   ? medicalRecord.notes
-                  : undefined,
+                  : medicalRecord.notes === null
+                    ? null
+                    : undefined,
               created_at: "2026-04-14T10:00:00.000Z",
             };
           });

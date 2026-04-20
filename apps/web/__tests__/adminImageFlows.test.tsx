@@ -387,6 +387,62 @@ describe("admin image flow gating", () => {
     ]);
   });
 
+  it("sends nulls when clearing optional fields on an existing medical record", async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          success: true,
+          data: {
+            ...sampleAnimalWithMedicalRecords,
+            medical_records: [
+              {
+                record_id: 31,
+                aid: 7,
+                record_type: "vacunación",
+                date_given: null,
+                vet_name: null,
+                notes: null,
+              },
+            ],
+          },
+        }),
+    });
+
+    render(<EditAnimalForm animal={sampleAnimalWithMedicalRecords} />);
+
+    fillMedicalRecordFields(0, {
+      date_given: "",
+      vet_name: "",
+      notes: "",
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: /Guardar Cambios/i }));
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        "http://localhost:4000/api/animals/7",
+        expect.objectContaining({
+          method: "PATCH",
+        })
+      );
+    });
+
+    const body = JSON.parse(
+      ((global.fetch as jest.Mock).mock.calls[0][1] as { body: string }).body
+    );
+
+    expect(body.medical_records).toEqual([
+      {
+        record_id: 31,
+        record_type: "vacunación",
+        date_given: null,
+        vet_name: null,
+        notes: null,
+      },
+    ]);
+  });
+
   it("disables the standalone upload action when storage is unhealthy", async () => {
     render(<AnimalImageUploadForm />);
 

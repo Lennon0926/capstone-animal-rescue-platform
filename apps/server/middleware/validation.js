@@ -38,7 +38,10 @@ function sanitizeLongText(value) {
 }
 
 function validateMedicalRecordEntry(medicalRecord, fieldPath, options = {}) {
-  const { allowRecordId = false } = options;
+  const {
+    allowRecordId = false,
+    coerceEmptyOptionalFieldsToNull = false,
+  } = options;
 
   if (!medicalRecord || typeof medicalRecord !== "object" || Array.isArray(medicalRecord)) {
     throw new ApiError(400, `${fieldPath} must be an object.`);
@@ -75,6 +78,8 @@ function validateMedicalRecordEntry(medicalRecord, fieldPath, options = {}) {
       }
 
       validatedMedicalRecord.date_given = parsedDate.toISOString();
+    } else if (coerceEmptyOptionalFieldsToNull) {
+      validatedMedicalRecord.date_given = null;
     }
   }
 
@@ -82,6 +87,8 @@ function validateMedicalRecordEntry(medicalRecord, fieldPath, options = {}) {
     const vetName = sanitizeString(medicalRecord.vet_name);
     if (vetName) {
       validatedMedicalRecord.vet_name = vetName;
+    } else if (coerceEmptyOptionalFieldsToNull) {
+      validatedMedicalRecord.vet_name = null;
     }
   }
 
@@ -89,6 +96,8 @@ function validateMedicalRecordEntry(medicalRecord, fieldPath, options = {}) {
     const notes = sanitizeLongText(medicalRecord.notes);
     if (notes) {
       validatedMedicalRecord.notes = notes;
+    } else if (coerceEmptyOptionalFieldsToNull) {
+      validatedMedicalRecord.notes = null;
     }
   }
 
@@ -101,6 +110,7 @@ function validateMedicalRecords(reqBody, options = {}) {
   const {
     allowRecordId = false,
     preserveExplicitEmptyArray = false,
+    coerceEmptyOptionalFieldsToNull = false,
   } = options;
   const hasSingularMedicalRecord = reqBody.medical_record !== undefined;
   const hasPluralMedicalRecords = reqBody.medical_records !== undefined;
@@ -118,6 +128,7 @@ function validateMedicalRecords(reqBody, options = {}) {
       .map((medicalRecord, index) =>
         validateMedicalRecordEntry(medicalRecord, `medical_records[${index}]`, {
           allowRecordId,
+          coerceEmptyOptionalFieldsToNull,
         })
       )
       .filter(Boolean);
@@ -133,7 +144,10 @@ function validateMedicalRecords(reqBody, options = {}) {
     const validatedMedicalRecord = validateMedicalRecordEntry(
       reqBody.medical_record,
       "medical_record",
-      { allowRecordId }
+      {
+        allowRecordId,
+        coerceEmptyOptionalFieldsToNull,
+      }
     );
 
     return validatedMedicalRecord
@@ -467,6 +481,7 @@ function validateUpdateAnimal(req, res, next) {
       updates.medical_records = validateMedicalRecords(req.body, {
         allowRecordId: true,
         preserveExplicitEmptyArray: true,
+        coerceEmptyOptionalFieldsToNull: true,
       });
     }
 

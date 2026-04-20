@@ -21,21 +21,22 @@ const MEDICAL_RECORD_CREATE_FAILED_CODE = "MEDICAL_RECORD_CREATE_FAILED";
 
 function normalizeMedicalRecordFields(medicalRecordData = {}) {
   const normalizedMedicalRecord = {};
+  const hasOwn = (key) => Object.prototype.hasOwnProperty.call(medicalRecordData, key);
 
   if (medicalRecordData.record_type) {
     normalizedMedicalRecord.record_type = medicalRecordData.record_type;
   }
 
-  if (medicalRecordData.date_given) {
-    normalizedMedicalRecord.date_given = medicalRecordData.date_given;
+  if (hasOwn("date_given")) {
+    normalizedMedicalRecord.date_given = medicalRecordData.date_given ?? null;
   }
 
-  if (medicalRecordData.vet_name) {
-    normalizedMedicalRecord.vet_name = medicalRecordData.vet_name;
+  if (hasOwn("vet_name")) {
+    normalizedMedicalRecord.vet_name = medicalRecordData.vet_name ?? null;
   }
 
-  if (medicalRecordData.notes) {
-    normalizedMedicalRecord.notes = medicalRecordData.notes;
+  if (hasOwn("notes")) {
+    normalizedMedicalRecord.notes = medicalRecordData.notes ?? null;
   }
 
   if (medicalRecordData.aid) {
