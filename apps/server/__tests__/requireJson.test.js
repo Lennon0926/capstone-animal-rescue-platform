@@ -39,6 +39,14 @@ describe("requireJson middleware", () => {
         .send({});
       expect(res.status).not.toBe(415);
     });
+
+    it("proceeds past requireJson when Content-Type is application/json with charset", async () => {
+      const res = await request(getApp())
+        .post("/api/animals")
+        .set("Content-Type", "application/json; charset=utf-8")
+        .send({});
+      expect(res.status).not.toBe(415);
+    });
   });
 
   describe("PATCH /api/animals/:aid", () => {
