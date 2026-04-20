@@ -2,7 +2,6 @@
 
 A full-stack web application for animal rescue coordination, built with Next.js and Express.
 
-
 ## Project Structure
 
 ```
