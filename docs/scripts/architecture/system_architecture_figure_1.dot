@@ -1,0 +1,192 @@
+digraph SystemArchitectureFigure1 {
+  graph [
+    rankdir=LR,
+    splines=spline,
+    compound=true,
+    nodesep=0.55,
+    ranksep=0.95,
+    pad=0.45,
+    bgcolor="#FAFAFA",
+    label="Figure 1. Future-State System Architecture",
+    labelloc=t,
+    labeljust=c,
+    fontname="Helvetica Neue Bold",
+    fontsize=22,
+    fontcolor="#1F2937"
+  ];
+
+  node [
+    shape=box,
+    style="rounded,filled",
+    fontname="Helvetica Neue",
+    fontsize=11,
+    penwidth=1.6,
+    margin="0.16,0.11",
+    color="#CBD5E1",
+    fillcolor="#FFFFFF",
+    fontcolor="#111827"
+  ];
+
+  edge [
+    color="#64748B",
+    penwidth=1.4,
+    arrowsize=0.8,
+    fontname="Helvetica Neue",
+    fontsize=9,
+    fontcolor="#475569"
+  ];
+
+  subgraph cluster_users {
+    label=" Users ";
+    style="rounded,filled";
+    color="#1D4ED8";
+    fillcolor="#E0F2FE";
+    penwidth=2.0;
+    fontname="Helvetica Neue Bold";
+    fontsize=12;
+
+    U_VISITOR [label="Public Visitor", fillcolor="#BFDBFE", color="#2563EB"];
+    U_ADOPTER [label="Adopter", fillcolor="#BFDBFE", color="#2563EB"];
+    U_DONOR [label="Donor", fillcolor="#BFDBFE", color="#2563EB"];
+    U_ADMIN [label="Admin / Staff", fillcolor="#BFDBFE", color="#2563EB"];
+  }
+
+  subgraph cluster_vercel {
+    label=" Vercel Deployments ";
+    style="rounded,filled";
+    color="#15803D";
+    fillcolor="#ECFDF5";
+    penwidth=2.0;
+    fontname="Helvetica Neue Bold";
+    fontsize=12;
+
+    subgraph cluster_web {
+      label=" Project: apps/web\nNext.js / React ";
+      style="rounded,filled";
+      color="#16A34A";
+      fillcolor="#DCFCE7";
+      penwidth=1.8;
+      fontname="Helvetica Neue Bold";
+      fontsize=11;
+
+      WEB_PUBLIC [label="Public Pages\nhome / about / landing", fillcolor="#BBF7D0", color="#16A34A"];
+      WEB_ADOPT [label="Adopt Catalog + Detail\nprefills Google Forms", fillcolor="#BBF7D0", color="#16A34A"];
+      WEB_BLOG [label="Blog UI\nfuture Facebook-fed content", fillcolor="#BBF7D0", color="#16A34A", style="rounded,filled,dashed"];
+      WEB_DONATE [label="Donation Page\nATH Móvil / PayPal primary flow", fillcolor="#BBF7D0", color="#16A34A"];
+      WEB_ADMIN [label="Admin UI\nanimals / uploads / management", fillcolor="#BBF7D0", color="#16A34A"];
+      WEB_AI [label="AI Adopt Experience\nrecommendations / match results", fillcolor="#BBF7D0", color="#16A34A", style="rounded,filled,dashed"];
+      WEB_ANALYTICS [label="Vercel Analytics", fillcolor="#DCFCE7", color="#16A34A"];
+      WEB_SPEED [label="Speed Insights", fillcolor="#DCFCE7", color="#16A34A"];
+    }
+
+    subgraph cluster_server {
+      label=" Project: apps/server\nExpress REST API ";
+      style="rounded,filled";
+      color="#EA580C";
+      fillcolor="#FFEDD5";
+      penwidth=1.8;
+      fontname="Helvetica Neue Bold";
+      fontsize=11;
+
+      API_ANIMALS [label="Animals API\ncatalog / filters / detail", fillcolor="#FED7AA", color="#EA580C"];
+      API_UPLOADS [label="Uploads API\nimage upload + config", fillcolor="#FED7AA", color="#EA580C"];
+      API_ADMIN [label="Admin Mutations\ncreate / update / delete", fillcolor="#FED7AA", color="#EA580C"];
+      API_HEALTH [label="Health / Ready\noperational endpoints", fillcolor="#FED7AA", color="#EA580C"];
+      API_AI [label="AI Adopt API\nsimilarity search / scoring", fillcolor="#FED7AA", color="#EA580C", style="rounded,filled,dashed"];
+      API_PAY [label="Payment Audit / Webhooks\nfuture server-mediated flows", fillcolor="#FED7AA", color="#EA580C", style="rounded,filled,dashed"];
+    }
+  }
+
+  subgraph cluster_supabase {
+    label=" Supabase ";
+    style="rounded,filled";
+    color="#7C3AED";
+    fillcolor="#F5F3FF";
+    penwidth=2.0;
+    fontname="Helvetica Neue Bold";
+    fontsize=12;
+
+    DB_CORE [label="Postgres Database\nanimals + medical_records", fillcolor="#E9D5FF", color="#7C3AED"];
+    DB_VECTOR [label="animals.embedding_vector\n+ embedding/vector column\n+ embedding metadata\n(pgvector-style)", fillcolor="#E9D5FF", color="#7C3AED", style="rounded,filled,dashed"];
+    DB_AUTH [label="Supabase Auth\nadmin authentication boundary", fillcolor="#E9D5FF", color="#7C3AED", style="rounded,filled,dashed"];
+  }
+
+  subgraph cluster_external {
+    label=" External Services ";
+    style="rounded,filled";
+    color="#BE185D";
+    fillcolor="#FDF2F8";
+    penwidth=2.0;
+    fontname="Helvetica Neue Bold";
+    fontsize=12;
+
+    EXT_FACEBOOK [label="Facebook Graph API", fillcolor="#FBCFE8", color="#BE185D", style="rounded,filled,dashed"];
+    EXT_GOOGLE_FORMS [label="Google Forms\nadoption submission outside app", fillcolor="#FBCFE8", color="#BE185D"];
+    EXT_GOOGLE_SHEETS [label="Google Sheets / Staff Review\noff-platform intake tracking", fillcolor="#FBCFE8", color="#BE185D"];
+    EXT_R2 [label="Cloudflare R2", fillcolor="#E2E8F0", color="#475569"];
+    EXT_CDN [label="Public CDN / Object Delivery", fillcolor="#E2E8F0", color="#475569"];
+    EXT_ATH [label="ATH Móvil", fillcolor="#FBCFE8", color="#BE185D"];
+    EXT_PAYPAL [label="PayPal", fillcolor="#FBCFE8", color="#BE185D"];
+    EXT_STRIPE [label="Stripe (planned)", fillcolor="#FBCFE8", color="#BE185D", style="rounded,filled,dashed"];
+    EXT_EMBED [label="Embedding Service\nprovider selected later", fillcolor="#FBCFE8", color="#BE185D", style="rounded,filled,dashed"];
+  }
+
+  subgraph cluster_legend {
+    label=" Legend ";
+    style="rounded,filled";
+    color="#475569";
+    fillcolor="#F8FAFC";
+    penwidth=1.8;
+    fontname="Helvetica Neue Bold";
+    fontsize=11;
+
+    LEG_CURRENT [label="Solid = deployed / already wired in repo or deployment", fillcolor="#FFFFFF", color="#475569"];
+    LEG_PLANNED [label="Dashed = approved planned additions not yet end-to-end", fillcolor="#FFFFFF", color="#475569", style="rounded,filled,dashed"];
+  }
+
+  U_VISITOR -> WEB_PUBLIC [label="browse site"];
+  U_ADOPTER -> WEB_ADOPT [label="view animals"];
+  U_ADOPTER -> WEB_AI [label="future AI-assisted adoption", style=dashed];
+  U_DONOR -> WEB_DONATE [label="open donation flow"];
+  U_ADMIN -> WEB_ADMIN [label="manage operations"];
+
+  WEB_PUBLIC -> API_ANIMALS [label="fetch featured animals"];
+  WEB_ADOPT -> API_ANIMALS [label="GET /api/animals"];
+  WEB_ADMIN -> API_ADMIN [label="admin CRUD"];
+  WEB_ADMIN -> API_UPLOADS [label="upload animal images"];
+  WEB_PUBLIC -> API_HEALTH [label="deployment checks / monitoring", style=dotted, color="#94A3B8"];
+
+  WEB_ANALYTICS -> WEB_PUBLIC [label="page analytics", dir=back, style=dotted, color="#15803D"];
+  WEB_ANALYTICS -> WEB_ADOPT [label="adoption funnel", dir=back, style=dotted, color="#15803D"];
+  WEB_ANALYTICS -> WEB_DONATE [label="donation funnel", dir=back, style=dotted, color="#15803D"];
+  WEB_SPEED -> WEB_PUBLIC [label="web vitals", dir=back, style=dotted, color="#15803D"];
+
+  WEB_BLOG -> EXT_FACEBOOK [label="future blog content sync", style=dashed];
+  WEB_ADOPT -> EXT_GOOGLE_FORMS [label="open prefilled Google Forms URL\nsubmission happens outside app"];
+  EXT_GOOGLE_FORMS -> EXT_GOOGLE_SHEETS [label="responses + staff review\noutside app"];
+
+  WEB_DONATE -> EXT_ATH [label="primary donation redirect"];
+  WEB_DONATE -> EXT_PAYPAL [label="primary donation redirect"];
+  WEB_DONATE -> EXT_STRIPE [label="optional provider", style=dashed];
+
+  EXT_ATH -> API_PAY [label="future payment audit / webhook", style=dashed];
+  EXT_PAYPAL -> API_PAY [label="future payment audit / webhook", style=dashed];
+  EXT_STRIPE -> API_PAY [label="future payment audit / webhook", style=dashed];
+
+  API_ANIMALS -> DB_CORE [label="read animal data"];
+  API_ADMIN -> DB_CORE [label="write animal records"];
+  API_UPLOADS -> EXT_R2 [label="store uploaded images"];
+  EXT_R2 -> EXT_CDN [label="public asset delivery"];
+  EXT_CDN -> WEB_PUBLIC [label="animal image URLs"];
+  EXT_CDN -> WEB_ADOPT [label="animal image URLs"];
+
+  WEB_ADMIN -> DB_AUTH [label="future admin sign-in", style=dashed];
+  DB_AUTH -> API_ADMIN [label="future auth guard", style=dashed];
+
+  WEB_AI -> API_AI [label="match request / recommendations", style=dashed];
+  API_AI -> EXT_EMBED [label="generate text embedding", style=dashed];
+  API_AI -> DB_VECTOR [label="store + search embedding/vector column", style=dashed];
+  DB_VECTOR -> DB_CORE [label="linked animal profile metadata", style=dashed];
+
+  LEG_CURRENT -> LEG_PLANNED [style=invis];
+}

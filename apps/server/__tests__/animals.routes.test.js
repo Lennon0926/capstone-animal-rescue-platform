@@ -155,16 +155,38 @@ describe("GET /api/animals/filters", () => {
 
 describe("GET /api/animals/:aid", () => {
   it("returns a single animal by ID", async () => {
-    const chain = buildChainableMock({
-      data: MOCK_ANIMALS[0],
-      error: null,
+    mockFrom.mockImplementation((table) => {
+      if (table === "animals") {
+        return buildChainableMock({
+          data: MOCK_ANIMALS[0],
+          error: null,
+        });
+      }
+
+      if (table === "medical_records") {
+        return buildChainableMock({
+          data: [
+            {
+              record_id: 77,
+              aid: 1,
+              record_type: "vacunación",
+              notes: "Initial vaccine",
+            },
+          ],
+          error: null,
+        });
+      }
+
+      return buildChainableMock({ data: null, error: { message: "Unknown table" } });
     });
-    mockFrom.mockReturnValue(chain);
 
     const res = await request(getApp()).get("/api/animals/1");
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data.name).toBe("Buddy");
+    expect(res.body.data.medical_records).toEqual([
+      expect.objectContaining({ record_id: 77, record_type: "vacunación" }),
+    ]);
   });
 
   it("returns 404 when animal is not found", async () => {
@@ -232,6 +254,179 @@ describe("POST /api/animals", () => {
     expect(res.status).toBe(201);
     expect(res.body.success).toBe(true);
     expect(res.body.data.name).toBe("Luna");
+    expect(res.body.medicalRecordsAttempted).toBe(false);
+    expect(res.body.medicalRecordsRequested).toBe(0);
+    expect(res.body.medicalRecordsCreatedCount).toBe(0);
+    expect(res.body.medicalRecordCreated).toBe(false);
+  });
+
+  it("creates a new animal with multiple initial medical records", async () => {
+    const createdAnimal = {
+      aid: 3,
+      ...VALID_CREATE_BODY,
+      record_id: null,
+      created_at: "2026-01-01T00:00:00Z",
+    };
+    const createdMedicalRecords = [
+      {
+        record_id: 44,
+        aid: 3,
+        record_type: "vacunación",
+        date_given: "2026-04-14T10:00:00.000Z",
+        vet_name: "Dr. Rivera",
+        notes: "Initial intake vaccination",
+      },
+      {
+        record_id: 45,
+        aid: 3,
+        record_type: "examen",
+        date_given: "2026-04-15T10:00:00.000Z",
+        vet_name: "Dr. Soto",
+        notes: "Initial wellness exam",
+      },
+    ];
+    let medicalRecordCallCount = 0;
+
+    mockFrom.mockImplementation((table) => {
+      if (table === "animals") {
+        return buildChainableMock({ data: createdAnimal, error: null });
+      }
+
+      if (table === "medical_records") {
+        const response = createdMedicalRecords[medicalRecordCallCount];
+        medicalRecordCallCount += 1;
+        return buildChainableMock({ data: response, error: null });
+      }
+
+      return buildChainableMock({ data: null, error: { message: "Unknown table" } });
+    });
+
+    const res = await request(getApp())
+      .post("/api/animals")
+      .send({
+        ...VALID_CREATE_BODY,
+        medical_records: [
+          {
+            record_type: "vacunación",
+            date_given: "2026-04-14T10:00:00.000Z",
+            vet_name: "Dr. Rivera",
+            notes: "Initial intake vaccination",
+          },
+          {
+            record_type: "examen",
+            date_given: "2026-04-15T10:00:00.000Z",
+            vet_name: "Dr. Soto",
+            notes: "Initial wellness exam",
+          },
+        ],
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.success).toBe(true);
+    expect(res.body.medicalRecordsAttempted).toBe(true);
+    expect(res.body.medicalRecordsRequested).toBe(2);
+    expect(res.body.medicalRecordsCreatedCount).toBe(2);
+    expect(res.body.medicalRecordCreated).toBe(true);
+    expect(res.body.data.record_id).toBeNull();
+  });
+
+  it("returns 400 for an invalid medical_records entry type", async () => {
+    const res = await request(getApp())
+      .post("/api/animals")
+      .send({
+        ...VALID_CREATE_BODY,
+        medical_records: [
+          {
+            record_type: "vacunación",
+          },
+          {
+            record_type: "consulta",
+          },
+        ],
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/medical_records\[1\]\.record_type/i);
+  });
+
+  it("returns 400 for a malformed medical_records date", async () => {
+    const res = await request(getApp())
+      .post("/api/animals")
+      .send({
+        ...VALID_CREATE_BODY,
+        medical_records: [
+          {
+            date_given: "not-a-date",
+          },
+        ],
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/medical_records\[0\]\.date_given/i);
+  });
+
+  it("returns a partial-success warning when some medical records fail after the animal is created", async () => {
+    const createdAnimal = {
+      aid: 3,
+      ...VALID_CREATE_BODY,
+      record_id: null,
+      created_at: "2026-01-01T00:00:00Z",
+    };
+
+    mockFrom.mockImplementation((table) => {
+      if (table === "animals") {
+        return buildChainableMock({ data: createdAnimal, error: null });
+      }
+
+      if (table === "medical_records") {
+        if (mockFrom.mock.calls.filter(([name]) => name === "medical_records").length === 1) {
+          return buildChainableMock({
+            data: {
+              record_id: 44,
+              aid: 3,
+              record_type: "vacunación",
+            },
+            error: null,
+          });
+        }
+
+        return buildChainableMock({
+          data: null,
+          error: { message: "insert failed" },
+        });
+      }
+
+      return buildChainableMock({ data: null, error: { message: "Unknown table" } });
+    });
+
+    const res = await request(getApp())
+      .post("/api/animals")
+      .send({
+        ...VALID_CREATE_BODY,
+        medical_records: [
+          {
+            record_type: "vacunación",
+            notes: "Initial intake vaccination",
+          },
+          {
+            record_type: "examen",
+            notes: "Follow-up exam",
+          },
+        ],
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.record_id).toBeNull();
+    expect(res.body.medicalRecordsAttempted).toBe(true);
+    expect(res.body.medicalRecordsRequested).toBe(2);
+    expect(res.body.medicalRecordsCreatedCount).toBe(1);
+    expect(res.body.medicalRecordCreated).toBe(false);
+    expect(res.body.warnings).toEqual([
+      expect.objectContaining({ code: "MEDICAL_RECORD_CREATE_FAILED", index: 1 }),
+    ]);
   });
 
   it("returns 400 when name is missing", async () => {
@@ -413,8 +608,17 @@ describe("PATCH /api/animals/:aid", () => {
 
   it("updates an animal and returns 200 with the updated record", async () => {
     const updated = { ...MOCK_ANIMALS[0], name: "Buddy Updated" };
-    const chain = buildChainableMock({ data: updated, error: null });
-    mockFrom.mockReturnValue(chain);
+    mockFrom.mockImplementation((table) => {
+      if (table === "animals") {
+        return buildChainableMock({ data: updated, error: null });
+      }
+
+      if (table === "medical_records") {
+        return buildChainableMock({ data: [], error: null });
+      }
+
+      return buildChainableMock({ data: null, error: { message: "Unknown table" } });
+    });
 
     const res = await request(getApp())
       .patch("/api/animals/1")
@@ -428,8 +632,17 @@ describe("PATCH /api/animals/:aid", () => {
 
   it("accepts partial update with a single field", async () => {
     const updated = { ...MOCK_ANIMALS[0], status: "adoptado" };
-    const chain = buildChainableMock({ data: updated, error: null });
-    mockFrom.mockReturnValue(chain);
+    mockFrom.mockImplementation((table) => {
+      if (table === "animals") {
+        return buildChainableMock({ data: updated, error: null });
+      }
+
+      if (table === "medical_records") {
+        return buildChainableMock({ data: [], error: null });
+      }
+
+      return buildChainableMock({ data: null, error: { message: "Unknown table" } });
+    });
 
     const res = await request(getApp())
       .patch("/api/animals/1")
@@ -438,6 +651,107 @@ describe("PATCH /api/animals/:aid", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
+  });
+
+  it("updates medical records alongside the animal", async () => {
+    const updatedAnimal = { ...MOCK_ANIMALS[0], description: "Updated description" };
+    mockRpc.mockResolvedValue({
+      data: {
+        animal: updatedAnimal,
+        medical_records: [
+          {
+            record_id: 21,
+            aid: 1,
+            record_type: "vacunación",
+            notes: "Updated note",
+          },
+          {
+            record_id: 23,
+            aid: 1,
+            record_type: "tratamiento",
+            notes: "New record",
+          },
+        ],
+      },
+      error: null,
+    });
+
+    const res = await request(getApp())
+      .patch("/api/animals/1")
+      .send({
+        description: "Updated description",
+        medical_records: [
+          {
+            record_id: 21,
+            record_type: "vacunación",
+            notes: "Updated note",
+          },
+          {
+            record_type: "tratamiento",
+            notes: "New record",
+          },
+        ],
+      });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.description).toBe("Updated description");
+    expect(res.body.data.medical_records).toEqual([
+      expect.objectContaining({ record_id: 21, notes: "Updated note" }),
+      expect.objectContaining({ record_id: 23, notes: "New record" }),
+    ]);
+    expect(mockRpc).toHaveBeenCalledWith("patch_animal_with_medical_records", {
+      p_aid: 1,
+      p_animal_updates: {
+        description: "Updated description",
+      },
+      p_medical_records: [
+        {
+          record_id: 21,
+          record_type: "vacunación",
+          notes: "Updated note",
+        },
+        {
+          record_type: "tratamiento",
+          notes: "New record",
+        },
+      ],
+    });
+  });
+
+  it("returns 500 when the transactional medical record sync fails", async () => {
+    mockRpc.mockResolvedValue({
+      data: null,
+      error: { message: "Medical record 999 does not belong to animal 1." },
+    });
+
+    const res = await request(getApp())
+      .patch("/api/animals/1")
+      .send({
+        description: "Updated description",
+        medical_records: [
+          {
+            record_id: 999,
+            record_type: "vacunación",
+          },
+        ],
+      });
+
+    expect(res.status).toBe(500);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/failed to update animal/i);
+    expect(mockRpc).toHaveBeenCalledWith("patch_animal_with_medical_records", {
+      p_aid: 1,
+      p_animal_updates: {
+        description: "Updated description",
+      },
+      p_medical_records: [
+        {
+          record_id: 999,
+          record_type: "vacunación",
+        },
+      ],
+    });
   });
 
   it("returns 404 when animal is not found", async () => {
@@ -495,8 +809,17 @@ describe("PATCH /api/animals/:aid", () => {
 
   it("accepts tags array in an update", async () => {
     const updated = { ...MOCK_ANIMALS[0], tags: ["friendly", "vaccinated"] };
-    const chain = buildChainableMock({ data: updated, error: null });
-    mockFrom.mockReturnValue(chain);
+    mockFrom.mockImplementation((table) => {
+      if (table === "animals") {
+        return buildChainableMock({ data: updated, error: null });
+      }
+
+      if (table === "medical_records") {
+        return buildChainableMock({ data: [], error: null });
+      }
+
+      return buildChainableMock({ data: null, error: { message: "Unknown table" } });
+    });
 
     const res = await request(getApp())
       .patch("/api/animals/1")
@@ -518,5 +841,26 @@ describe("PATCH /api/animals/:aid", () => {
 
     expect(res.status).toBe(500);
     expect(res.body.success).toBe(false);
+  });
+
+  it("sends an empty medical_records array to the RPC, deleting all existing records", async () => {
+    const updatedAnimal = { ...MOCK_ANIMALS[0] };
+    mockRpc.mockResolvedValue({
+      data: { animal: updatedAnimal, medical_records: [] },
+      error: null,
+    });
+
+    const res = await request(getApp())
+      .patch("/api/animals/1")
+      .send({ name: "Buddy", medical_records: [] });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.medical_records).toEqual([]);
+    expect(mockRpc).toHaveBeenCalledWith("patch_animal_with_medical_records", {
+      p_aid: 1,
+      p_animal_updates: { name: "Buddy" },
+      p_medical_records: [],
+    });
   });
 });

@@ -386,6 +386,67 @@
   box-shadow: var(--shadow-md);
 }
 
+.medicalRecordsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.medicalRecordCard {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  padding: var(--space-4);
+}
+
+.medicalRecordCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.medicalRecordCardTitle {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.medicalRecordCardFields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.secondaryButton {
+  width: fit-content;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.secondaryButton:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.removeMedicalRecordButton {
+  border: none;
+  background: none;
+  color: var(--color-error);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
 @media (max-width: 768px) {
   .formWrapper {
     padding: var(--space-4);
