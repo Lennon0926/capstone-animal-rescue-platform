@@ -310,6 +310,20 @@ describe("image object key middleware validation", () => {
     expect(req.validatedBody.medical_records).toEqual([]);
   });
 
+  it("rejects a medical_records entry that contains only record_id on update", () => {
+    const req = {
+      body: {
+        medical_records: [{ record_id: 5 }],
+      },
+    };
+    const next = jest.fn();
+
+    validateUpdateAnimal(req, {}, next);
+
+    expect(next.mock.calls[0][0].statusCode).toBe(400);
+    expect(next.mock.calls[0][0].message).toMatch(/record_id/i);
+  });
+
   it("rejects invalid medical_records.record_id on update", () => {
     const req = {
       body: {

@@ -148,7 +148,9 @@ export const buildMedicalRecordsPayload = (
     const shouldEmitNullClearsForOptionalFields =
       allowRecordId && Boolean(medicalRecord.record_id);
 
-    if (!hasMedicalRecordValues(medicalRecord)) {
+    const isExistingRecord = allowRecordId && Boolean(medicalRecord.record_id);
+
+    if (!hasMedicalRecordValues(medicalRecord) && !isExistingRecord) {
       continue;
     }
 

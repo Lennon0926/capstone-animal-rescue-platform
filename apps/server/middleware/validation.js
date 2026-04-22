@@ -101,9 +101,16 @@ function validateMedicalRecordEntry(medicalRecord, fieldPath, options = {}) {
     }
   }
 
-  return Object.keys(validatedMedicalRecord).some((key) => key !== "record_id")
-    ? validatedMedicalRecord
-    : undefined;
+  const hasNonRecordIdFields = Object.keys(validatedMedicalRecord).some((key) => key !== "record_id");
+
+  if (!hasNonRecordIdFields && validatedMedicalRecord.record_id !== undefined) {
+    throw new ApiError(
+      400,
+      `${fieldPath} must include at least one field other than record_id.`
+    );
+  }
+
+  return hasNonRecordIdFields ? validatedMedicalRecord : undefined;
 }
 
 function validateMedicalRecords(reqBody, options = {}) {
