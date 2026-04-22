@@ -785,4 +785,25 @@ describe("PATCH /api/animals/:aid", () => {
     expect(res.status).toBe(500);
     expect(res.body.success).toBe(false);
   });
+
+  it("sends an empty medical_records array to the RPC, deleting all existing records", async () => {
+    const updatedAnimal = { ...MOCK_ANIMALS[0] };
+    mockRpc.mockResolvedValue({
+      data: { animal: updatedAnimal, medical_records: [] },
+      error: null,
+    });
+
+    const res = await request(getApp())
+      .patch("/api/animals/1")
+      .send({ name: "Buddy", medical_records: [] });
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.medical_records).toEqual([]);
+    expect(mockRpc).toHaveBeenCalledWith("patch_animal_with_medical_records", {
+      p_aid: 1,
+      p_animal_updates: { name: "Buddy" },
+      p_medical_records: [],
+    });
+  });
 });

@@ -226,4 +226,4 @@ END;
 $$;
 
 GRANT EXECUTE ON FUNCTION patch_animal_with_medical_records(integer, jsonb, jsonb)
-  TO anon, authenticated, service_role;
+  TO service_role;
