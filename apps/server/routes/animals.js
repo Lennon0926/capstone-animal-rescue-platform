@@ -17,6 +17,7 @@ const {
 const { validateAnimalsQuery, validateAnimalId, validateCreateAnimal, validateUpdateAnimal } = require("../middleware/validation");
 const { asyncHandler, ApiError } = require("../middleware/errorHandler");
 const { requireAuth } = require("../middleware/auth");
+const { requireJson } = require("../middleware/requireJson");
 
 /**
  * GET /api/animals
@@ -117,6 +118,7 @@ router.get(
  */
 router.post(
   "/",
+  requireJson,
   asyncHandler(requireAuth),
   validateCreateAnimal,
   asyncHandler(async (req, res) => {
@@ -175,6 +177,7 @@ router.delete(
  */
 router.patch(
   "/:aid",
+  requireJson,
   asyncHandler(requireAuth),
   validateAnimalId,
   validateUpdateAnimal,
