@@ -30,13 +30,13 @@ export default function AdminHeader() {
             alt="CPAAA Logo"
             sizes="45px"
           />
-          <div className={styles.logo} onClick={handleLogout}>
+          <div className={styles.logo}>
             <Link href="/">Ciudadanos Pro Albergue de Animales de Aguadilla</Link>
           </div>
         </div>
 
         <nav className={styles.navDesktop}>
-          <Link href="/home" className={styles.navLink} onClick={handleLogout}>
+          <Link href="/home" className={styles.navLink}>
             Home
           </Link>
           <Link href="/admin/home" className={styles.navLink}>

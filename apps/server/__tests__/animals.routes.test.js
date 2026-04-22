@@ -242,6 +242,19 @@ describe("POST /api/animals", () => {
     expect(res.body.error.message).toMatch(/authentication required/i);
   });
 
+  it("returns 401 when auth token is invalid or expired", async () => {
+    mockAuthGetUser.mockResolvedValueOnce({ data: { user: null }, error: { message: "invalid JWT" } });
+
+    const res = await request(getApp())
+      .post("/api/animals")
+      .set("Authorization", "Bearer invalid-token")
+      .send(VALID_CREATE_BODY);
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/invalid or expired/i);
+  });
+
   it("creates a new animal and returns 201", async () => {
     const newAnimal = { aid: 3, ...VALID_CREATE_BODY, created_at: "2026-01-01T00:00:00Z" };
     const chain = buildChainableMock({ data: newAnimal, error: null });
@@ -301,25 +314,23 @@ describe("POST /api/animals", () => {
       return buildChainableMock({ data: null, error: { message: "Unknown table" } });
     });
 
-    const res = await request(getApp())
-      .post("/api/animals")
-      .send({
-        ...VALID_CREATE_BODY,
-        medical_records: [
-          {
-            record_type: "vacunación",
-            date_given: "2026-04-14T10:00:00.000Z",
-            vet_name: "Dr. Rivera",
-            notes: "Initial intake vaccination",
-          },
-          {
-            record_type: "examen",
-            date_given: "2026-04-15T10:00:00.000Z",
-            vet_name: "Dr. Soto",
-            notes: "Initial wellness exam",
-          },
-        ],
-      });
+    const res = await asAuthenticated(request(getApp()).post("/api/animals")).send({
+      ...VALID_CREATE_BODY,
+      medical_records: [
+        {
+          record_type: "vacunación",
+          date_given: "2026-04-14T10:00:00.000Z",
+          vet_name: "Dr. Rivera",
+          notes: "Initial intake vaccination",
+        },
+        {
+          record_type: "examen",
+          date_given: "2026-04-15T10:00:00.000Z",
+          vet_name: "Dr. Soto",
+          notes: "Initial wellness exam",
+        },
+      ],
+    });
 
     expect(res.status).toBe(201);
     expect(res.body.success).toBe(true);
@@ -331,19 +342,17 @@ describe("POST /api/animals", () => {
   });
 
   it("returns 400 for an invalid medical_records entry type", async () => {
-    const res = await request(getApp())
-      .post("/api/animals")
-      .send({
-        ...VALID_CREATE_BODY,
-        medical_records: [
-          {
-            record_type: "vacunación",
-          },
-          {
-            record_type: "consulta",
-          },
-        ],
-      });
+    const res = await asAuthenticated(request(getApp()).post("/api/animals")).send({
+      ...VALID_CREATE_BODY,
+      medical_records: [
+        {
+          record_type: "vacunación",
+        },
+        {
+          record_type: "consulta",
+        },
+      ],
+    });
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
@@ -351,16 +360,14 @@ describe("POST /api/animals", () => {
   });
 
   it("returns 400 for a malformed medical_records date", async () => {
-    const res = await request(getApp())
-      .post("/api/animals")
-      .send({
-        ...VALID_CREATE_BODY,
-        medical_records: [
-          {
-            date_given: "not-a-date",
-          },
-        ],
-      });
+    const res = await asAuthenticated(request(getApp()).post("/api/animals")).send({
+      ...VALID_CREATE_BODY,
+      medical_records: [
+        {
+          date_given: "not-a-date",
+        },
+      ],
+    });
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
@@ -401,21 +408,19 @@ describe("POST /api/animals", () => {
       return buildChainableMock({ data: null, error: { message: "Unknown table" } });
     });
 
-    const res = await request(getApp())
-      .post("/api/animals")
-      .send({
-        ...VALID_CREATE_BODY,
-        medical_records: [
-          {
-            record_type: "vacunación",
-            notes: "Initial intake vaccination",
-          },
-          {
-            record_type: "examen",
-            notes: "Follow-up exam",
-          },
-        ],
-      });
+    const res = await asAuthenticated(request(getApp()).post("/api/animals")).send({
+      ...VALID_CREATE_BODY,
+      medical_records: [
+        {
+          record_type: "vacunación",
+          notes: "Initial intake vaccination",
+        },
+        {
+          record_type: "examen",
+          notes: "Follow-up exam",
+        },
+      ],
+    });
 
     expect(res.status).toBe(201);
     expect(res.body.success).toBe(true);
@@ -547,6 +552,18 @@ describe("DELETE /api/animals/:aid", () => {
     expect(res.body.error.message).toMatch(/authentication required/i);
   });
 
+  it("returns 401 when auth token is invalid or expired", async () => {
+    mockAuthGetUser.mockResolvedValueOnce({ data: { user: null }, error: { message: "invalid JWT" } });
+
+    const res = await request(getApp())
+      .delete("/api/animals/1")
+      .set("Authorization", "Bearer invalid-token");
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/invalid or expired/i);
+  });
+
   it("deletes an animal and returns 200 with the deleted record", async () => {
     const chain = buildChainableMock({ data: MOCK_ANIMALS[0], error: null });
     mockFrom.mockReturnValue(chain);
@@ -604,6 +621,19 @@ describe("PATCH /api/animals/:aid", () => {
     expect(res.status).toBe(401);
     expect(res.body.success).toBe(false);
     expect(res.body.error.message).toMatch(/authentication required/i);
+  });
+
+  it("returns 401 when auth token is invalid or expired", async () => {
+    mockAuthGetUser.mockResolvedValueOnce({ data: { user: null }, error: { message: "invalid JWT" } });
+
+    const res = await request(getApp())
+      .patch("/api/animals/1")
+      .set("Authorization", "Bearer invalid-token")
+      .send({ name: "No Auth" });
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/invalid or expired/i);
   });
 
   it("updates an animal and returns 200 with the updated record", async () => {
@@ -678,6 +708,7 @@ describe("PATCH /api/animals/:aid", () => {
 
     const res = await request(getApp())
       .patch("/api/animals/1")
+      .set("Authorization", "Bearer test-auth-token")
       .send({
         description: "Updated description",
         medical_records: [
@@ -727,6 +758,7 @@ describe("PATCH /api/animals/:aid", () => {
 
     const res = await request(getApp())
       .patch("/api/animals/1")
+      .set("Authorization", "Bearer test-auth-token")
       .send({
         description: "Updated description",
         medical_records: [
@@ -852,6 +884,7 @@ describe("PATCH /api/animals/:aid", () => {
 
     const res = await request(getApp())
       .patch("/api/animals/1")
+      .set("Authorization", "Bearer test-auth-token")
       .send({ name: "Buddy", medical_records: [] });
 
     expect(res.status).toBe(200);

@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -37,8 +35,6 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      console.log('Attempting to sign in with email:', email);
-      
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password,
@@ -58,16 +54,12 @@ export default function LoginPage() {
         return;
       }
 
-      // Check if session was created
-      if (!data || !data.session) {
-        console.error('No session returned:', data);
+      if (!data?.session) {
         setError('Login successful but session could not be created. Please try again.');
         setLoading(false);
         return;
       }
 
-      // Add a small delay to ensure session is persisted
-      await new Promise(resolve => setTimeout(resolve, 500));
       await router.push('/admin/home');
     } catch (err) {
       // Catch any unexpected errors
