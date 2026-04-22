@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Animal } from "@/types/animal";
 import { getAnimalImageUrl } from "@/utils/animalImages";
+import { getAuthenticatedHeaders } from "@/lib/apiAuth";
 import styles from "./adminAnimalsList.module.css";
 import { ChevronDown, Search } from "lucide-react";
 
@@ -174,6 +175,7 @@ export default function AdminAnimalsList({
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals/${animalToDelete.aid}`,
         {
           method: "DELETE",
+          headers: await getAuthenticatedHeaders(),
         },
       );
 

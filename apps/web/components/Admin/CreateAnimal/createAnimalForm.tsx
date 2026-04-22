@@ -13,6 +13,7 @@ import {
   updateAnimalImageObjectKey,
   uploadAnimalImage,
 } from "@/services/animalImageUploadService";
+import { getAuthenticatedHeaders } from "@/lib/apiAuth";
 
 interface CreateAnimalFormProps {
   onSave?: (newAnimal: Animal) => void;
@@ -214,9 +215,9 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals`,
         {
           method: "POST",
-          headers: {
+          headers: await getAuthenticatedHeaders({
             "Content-Type": "application/json",
-          },
+          }),
           body: JSON.stringify({
             name: formData.name,
             description: formData.description,
