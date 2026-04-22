@@ -1,10 +1,11 @@
-import { FormEvent, useState, useEffect } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Animal } from "@/types/animal";
 import styles from "./createAnimalForm.module.css";
 import { X, Plus, ArrowLeft } from "lucide-react";
+import MedicalRecordsFieldset from "@/components/Admin/shared/MedicalRecordsFieldset";
 import {
   fetchUploadConfig,
   getUploadStorageUnavailableMessage,
@@ -13,10 +14,39 @@ import {
   updateAnimalImageObjectKey,
   uploadAnimalImage,
 } from "@/services/animalImageUploadService";
+import {
+  CREATE_ANIMAL_REDIRECT_DELAY_MS,
+  addEmptyMedicalRecord,
+  buildMedicalRecordsPayload,
+  getCreateAnimalSuccessMessage,
+  getEmptyMedicalRecord,
+  type MedicalRecordFormFieldName,
+  removeMedicalRecordAtIndex,
+  type MedicalRecordFormData,
+  updateMedicalRecordAtIndex,
+} from "@/utils/medicalRecords";
 
 interface CreateAnimalFormProps {
   onSave?: (newAnimal: Animal) => void;
 }
+
+type CreateAnimalWarning = {
+  code: string;
+  message: string;
+};
+
+type CreateAnimalResponse = {
+  success: boolean;
+  data?: Animal;
+  medicalRecordsAttempted?: boolean;
+  medicalRecordsRequested?: number;
+  medicalRecordsCreatedCount?: number;
+  medicalRecordCreated?: boolean;
+  warnings?: CreateAnimalWarning[];
+  error?: {
+    message?: string;
+  } | string;
+};
 
 // Default empty animal for creation
 const getEmptyAnimal = (): Partial<Animal> => ({
@@ -32,6 +62,9 @@ const getEmptyAnimal = (): Partial<Animal> => ({
 export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
   const router = useRouter();
   const [formData, setFormData] = useState(getEmptyAnimal());
+  const [medicalRecordsData, setMedicalRecordsData] = useState<MedicalRecordFormData[]>([
+    getEmptyMedicalRecord(),
+  ]);
   const [isLoading, setIsLoading] = useState(false);
   const [isUploadConfigLoading, setIsUploadConfigLoading] = useState(true);
   const [uploadConfig, setUploadConfig] = useState<UploadConfig | null>(null);
@@ -50,6 +83,29 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleMedicalRecordInputChange = (
+    index: number,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setMedicalRecordsData((prev) =>
+      updateMedicalRecordAtIndex(
+        prev,
+        index,
+        name as MedicalRecordFormFieldName,
+        value
+      )
+    );
+  };
+
+  const handleAddMedicalRecord = () => {
+    setMedicalRecordsData((prev) => addEmptyMedicalRecord(prev));
+  };
+
+  const handleRemoveMedicalRecord = (indexToRemove: number) => {
+    setMedicalRecordsData((prev) => removeMedicalRecordAtIndex(prev, indexToRemove));
   };
 
   const handleAddTag = () => {
@@ -83,9 +139,9 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
       const url = URL.createObjectURL(selectedFile);
       setPreviewUrl(url);
       return () => URL.revokeObjectURL(url);
-    } else {
-      setPreviewUrl(null);
     }
+
+    setPreviewUrl(null);
   }, [selectedFile]);
 
   const refreshUploadConfig = async (): Promise<{
@@ -199,6 +255,19 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
     setIsLoading(true);
 
     try {
+      const {
+        medicalRecordsPayload,
+        errorMessage: medicalRecordsErrorMessage,
+      } = buildMedicalRecordsPayload(medicalRecordsData, {
+        invalidDateMessage: (recordNumber) =>
+          `La fecha del registro médico inicial ${recordNumber} no es válida.`,
+      });
+
+      if (medicalRecordsErrorMessage) {
+        setErrorMessage(medicalRecordsErrorMessage);
+        return;
+      }
+
       const { config: latestUploadConfig, error: latestUploadError } =
         await refreshUploadConfig();
 
@@ -225,6 +294,9 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
             gender: formData.gender,
             status: formData.status,
             tags: formData.tags || [],
+            ...(medicalRecordsPayload
+              ? { medical_records: medicalRecordsPayload }
+              : {}),
           }),
         }
       );
@@ -238,8 +310,12 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
         throw new Error(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
       }
 
-      const createResult = await createResponse.json();
+      const createResult = (await createResponse.json()) as CreateAnimalResponse;
       const newAnimal = createResult.data;
+
+      if (!newAnimal) {
+        throw new Error("La respuesta de creación del animal fue inválida.");
+      }
 
       const uploadResult = await uploadAnimalImage(
         newAnimal.aid.toString(),
@@ -250,7 +326,7 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
         uploadResult.objectKey
       );
 
-      setSuccessMessage("¡Animal creado exitosamente con imagen!");
+      setSuccessMessage(getCreateAnimalSuccessMessage(createResult));
 
       // Call onSave callback if provided
       if (onSave) {
@@ -260,7 +336,7 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
       // Redirect to animal list after a short delay
       setTimeout(() => {
         router.push("/admin/animals");
-      }, 1500);
+      }, CREATE_ANIMAL_REDIRECT_DELAY_MS);
     } catch (error) {
       setErrorMessage(
         error instanceof Error ? error.message : "Error inesperado."
@@ -439,6 +515,19 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
               </div>
             </div>
           </fieldset>
+
+          <MedicalRecordsFieldset
+            title="Registros Médicos Iniciales"
+            description="Agrega uno o varios registros médicos iniciales. Los formularios vacíos no se enviarán."
+            addButtonLabel="Agregar otro registro médico"
+            notesPlaceholder="Detalles del registro médico inicial"
+            medicalRecords={medicalRecordsData}
+            styles={styles}
+            onMedicalRecordChange={handleMedicalRecordInputChange}
+            onAddMedicalRecord={handleAddMedicalRecord}
+            onRemoveMedicalRecord={handleRemoveMedicalRecord}
+            hideRemoveButtonWhenSingle
+          />
 
           {/* Image Upload Section */}
           <fieldset className={styles.fieldset}>

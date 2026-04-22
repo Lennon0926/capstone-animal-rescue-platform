@@ -27,7 +27,7 @@ export default defineConfig({
   webServer: {
     command: "npm run dev",
     url: "http://localhost:3000",
-    reuseExistingServer: false,
+    reuseExistingServer: process.env.PLAYWRIGHT_REUSE_EXISTING_SERVER === "1",
     env: { NEXT_PUBLIC_API_BASE_URL: "http://localhost:4001" },
   },
 });

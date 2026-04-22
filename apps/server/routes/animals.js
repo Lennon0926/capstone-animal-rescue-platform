@@ -10,9 +10,9 @@ const {
   getAnimals,
   getAnimalById,
   getFilterOptions,
-  createAnimal,
+  createAnimalWithInitialMedicalRecords,
   deleteAnimal,
-  updateAnimalById
+  updateAnimalWithMedicalRecordsById
 } = require("../repositories/animalsRepository");
 const { validateAnimalsQuery, validateAnimalId, validateCreateAnimal, validateUpdateAnimal } = require("../middleware/validation");
 const { asyncHandler, ApiError } = require("../middleware/errorHandler");
@@ -120,16 +120,26 @@ router.post(
   requireJson,
   validateCreateAnimal,
   asyncHandler(async (req, res) => {
-    const result = await createAnimal(req.validatedBody);
+    const result = await createAnimalWithInitialMedicalRecords(req.validatedBody);
 
     if (result.error) {
       throw new ApiError(500, "Failed to create animal", result.error);
     }
 
-    res.status(201).json({
+    const response = {
       success: true,
       data: result.data,
-    });
+      medicalRecordsAttempted: result.medicalRecordsAttempted,
+      medicalRecordsRequested: result.medicalRecordsRequested,
+      medicalRecordsCreatedCount: result.medicalRecordsCreatedCount,
+      medicalRecordCreated: result.medicalRecordCreated,
+    };
+
+    if (result.warnings.length > 0) {
+      response.warnings = result.warnings;
+    }
+
+    res.status(201).json(response);
   })
 );
 
@@ -168,7 +178,10 @@ router.patch(
   validateAnimalId,
   validateUpdateAnimal,
   asyncHandler(async (req, res) => {
-    const result = await updateAnimalById(req.params.aid, req.validatedBody);
+    const result = await updateAnimalWithMedicalRecordsById(
+      req.params.aid,
+      req.validatedBody
+    );
 
     if (result.error === "Animal not found") {
       throw new ApiError(404, `Animal with ID ${req.params.aid} not found`);
