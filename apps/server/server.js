@@ -22,7 +22,7 @@ const port = Number(process.env.PORT) || 4000;
 // Middleware
 app.use(
   cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(",") ?? [],
+    origin: process.env.ALLOWED_ORIGINS?.split(",").map((o) => o.trim()).filter(Boolean) ?? [],
     methods: ["GET", "POST", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })

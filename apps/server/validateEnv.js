@@ -9,6 +9,11 @@ function validateEnv() {
     console.error("Server cannot start. Please set them in .env.local");
     process.exit(1);
   }
+
+  if (process.env.NODE_ENV === "production" && !process.env.ALLOWED_ORIGINS) {
+    console.error("FATAL: ALLOWED_ORIGINS must be set in production");
+    process.exit(1);
+  }
 }
 
 module.exports = { validateEnv, REQUIRED_ENV_VARS };
