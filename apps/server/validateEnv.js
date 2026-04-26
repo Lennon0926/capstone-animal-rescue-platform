@@ -9,6 +9,20 @@ function validateEnv() {
     console.error("Server cannot start. Please set them in .env.local");
     process.exit(1);
   }
+
+  if (process.env.NODE_ENV === "production") {
+    const allowedOrigins = (process.env.ALLOWED_ORIGINS ?? "")
+      .split(",")
+      .map((o) => o.trim())
+      .filter(Boolean);
+
+    if (allowedOrigins.length === 0) {
+      console.error(
+        "FATAL: ALLOWED_ORIGINS must include at least one non-empty origin in production"
+      );
+      process.exit(1);
+    }
+  }
 }
 
 module.exports = { validateEnv, REQUIRED_ENV_VARS };
