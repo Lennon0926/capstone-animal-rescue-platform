@@ -10,9 +10,18 @@ function validateEnv() {
     process.exit(1);
   }
 
-  if (process.env.NODE_ENV === "production" && !process.env.ALLOWED_ORIGINS) {
-    console.error("FATAL: ALLOWED_ORIGINS must be set in production");
-    process.exit(1);
+  if (process.env.NODE_ENV === "production") {
+    const allowedOrigins = (process.env.ALLOWED_ORIGINS ?? "")
+      .split(",")
+      .map((o) => o.trim())
+      .filter(Boolean);
+
+    if (allowedOrigins.length === 0) {
+      console.error(
+        "FATAL: ALLOWED_ORIGINS must include at least one non-empty origin in production"
+      );
+      process.exit(1);
+    }
   }
 }
 

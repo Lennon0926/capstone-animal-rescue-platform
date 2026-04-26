@@ -44,6 +44,8 @@ const uploadLimiter = rateLimit({
   handler: rateLimitHandler,
 });
 
+app.set("trust proxy", 1);
+
 // Middleware
 app.use(
   cors({
@@ -52,12 +54,12 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-app.use(express.json());
 app.use(globalLimiter);
+app.use(express.json());
 
 // Routes
 app.use("/api/animals", animalsRouter);
-app.use("/api/uploads/animals/:animalId/image", uploadLimiter);
+app.post("/api/uploads/animals/:animalId/image", uploadLimiter);
 app.use("/api/uploads", uploadsRouter);
 app.use("/", healthRouter);
 
