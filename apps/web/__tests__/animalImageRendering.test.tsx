@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import type { Animal } from "@/types/animal";
@@ -7,14 +8,10 @@ jest.mock("next/image", () => ({
   default: ({
     src,
     alt,
-    fill: _fill,
-    priority: _priority,
     ...props
   }: {
     src: string | { src: string };
     alt: string;
-    fill?: boolean;
-    priority?: boolean;
     [key: string]: unknown;
   }) => (
     <img
@@ -24,6 +21,7 @@ jest.mock("next/image", () => ({
     />
   ),
 }));
+
 
 jest.mock("next/link", () => ({
   __esModule: true,

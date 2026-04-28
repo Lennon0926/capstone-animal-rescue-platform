@@ -1,8 +1,8 @@
 import AdminHeader from "@/components/Admin/AdminHeader/adminHeader";
-import CreateAnimalForm from "@/components/Admin/CreateAnimal/createAnimalForm";
+import AdminHome from "@/components/Admin/AdminHome/adminHome";
 import { useAuthRequired } from "@/lib/useAuthRequired";
 
-export default function CreateAnimalPage() {
+export default function AdminHomePage() {
   const { isLoading } = useAuthRequired();
 
   if (isLoading) return <div>Loading...</div>;
@@ -10,7 +10,7 @@ export default function CreateAnimalPage() {
   return (
     <>
       <AdminHeader />
-      <CreateAnimalForm />
+      <AdminHome />
     </>
   );
 }

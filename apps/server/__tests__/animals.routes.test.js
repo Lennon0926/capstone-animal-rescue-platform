@@ -25,7 +25,14 @@ const MOCK_ANIMALS = [
 const mockSelect = jest.fn();
 const mockFrom = jest.fn(() => ({ select: mockSelect }));
 const mockRpc = jest.fn();
-const mockSupabaseClient = { from: mockFrom, rpc: mockRpc };
+const mockAuthGetUser = jest.fn();
+const mockSupabaseClient = {
+  from: mockFrom,
+  rpc: mockRpc,
+  auth: {
+    getUser: mockAuthGetUser,
+  },
+};
 
 jest.mock("../lib/supabase", () => ({
   getSupabaseClient: () => mockSupabaseClient,
@@ -59,7 +66,14 @@ function buildChainableMock(resolvedValue) {
 beforeEach(() => {
   jest.clearAllMocks();
   require("../repositories/animalsRepository").clearAnimalsCache();
+  mockAuthGetUser.mockResolvedValue({
+    data: { user: { id: "test-user-id" } },
+    error: null,
+  });
 });
+
+const asAuthenticated = (req) =>
+  req.set("Authorization", "Bearer test-auth-token");
 
 describe("GET /api/animals", () => {
   it("returns a paginated list of animals", async () => {
@@ -220,12 +234,35 @@ describe("POST /api/animals", () => {
     status: "disponible",
   };
 
+  it("returns 401 when auth token is missing", async () => {
+    const res = await request(getApp()).post("/api/animals").send(VALID_CREATE_BODY);
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/authentication required/i);
+  });
+
+  it("returns 401 when auth token is invalid or expired", async () => {
+    mockAuthGetUser.mockResolvedValueOnce({ data: { user: null }, error: { message: "invalid JWT" } });
+
+    const res = await request(getApp())
+      .post("/api/animals")
+      .set("Authorization", "Bearer invalid-token")
+      .send(VALID_CREATE_BODY);
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/invalid or expired/i);
+  });
+
   it("creates a new animal and returns 201", async () => {
     const newAnimal = { aid: 3, ...VALID_CREATE_BODY, created_at: "2026-01-01T00:00:00Z" };
     const chain = buildChainableMock({ data: newAnimal, error: null });
     mockFrom.mockReturnValue(chain);
 
-    const res = await request(getApp()).post("/api/animals").send(VALID_CREATE_BODY);
+    const res = await asAuthenticated(
+      request(getApp()).post("/api/animals")
+    ).send(VALID_CREATE_BODY);
 
     expect(res.status).toBe(201);
     expect(res.body.success).toBe(true);
@@ -277,25 +314,23 @@ describe("POST /api/animals", () => {
       return buildChainableMock({ data: null, error: { message: "Unknown table" } });
     });
 
-    const res = await request(getApp())
-      .post("/api/animals")
-      .send({
-        ...VALID_CREATE_BODY,
-        medical_records: [
-          {
-            record_type: "vacunación",
-            date_given: "2026-04-14T10:00:00.000Z",
-            vet_name: "Dr. Rivera",
-            notes: "Initial intake vaccination",
-          },
-          {
-            record_type: "examen",
-            date_given: "2026-04-15T10:00:00.000Z",
-            vet_name: "Dr. Soto",
-            notes: "Initial wellness exam",
-          },
-        ],
-      });
+    const res = await asAuthenticated(request(getApp()).post("/api/animals")).send({
+      ...VALID_CREATE_BODY,
+      medical_records: [
+        {
+          record_type: "vacunación",
+          date_given: "2026-04-14T10:00:00.000Z",
+          vet_name: "Dr. Rivera",
+          notes: "Initial intake vaccination",
+        },
+        {
+          record_type: "examen",
+          date_given: "2026-04-15T10:00:00.000Z",
+          vet_name: "Dr. Soto",
+          notes: "Initial wellness exam",
+        },
+      ],
+    });
 
     expect(res.status).toBe(201);
     expect(res.body.success).toBe(true);
@@ -307,19 +342,17 @@ describe("POST /api/animals", () => {
   });
 
   it("returns 400 for an invalid medical_records entry type", async () => {
-    const res = await request(getApp())
-      .post("/api/animals")
-      .send({
-        ...VALID_CREATE_BODY,
-        medical_records: [
-          {
-            record_type: "vacunación",
-          },
-          {
-            record_type: "consulta",
-          },
-        ],
-      });
+    const res = await asAuthenticated(request(getApp()).post("/api/animals")).send({
+      ...VALID_CREATE_BODY,
+      medical_records: [
+        {
+          record_type: "vacunación",
+        },
+        {
+          record_type: "consulta",
+        },
+      ],
+    });
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
@@ -327,16 +360,14 @@ describe("POST /api/animals", () => {
   });
 
   it("returns 400 for a malformed medical_records date", async () => {
-    const res = await request(getApp())
-      .post("/api/animals")
-      .send({
-        ...VALID_CREATE_BODY,
-        medical_records: [
-          {
-            date_given: "not-a-date",
-          },
-        ],
-      });
+    const res = await asAuthenticated(request(getApp()).post("/api/animals")).send({
+      ...VALID_CREATE_BODY,
+      medical_records: [
+        {
+          date_given: "not-a-date",
+        },
+      ],
+    });
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
@@ -377,21 +408,19 @@ describe("POST /api/animals", () => {
       return buildChainableMock({ data: null, error: { message: "Unknown table" } });
     });
 
-    const res = await request(getApp())
-      .post("/api/animals")
-      .send({
-        ...VALID_CREATE_BODY,
-        medical_records: [
-          {
-            record_type: "vacunación",
-            notes: "Initial intake vaccination",
-          },
-          {
-            record_type: "examen",
-            notes: "Follow-up exam",
-          },
-        ],
-      });
+    const res = await asAuthenticated(request(getApp()).post("/api/animals")).send({
+      ...VALID_CREATE_BODY,
+      medical_records: [
+        {
+          record_type: "vacunación",
+          notes: "Initial intake vaccination",
+        },
+        {
+          record_type: "examen",
+          notes: "Follow-up exam",
+        },
+      ],
+    });
 
     expect(res.status).toBe(201);
     expect(res.body.success).toBe(true);
@@ -407,7 +436,7 @@ describe("POST /api/animals", () => {
 
   it("returns 400 when name is missing", async () => {
     const { name, ...body } = VALID_CREATE_BODY;
-    const res = await request(getApp()).post("/api/animals").send(body);
+    const res = await asAuthenticated(request(getApp()).post("/api/animals")).send(body);
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
@@ -416,7 +445,7 @@ describe("POST /api/animals", () => {
 
   it("returns 400 when description is missing", async () => {
     const { description, ...body } = VALID_CREATE_BODY;
-    const res = await request(getApp()).post("/api/animals").send(body);
+    const res = await asAuthenticated(request(getApp()).post("/api/animals")).send(body);
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
@@ -426,6 +455,7 @@ describe("POST /api/animals", () => {
   it("returns 400 when species is invalid", async () => {
     const res = await request(getApp())
       .post("/api/animals")
+      .set("Authorization", "Bearer test-auth-token")
       .send({ ...VALID_CREATE_BODY, species: "hamster" });
 
     expect(res.status).toBe(400);
@@ -435,6 +465,7 @@ describe("POST /api/animals", () => {
   it("returns 400 when size is invalid", async () => {
     const res = await request(getApp())
       .post("/api/animals")
+      .set("Authorization", "Bearer test-auth-token")
       .send({ ...VALID_CREATE_BODY, size: "tiny" });
 
     expect(res.status).toBe(400);
@@ -444,6 +475,7 @@ describe("POST /api/animals", () => {
   it("returns 400 when gender is invalid", async () => {
     const res = await request(getApp())
       .post("/api/animals")
+      .set("Authorization", "Bearer test-auth-token")
       .send({ ...VALID_CREATE_BODY, gender: "other" });
 
     expect(res.status).toBe(400);
@@ -453,6 +485,7 @@ describe("POST /api/animals", () => {
   it("returns 400 when status is invalid", async () => {
     const res = await request(getApp())
       .post("/api/animals")
+      .set("Authorization", "Bearer test-auth-token")
       .send({ ...VALID_CREATE_BODY, status: "available" });
 
     expect(res.status).toBe(400);
@@ -462,6 +495,7 @@ describe("POST /api/animals", () => {
   it("returns 400 when image_url is provided", async () => {
     const res = await request(getApp())
       .post("/api/animals")
+      .set("Authorization", "Bearer test-auth-token")
       .send({ ...VALID_CREATE_BODY, image_url: "https://example.com/photo.jpg" });
 
     expect(res.status).toBe(400);
@@ -475,6 +509,7 @@ describe("POST /api/animals", () => {
 
     const res = await request(getApp())
       .post("/api/animals")
+      .set("Authorization", "Bearer test-auth-token")
       .send({ ...VALID_CREATE_BODY, image_object_key: "animals/3/photo.jpg" });
 
     expect(res.status).toBe(201);
@@ -488,6 +523,7 @@ describe("POST /api/animals", () => {
 
     const res = await request(getApp())
       .post("/api/animals")
+      .set("Authorization", "Bearer test-auth-token")
       .send({ ...VALID_CREATE_BODY, tags: ["vaccinated", "friendly"] });
 
     expect(res.status).toBe(201);
@@ -498,7 +534,9 @@ describe("POST /api/animals", () => {
     const chain = buildChainableMock({ data: null, error: { message: "DB connection failed" } });
     mockFrom.mockReturnValue(chain);
 
-    const res = await request(getApp()).post("/api/animals").send(VALID_CREATE_BODY);
+    const res = await asAuthenticated(request(getApp()).post("/api/animals")).send(
+      VALID_CREATE_BODY
+    );
 
     expect(res.status).toBe(500);
     expect(res.body.success).toBe(false);
@@ -506,11 +544,31 @@ describe("POST /api/animals", () => {
 });
 
 describe("DELETE /api/animals/:aid", () => {
+  it("returns 401 when auth token is missing", async () => {
+    const res = await request(getApp()).delete("/api/animals/1");
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/authentication required/i);
+  });
+
+  it("returns 401 when auth token is invalid or expired", async () => {
+    mockAuthGetUser.mockResolvedValueOnce({ data: { user: null }, error: { message: "invalid JWT" } });
+
+    const res = await request(getApp())
+      .delete("/api/animals/1")
+      .set("Authorization", "Bearer invalid-token");
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/invalid or expired/i);
+  });
+
   it("deletes an animal and returns 200 with the deleted record", async () => {
     const chain = buildChainableMock({ data: MOCK_ANIMALS[0], error: null });
     mockFrom.mockReturnValue(chain);
 
-    const res = await request(getApp()).delete("/api/animals/1");
+    const res = await asAuthenticated(request(getApp()).delete("/api/animals/1"));
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
@@ -524,14 +582,14 @@ describe("DELETE /api/animals/:aid", () => {
     });
     mockFrom.mockReturnValue(chain);
 
-    const res = await request(getApp()).delete("/api/animals/999");
+    const res = await asAuthenticated(request(getApp()).delete("/api/animals/999"));
 
     expect(res.status).toBe(404);
     expect(res.body.success).toBe(false);
   });
 
   it("returns 400 for an invalid animal ID", async () => {
-    const res = await request(getApp()).delete("/api/animals/abc");
+    const res = await asAuthenticated(request(getApp()).delete("/api/animals/abc"));
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
@@ -539,7 +597,7 @@ describe("DELETE /api/animals/:aid", () => {
   });
 
   it("returns 400 for a negative animal ID", async () => {
-    const res = await request(getApp()).delete("/api/animals/-1");
+    const res = await asAuthenticated(request(getApp()).delete("/api/animals/-1"));
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
@@ -549,7 +607,7 @@ describe("DELETE /api/animals/:aid", () => {
     const chain = buildChainableMock({ data: null, error: { message: "DB connection failed" } });
     mockFrom.mockReturnValue(chain);
 
-    const res = await request(getApp()).delete("/api/animals/1");
+    const res = await asAuthenticated(request(getApp()).delete("/api/animals/1"));
 
     expect(res.status).toBe(500);
     expect(res.body.success).toBe(false);
@@ -557,6 +615,27 @@ describe("DELETE /api/animals/:aid", () => {
 });
 
 describe("PATCH /api/animals/:aid", () => {
+  it("returns 401 when auth token is missing", async () => {
+    const res = await request(getApp()).patch("/api/animals/1").send({ name: "No Auth" });
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/authentication required/i);
+  });
+
+  it("returns 401 when auth token is invalid or expired", async () => {
+    mockAuthGetUser.mockResolvedValueOnce({ data: { user: null }, error: { message: "invalid JWT" } });
+
+    const res = await request(getApp())
+      .patch("/api/animals/1")
+      .set("Authorization", "Bearer invalid-token")
+      .send({ name: "No Auth" });
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/invalid or expired/i);
+  });
+
   it("updates an animal and returns 200 with the updated record", async () => {
     const updated = { ...MOCK_ANIMALS[0], name: "Buddy Updated" };
     mockFrom.mockImplementation((table) => {
@@ -573,6 +652,7 @@ describe("PATCH /api/animals/:aid", () => {
 
     const res = await request(getApp())
       .patch("/api/animals/1")
+      .set("Authorization", "Bearer test-auth-token")
       .send({ name: "Buddy Updated" });
 
     expect(res.status).toBe(200);
@@ -596,6 +676,7 @@ describe("PATCH /api/animals/:aid", () => {
 
     const res = await request(getApp())
       .patch("/api/animals/1")
+      .set("Authorization", "Bearer test-auth-token")
       .send({ status: "adoptado" });
 
     expect(res.status).toBe(200);
@@ -627,6 +708,7 @@ describe("PATCH /api/animals/:aid", () => {
 
     const res = await request(getApp())
       .patch("/api/animals/1")
+      .set("Authorization", "Bearer test-auth-token")
       .send({
         description: "Updated description",
         medical_records: [
@@ -676,6 +758,7 @@ describe("PATCH /api/animals/:aid", () => {
 
     const res = await request(getApp())
       .patch("/api/animals/1")
+      .set("Authorization", "Bearer test-auth-token")
       .send({
         description: "Updated description",
         medical_records: [
@@ -712,6 +795,7 @@ describe("PATCH /api/animals/:aid", () => {
 
     const res = await request(getApp())
       .patch("/api/animals/999")
+      .set("Authorization", "Bearer test-auth-token")
       .send({ name: "Ghost Animal" });
 
     expect(res.status).toBe(404);
@@ -721,6 +805,7 @@ describe("PATCH /api/animals/:aid", () => {
   it("returns 400 for an invalid animal ID", async () => {
     const res = await request(getApp())
       .patch("/api/animals/abc")
+      .set("Authorization", "Bearer test-auth-token")
       .send({ name: "Test" });
 
     expect(res.status).toBe(400);
@@ -728,7 +813,7 @@ describe("PATCH /api/animals/:aid", () => {
   });
 
   it("returns 400 when no valid update fields are provided", async () => {
-    const res = await request(getApp()).patch("/api/animals/1").send({});
+    const res = await asAuthenticated(request(getApp()).patch("/api/animals/1")).send({});
 
     expect(res.status).toBe(400);
     expect(res.body.error.message).toMatch(/no valid fields/i);
@@ -737,6 +822,7 @@ describe("PATCH /api/animals/:aid", () => {
   it("returns 400 when image_url is provided", async () => {
     const res = await request(getApp())
       .patch("/api/animals/1")
+      .set("Authorization", "Bearer test-auth-token")
       .send({ image_url: "https://example.com/photo.jpg" });
 
     expect(res.status).toBe(400);
@@ -746,6 +832,7 @@ describe("PATCH /api/animals/:aid", () => {
   it("returns 400 when tags is not an array", async () => {
     const res = await request(getApp())
       .patch("/api/animals/1")
+      .set("Authorization", "Bearer test-auth-token")
       .send({ tags: "vaccinated" });
 
     expect(res.status).toBe(400);
@@ -768,6 +855,7 @@ describe("PATCH /api/animals/:aid", () => {
 
     const res = await request(getApp())
       .patch("/api/animals/1")
+      .set("Authorization", "Bearer test-auth-token")
       .send({ tags: ["friendly", "vaccinated"] });
 
     expect(res.status).toBe(200);
@@ -780,6 +868,7 @@ describe("PATCH /api/animals/:aid", () => {
 
     const res = await request(getApp())
       .patch("/api/animals/1")
+      .set("Authorization", "Bearer test-auth-token")
       .send({ name: "Updated" });
 
     expect(res.status).toBe(500);
@@ -795,6 +884,7 @@ describe("PATCH /api/animals/:aid", () => {
 
     const res = await request(getApp())
       .patch("/api/animals/1")
+      .set("Authorization", "Bearer test-auth-token")
       .send({ name: "Buddy", medical_records: [] });
 
     expect(res.status).toBe(200);

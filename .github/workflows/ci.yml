@@ -80,6 +80,7 @@ jobs:
         env:
           CI: true
           NEXT_PUBLIC_API_BASE_URL: http://localhost:4001
+          NEXT_PUBLIC_E2E_BYPASS_AUTH: "true"
 
       - uses: actions/upload-artifact@v7
         if: failure()

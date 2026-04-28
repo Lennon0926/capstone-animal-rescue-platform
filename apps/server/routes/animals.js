@@ -16,6 +16,7 @@ const {
 } = require("../repositories/animalsRepository");
 const { validateAnimalsQuery, validateAnimalId, validateCreateAnimal, validateUpdateAnimal } = require("../middleware/validation");
 const { asyncHandler, ApiError } = require("../middleware/errorHandler");
+const { requireAuth } = require("../middleware/auth");
 const { requireJson } = require("../middleware/requireJson");
 
 /**
@@ -118,6 +119,7 @@ router.get(
 router.post(
   "/",
   requireJson,
+  asyncHandler(requireAuth),
   validateCreateAnimal,
   asyncHandler(async (req, res) => {
     const result = await createAnimalWithInitialMedicalRecords(req.validatedBody);
@@ -149,6 +151,7 @@ router.post(
  */
 router.delete(
   "/:aid",
+  asyncHandler(requireAuth),
   validateAnimalId,
   asyncHandler(async (req, res) => {
     const result = await deleteAnimal(req.params.aid);
@@ -175,6 +178,7 @@ router.delete(
 router.patch(
   "/:aid",
   requireJson,
+  asyncHandler(requireAuth),
   validateAnimalId,
   validateUpdateAnimal,
   asyncHandler(async (req, res) => {

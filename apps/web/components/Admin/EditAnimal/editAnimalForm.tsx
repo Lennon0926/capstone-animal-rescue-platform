@@ -11,6 +11,7 @@ import {
   type UploadConfig,
   uploadAnimalImage,
 } from "@/services/animalImageUploadService";
+import { getAuthenticatedHeaders } from "@/lib/apiAuth";
 import type { Animal, MedicalRecord } from "@/types/animal";
 import styles from "./editAnimalForm.module.css";
 import { X, Plus, ArrowLeft } from "lucide-react";
@@ -322,9 +323,9 @@ export default function EditAnimalForm({ animal, onSave, error, notFound }: Edit
         `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals/${formData.aid}`,
         {
           method: "PATCH",
-          headers: {
+          headers: await getAuthenticatedHeaders({
             "Content-Type": "application/json",
-          },
+          }),
           body: JSON.stringify(updateBody),
         }
       );
