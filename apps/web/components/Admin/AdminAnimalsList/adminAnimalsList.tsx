@@ -8,7 +8,7 @@ import styles from "./adminAnimalsList.module.css";
 import { ChevronDown, Search } from "lucide-react";
 import React from "react";
 import * as FileSaver from "file-saver";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import type { MedicalRecord } from "@/types/animal";
 
 const fileType =
@@ -58,7 +58,7 @@ const formatExcelDate = (value: unknown) => {
   return parsedDate.toLocaleDateString();
 };
 
-const exportToCSV = (
+const exportToExcel = async (
   excelData: ExportableAnimal[],
   medicalRecords: AnimalsRecordRow[],
   fileName: string,
@@ -92,18 +92,29 @@ const exportToCSV = (
     "Creado en": formatExcelDate(getCellValue(medicalRecord, "created_at")),
   }));
 
-  const animalSheet = XLSX.utils.json_to_sheet(excelAnimalData);
-  const medicalRecordsSheet = XLSX.utils.json_to_sheet(excelMedicalRecordData);
+  const workbook = new ExcelJS.Workbook();
+  const animalsSheet = workbook.addWorksheet("Animales");
+  const medicalRecordsSheet = workbook.addWorksheet("Registros Médicos");
 
-  const wb = {
-    Sheets: {
-      Animales: animalSheet,
-      "Registros Médicos": medicalRecordsSheet,
-    },
-    SheetNames: ["Animales", "Registros Médicos"],
-  };
+  if (excelAnimalData.length > 0) {
+    animalsSheet.columns = Object.keys(excelAnimalData[0]).map((key) => ({
+      header: key,
+      key,
+    }));
+    excelAnimalData.forEach((row) => animalsSheet.addRow(row));
+  }
 
-  const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+  if (excelMedicalRecordData.length > 0) {
+    medicalRecordsSheet.columns = Object.keys(excelMedicalRecordData[0]).map(
+      (key) => ({
+        header: key,
+        key,
+      }),
+    );
+    excelMedicalRecordData.forEach((row) => medicalRecordsSheet.addRow(row));
+  }
+
+  const excelBuffer = await workbook.xlsx.writeBuffer();
 
   const data = new Blob([excelBuffer], { type: fileType });
 
@@ -364,10 +375,10 @@ export default function AdminAnimalsList({
             <div className={styles.exportButtons}>
               <button
                 onClick={() =>
-                  exportToCSV(
-                    sortedAnimals as ExportableAnimal[],
-                    medicalRecords,
-                    "animales",
+                    void exportToExcel(
+                      sortedAnimals as ExportableAnimal[],
+                      medicalRecords,
+                      "animales",
                   )
                 }
                 className={styles.exportButton}
