@@ -53,8 +53,18 @@ const getApp = () => require("../server");
 function buildChainableMock(resolvedValue) {
   const chain = {};
   const methods = [
-    "select", "eq", "ilike", "not", "order", "range", "single", "limit",
-    "insert", "update", "delete", "contains",
+    "select",
+    "eq",
+    "ilike",
+    "not",
+    "order",
+    "range",
+    "single",
+    "limit",
+    "insert",
+    "update",
+    "delete",
+    "contains",
   ];
   for (const m of methods) {
     chain[m] = jest.fn(() => chain);
@@ -90,7 +100,7 @@ describe("GET /api/animals", () => {
     expect(res.body.data).toHaveLength(2);
     expect(res.body.data[0].image_object_key).toBe("animals/1/123-photo.jpg");
     expect(res.body.data[0].image_url).toBe(
-      "https://pub-test-bucket.r2.dev/animals/1/123-photo.jpg"
+      "https://pub-test-bucket.r2.dev/animals/1/123-photo.jpg",
     );
     expect(res.body.pagination).toMatchObject({
       total: 2,
@@ -153,6 +163,68 @@ describe("GET /api/animals/filters", () => {
   });
 });
 
+describe("GET /api/animals/records", () => {
+  it("returns all rows from the animalsrecord view", async () => {
+    mockFrom.mockImplementation((table) => {
+      if (table === "animalsrecord") {
+        return buildChainableMock({
+          data: [
+            {
+              aid: 1,
+              name: "Buddy",
+              record_id: 77,
+              record_type: "vacunación",
+            },
+          ],
+          error: null,
+        });
+      }
+
+      return buildChainableMock({
+        data: null,
+        error: { message: `Unknown table: ${table}` },
+      });
+    });
+
+    const res = await request(getApp()).get("/api/animals/records");
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data).toEqual([
+      expect.objectContaining({
+        aid: 1,
+        name: "Buddy",
+        record_id: 77,
+        record_type: "vacunación",
+      }),
+    ]);
+  });
+
+  it("returns 500 when the view query fails", async () => {
+    mockFrom.mockImplementation((table) => {
+      if (table === "animalsrecord") {
+        return buildChainableMock({
+          data: null,
+          error: { message: "View query failed" },
+        });
+      }
+
+      return buildChainableMock({
+        data: null,
+        error: { message: `Unknown table: ${table}` },
+      });
+    });
+
+    const res = await request(getApp()).get("/api/animals/records");
+
+    expect(res.status).toBe(500);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(
+      /failed to fetch animal medical records/i,
+    );
+  });
+});
+
 describe("GET /api/animals/:aid", () => {
   it("returns a single animal by ID", async () => {
     mockFrom.mockImplementation((table) => {
@@ -177,7 +249,10 @@ describe("GET /api/animals/:aid", () => {
         });
       }
 
-      return buildChainableMock({ data: null, error: { message: "Unknown table" } });
+      return buildChainableMock({
+        data: null,
+        error: { message: "Unknown table" },
+      });
     });
 
     const res = await request(getApp()).get("/api/animals/1");
@@ -235,7 +310,9 @@ describe("POST /api/animals", () => {
   };
 
   it("returns 401 when auth token is missing", async () => {
-    const res = await request(getApp()).post("/api/animals").send(VALID_CREATE_BODY);
+    const res = await request(getApp())
+      .post("/api/animals")
+      .send(VALID_CREATE_BODY);
 
     expect(res.status).toBe(401);
     expect(res.body.success).toBe(false);
@@ -243,7 +320,10 @@ describe("POST /api/animals", () => {
   });
 
   it("returns 401 when auth token is invalid or expired", async () => {
-    mockAuthGetUser.mockResolvedValueOnce({ data: { user: null }, error: { message: "invalid JWT" } });
+    mockAuthGetUser.mockResolvedValueOnce({
+      data: { user: null },
+      error: { message: "invalid JWT" },
+    });
 
     const res = await request(getApp())
       .post("/api/animals")
@@ -256,12 +336,16 @@ describe("POST /api/animals", () => {
   });
 
   it("creates a new animal and returns 201", async () => {
-    const newAnimal = { aid: 3, ...VALID_CREATE_BODY, created_at: "2026-01-01T00:00:00Z" };
+    const newAnimal = {
+      aid: 3,
+      ...VALID_CREATE_BODY,
+      created_at: "2026-01-01T00:00:00Z",
+    };
     const chain = buildChainableMock({ data: newAnimal, error: null });
     mockFrom.mockReturnValue(chain);
 
     const res = await asAuthenticated(
-      request(getApp()).post("/api/animals")
+      request(getApp()).post("/api/animals"),
     ).send(VALID_CREATE_BODY);
 
     expect(res.status).toBe(201);
@@ -311,10 +395,15 @@ describe("POST /api/animals", () => {
         return buildChainableMock({ data: response, error: null });
       }
 
-      return buildChainableMock({ data: null, error: { message: "Unknown table" } });
+      return buildChainableMock({
+        data: null,
+        error: { message: "Unknown table" },
+      });
     });
 
-    const res = await asAuthenticated(request(getApp()).post("/api/animals")).send({
+    const res = await asAuthenticated(
+      request(getApp()).post("/api/animals"),
+    ).send({
       ...VALID_CREATE_BODY,
       medical_records: [
         {
@@ -342,7 +431,9 @@ describe("POST /api/animals", () => {
   });
 
   it("returns 400 for an invalid medical_records entry type", async () => {
-    const res = await asAuthenticated(request(getApp()).post("/api/animals")).send({
+    const res = await asAuthenticated(
+      request(getApp()).post("/api/animals"),
+    ).send({
       ...VALID_CREATE_BODY,
       medical_records: [
         {
@@ -356,11 +447,15 @@ describe("POST /api/animals", () => {
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
-    expect(res.body.error.message).toMatch(/medical_records\[1\]\.record_type/i);
+    expect(res.body.error.message).toMatch(
+      /medical_records\[1\]\.record_type/i,
+    );
   });
 
   it("returns 400 for a malformed medical_records date", async () => {
-    const res = await asAuthenticated(request(getApp()).post("/api/animals")).send({
+    const res = await asAuthenticated(
+      request(getApp()).post("/api/animals"),
+    ).send({
       ...VALID_CREATE_BODY,
       medical_records: [
         {
@@ -388,7 +483,10 @@ describe("POST /api/animals", () => {
       }
 
       if (table === "medical_records") {
-        if (mockFrom.mock.calls.filter(([name]) => name === "medical_records").length === 1) {
+        if (
+          mockFrom.mock.calls.filter(([name]) => name === "medical_records")
+            .length === 1
+        ) {
           return buildChainableMock({
             data: {
               record_id: 44,
@@ -405,10 +503,15 @@ describe("POST /api/animals", () => {
         });
       }
 
-      return buildChainableMock({ data: null, error: { message: "Unknown table" } });
+      return buildChainableMock({
+        data: null,
+        error: { message: "Unknown table" },
+      });
     });
 
-    const res = await asAuthenticated(request(getApp()).post("/api/animals")).send({
+    const res = await asAuthenticated(
+      request(getApp()).post("/api/animals"),
+    ).send({
       ...VALID_CREATE_BODY,
       medical_records: [
         {
@@ -430,13 +533,18 @@ describe("POST /api/animals", () => {
     expect(res.body.medicalRecordsCreatedCount).toBe(1);
     expect(res.body.medicalRecordCreated).toBe(false);
     expect(res.body.warnings).toEqual([
-      expect.objectContaining({ code: "MEDICAL_RECORD_CREATE_FAILED", index: 1 }),
+      expect.objectContaining({
+        code: "MEDICAL_RECORD_CREATE_FAILED",
+        index: 1,
+      }),
     ]);
   });
 
   it("returns 400 when name is missing", async () => {
     const { name, ...body } = VALID_CREATE_BODY;
-    const res = await asAuthenticated(request(getApp()).post("/api/animals")).send(body);
+    const res = await asAuthenticated(
+      request(getApp()).post("/api/animals"),
+    ).send(body);
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
@@ -445,7 +553,9 @@ describe("POST /api/animals", () => {
 
   it("returns 400 when description is missing", async () => {
     const { description, ...body } = VALID_CREATE_BODY;
-    const res = await asAuthenticated(request(getApp()).post("/api/animals")).send(body);
+    const res = await asAuthenticated(
+      request(getApp()).post("/api/animals"),
+    ).send(body);
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
@@ -496,14 +606,21 @@ describe("POST /api/animals", () => {
     const res = await request(getApp())
       .post("/api/animals")
       .set("Authorization", "Bearer test-auth-token")
-      .send({ ...VALID_CREATE_BODY, image_url: "https://example.com/photo.jpg" });
+      .send({
+        ...VALID_CREATE_BODY,
+        image_url: "https://example.com/photo.jpg",
+      });
 
     expect(res.status).toBe(400);
     expect(res.body.error.message).toMatch(/image_url is read-only/i);
   });
 
   it("creates animal with image_object_key", async () => {
-    const newAnimal = { aid: 3, ...VALID_CREATE_BODY, image_object_key: "animals/3/photo.jpg" };
+    const newAnimal = {
+      aid: 3,
+      ...VALID_CREATE_BODY,
+      image_object_key: "animals/3/photo.jpg",
+    };
     const chain = buildChainableMock({ data: newAnimal, error: null });
     mockFrom.mockReturnValue(chain);
 
@@ -517,7 +634,11 @@ describe("POST /api/animals", () => {
   });
 
   it("creates animal with tags array", async () => {
-    const newAnimal = { aid: 3, ...VALID_CREATE_BODY, tags: ["vaccinated", "friendly"] };
+    const newAnimal = {
+      aid: 3,
+      ...VALID_CREATE_BODY,
+      tags: ["vaccinated", "friendly"],
+    };
     const chain = buildChainableMock({ data: newAnimal, error: null });
     mockFrom.mockReturnValue(chain);
 
@@ -531,12 +652,15 @@ describe("POST /api/animals", () => {
   });
 
   it("returns 500 when database returns an error", async () => {
-    const chain = buildChainableMock({ data: null, error: { message: "DB connection failed" } });
+    const chain = buildChainableMock({
+      data: null,
+      error: { message: "DB connection failed" },
+    });
     mockFrom.mockReturnValue(chain);
 
-    const res = await asAuthenticated(request(getApp()).post("/api/animals")).send(
-      VALID_CREATE_BODY
-    );
+    const res = await asAuthenticated(
+      request(getApp()).post("/api/animals"),
+    ).send(VALID_CREATE_BODY);
 
     expect(res.status).toBe(500);
     expect(res.body.success).toBe(false);
@@ -553,7 +677,10 @@ describe("DELETE /api/animals/:aid", () => {
   });
 
   it("returns 401 when auth token is invalid or expired", async () => {
-    mockAuthGetUser.mockResolvedValueOnce({ data: { user: null }, error: { message: "invalid JWT" } });
+    mockAuthGetUser.mockResolvedValueOnce({
+      data: { user: null },
+      error: { message: "invalid JWT" },
+    });
 
     const res = await request(getApp())
       .delete("/api/animals/1")
@@ -568,7 +695,9 @@ describe("DELETE /api/animals/:aid", () => {
     const chain = buildChainableMock({ data: MOCK_ANIMALS[0], error: null });
     mockFrom.mockReturnValue(chain);
 
-    const res = await asAuthenticated(request(getApp()).delete("/api/animals/1"));
+    const res = await asAuthenticated(
+      request(getApp()).delete("/api/animals/1"),
+    );
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
@@ -582,14 +711,18 @@ describe("DELETE /api/animals/:aid", () => {
     });
     mockFrom.mockReturnValue(chain);
 
-    const res = await asAuthenticated(request(getApp()).delete("/api/animals/999"));
+    const res = await asAuthenticated(
+      request(getApp()).delete("/api/animals/999"),
+    );
 
     expect(res.status).toBe(404);
     expect(res.body.success).toBe(false);
   });
 
   it("returns 400 for an invalid animal ID", async () => {
-    const res = await asAuthenticated(request(getApp()).delete("/api/animals/abc"));
+    const res = await asAuthenticated(
+      request(getApp()).delete("/api/animals/abc"),
+    );
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
@@ -597,17 +730,24 @@ describe("DELETE /api/animals/:aid", () => {
   });
 
   it("returns 400 for a negative animal ID", async () => {
-    const res = await asAuthenticated(request(getApp()).delete("/api/animals/-1"));
+    const res = await asAuthenticated(
+      request(getApp()).delete("/api/animals/-1"),
+    );
 
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
   });
 
   it("returns 500 when database returns an error", async () => {
-    const chain = buildChainableMock({ data: null, error: { message: "DB connection failed" } });
+    const chain = buildChainableMock({
+      data: null,
+      error: { message: "DB connection failed" },
+    });
     mockFrom.mockReturnValue(chain);
 
-    const res = await asAuthenticated(request(getApp()).delete("/api/animals/1"));
+    const res = await asAuthenticated(
+      request(getApp()).delete("/api/animals/1"),
+    );
 
     expect(res.status).toBe(500);
     expect(res.body.success).toBe(false);
@@ -616,7 +756,9 @@ describe("DELETE /api/animals/:aid", () => {
 
 describe("PATCH /api/animals/:aid", () => {
   it("returns 401 when auth token is missing", async () => {
-    const res = await request(getApp()).patch("/api/animals/1").send({ name: "No Auth" });
+    const res = await request(getApp())
+      .patch("/api/animals/1")
+      .send({ name: "No Auth" });
 
     expect(res.status).toBe(401);
     expect(res.body.success).toBe(false);
@@ -624,7 +766,10 @@ describe("PATCH /api/animals/:aid", () => {
   });
 
   it("returns 401 when auth token is invalid or expired", async () => {
-    mockAuthGetUser.mockResolvedValueOnce({ data: { user: null }, error: { message: "invalid JWT" } });
+    mockAuthGetUser.mockResolvedValueOnce({
+      data: { user: null },
+      error: { message: "invalid JWT" },
+    });
 
     const res = await request(getApp())
       .patch("/api/animals/1")
@@ -647,7 +792,10 @@ describe("PATCH /api/animals/:aid", () => {
         return buildChainableMock({ data: [], error: null });
       }
 
-      return buildChainableMock({ data: null, error: { message: "Unknown table" } });
+      return buildChainableMock({
+        data: null,
+        error: { message: "Unknown table" },
+      });
     });
 
     const res = await request(getApp())
@@ -671,7 +819,10 @@ describe("PATCH /api/animals/:aid", () => {
         return buildChainableMock({ data: [], error: null });
       }
 
-      return buildChainableMock({ data: null, error: { message: "Unknown table" } });
+      return buildChainableMock({
+        data: null,
+        error: { message: "Unknown table" },
+      });
     });
 
     const res = await request(getApp())
@@ -684,7 +835,10 @@ describe("PATCH /api/animals/:aid", () => {
   });
 
   it("updates medical records alongside the animal", async () => {
-    const updatedAnimal = { ...MOCK_ANIMALS[0], description: "Updated description" };
+    const updatedAnimal = {
+      ...MOCK_ANIMALS[0],
+      description: "Updated description",
+    };
     mockRpc.mockResolvedValue({
       data: {
         animal: updatedAnimal,
@@ -813,7 +967,9 @@ describe("PATCH /api/animals/:aid", () => {
   });
 
   it("returns 400 when no valid update fields are provided", async () => {
-    const res = await asAuthenticated(request(getApp()).patch("/api/animals/1")).send({});
+    const res = await asAuthenticated(
+      request(getApp()).patch("/api/animals/1"),
+    ).send({});
 
     expect(res.status).toBe(400);
     expect(res.body.error.message).toMatch(/no valid fields/i);
@@ -850,7 +1006,10 @@ describe("PATCH /api/animals/:aid", () => {
         return buildChainableMock({ data: [], error: null });
       }
 
-      return buildChainableMock({ data: null, error: { message: "Unknown table" } });
+      return buildChainableMock({
+        data: null,
+        error: { message: "Unknown table" },
+      });
     });
 
     const res = await request(getApp())
@@ -863,7 +1022,10 @@ describe("PATCH /api/animals/:aid", () => {
   });
 
   it("returns 500 when database returns an error", async () => {
-    const chain = buildChainableMock({ data: null, error: { message: "DB connection failed" } });
+    const chain = buildChainableMock({
+      data: null,
+      error: { message: "DB connection failed" },
+    });
     mockFrom.mockReturnValue(chain);
 
     const res = await request(getApp())

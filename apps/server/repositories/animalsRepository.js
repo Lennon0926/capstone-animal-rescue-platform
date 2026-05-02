@@ -11,7 +11,10 @@ const {
   normalizeMedicalRecordFields,
   serializeMedicalRecord,
 } = require("../lib/animalData");
-const { getPublicObjectUrl, normalizeObjectKey } = require("../services/r2Service");
+const {
+  getPublicObjectUrl,
+  normalizeObjectKey,
+} = require("../services/r2Service");
 
 // In-memory cache for filter options — these change only when animals are
 // added/edited, so a 30-second TTL eliminates ~200 redundant DB round-trips
@@ -170,7 +173,9 @@ async function getMedicalRecordsByAnimalId(aid) {
 
     const { data, error } = await client
       .from("medical_records")
-      .select("record_id, aid, record_type, date_given, vet_name, notes, created_at")
+      .select(
+        "record_id, aid, record_type, date_given, vet_name, notes, created_at",
+      )
       .eq("aid", aid)
       .order("record_id", { ascending: true });
 
@@ -180,6 +185,25 @@ async function getMedicalRecordsByAnimalId(aid) {
 
     return {
       data: (data || []).map(serializeMedicalRecord),
+      error: null,
+    };
+  } catch (err) {
+    return { data: [], error: err.message };
+  }
+}
+
+async function getAnimalsRecordView() {
+  try {
+    const client = getSupabaseClient();
+
+    const { data, error } = await client.from("animalsrecord").select("*");
+
+    if (error) {
+      return { data: [], error: error.message };
+    }
+
+    return {
+      data: data || [],
       error: null,
     };
   } catch (err) {
@@ -223,7 +247,13 @@ async function getAnimals(options = {}) {
     offset = 0,
   } = options;
 
-  const cacheKey = _animalsQueryKey({ filters, limit, offset, sortBy, sortOrder });
+  const cacheKey = _animalsQueryKey({
+    filters,
+    limit,
+    offset,
+    sortBy,
+    sortOrder,
+  });
 
   // Cache hit — return immediately
   const cached = _animalsCache.get(cacheKey);
@@ -244,9 +274,7 @@ async function getAnimals(options = {}) {
       const client = getSupabaseClient();
 
       // Start query with count
-      let query = client
-        .from("animals")
-        .select("*", { count: "exact" });
+      let query = client.from("animals").select("*", { count: "exact" });
 
       // Apply filters
       for (const [field, value] of Object.entries(filters)) {
@@ -254,14 +282,19 @@ async function getAnimals(options = {}) {
 
         if (field === "search") {
           // Combined search: match name OR any tag (case-insensitive)
-          query = query.or(`name.ilike.%${value}%,tags.cs.{${value.toLowerCase()}}`);
+          query = query.or(
+            `name.ilike.%${value}%,tags.cs.{${value.toLowerCase()}}`,
+          );
         } else if (VALID_FILTERS[field].includes("ilike") && field === "name") {
           // Partial name match (case-insensitive)
           query = query.ilike(field, `%${value}%`);
         } else if (field === "tags") {
           // Search within tags array (contains)
           query = query.contains(field, [value.toLowerCase()]);
-        } else if (VALID_FILTERS[field].includes("ilike") && field === "species") {
+        } else if (
+          VALID_FILTERS[field].includes("ilike") &&
+          field === "species"
+        ) {
           // Species can be exact or partial match
           query = query.ilike(field, `%${value}%`);
         } else {
@@ -271,12 +304,17 @@ async function getAnimals(options = {}) {
       }
 
       // Apply sorting
-      const validSortBy = VALID_SORT_FIELDS.includes(sortBy) ? sortBy : "created_at";
+      const validSortBy = VALID_SORT_FIELDS.includes(sortBy)
+        ? sortBy
+        : "created_at";
       const validSortOrder = sortOrder === "asc";
       query = query.order(validSortBy, { ascending: validSortOrder });
 
       // Apply pagination (enforce max limit of 100)
-      const safeLimit = Math.min(Math.max(1, Number.parseInt(limit, 10) || 50), 100);
+      const safeLimit = Math.min(
+        Math.max(1, Number.parseInt(limit, 10) || 50),
+        100,
+      );
       const safeOffset = Math.max(0, Number.parseInt(offset, 10) || 0);
       query = query.range(safeOffset, safeOffset + safeLimit - 1);
 
@@ -334,7 +372,10 @@ async function getAnimalById(aid) {
  * @returns {Promise<{data: {species, status, size, gender} | null, error?: string}>}
  */
 async function getFilterOptions() {
-  if (_filterOptionsCache && Date.now() - _filterOptionsCachedAt < FILTER_OPTIONS_TTL_MS) {
+  if (
+    _filterOptionsCache &&
+    Date.now() - _filterOptionsCachedAt < FILTER_OPTIONS_TTL_MS
+  ) {
     return { data: _filterOptionsCache, error: null };
   }
 
@@ -356,9 +397,9 @@ async function getFilterOptions() {
 
 /**
  * Inserts a new animal record into the database.
- * 
- * @param {*} animalData 
- * @returns 
+ *
+ * @param {*} animalData
+ * @returns
  */
 async function createAnimal(animalData) {
   try {
@@ -385,7 +426,8 @@ async function createAnimal(animalData) {
 async function createMedicalRecord(medicalRecordData) {
   try {
     const client = getSupabaseClient();
-    const normalizedMedicalRecord = normalizeMedicalRecordFields(medicalRecordData);
+    const normalizedMedicalRecord =
+      normalizeMedicalRecordFields(medicalRecordData);
 
     const { data, error } = await client
       .from("medical_records")
@@ -447,16 +489,16 @@ async function createAnimalWithInitialMedicalRecords(payload) {
     ...buildMedicalRecordCreationSummary(
       medicalRecordsRequested,
       medicalRecordsCreatedCount,
-      warnings
+      warnings,
     ),
   };
 }
 
 /**
  * Deletes an animal record by ID.
- * 
- * @param {number} aid 
- * @returns 
+ *
+ * @param {number} aid
+ * @returns
  */
 async function deleteAnimal(aid) {
   try {
@@ -516,8 +558,15 @@ async function updateAnimalById(aid, updates) {
 }
 
 function serializePatchedAnimalResponse(data) {
-  if (!data || typeof data !== "object" || Array.isArray(data) || !data.animal) {
-    throw new Error("patch_animal_with_medical_records returned an invalid response.");
+  if (
+    !data ||
+    typeof data !== "object" ||
+    Array.isArray(data) ||
+    !data.animal
+  ) {
+    throw new Error(
+      "patch_animal_with_medical_records returned an invalid response.",
+    );
   }
 
   return {
@@ -530,7 +579,8 @@ function serializePatchedAnimalResponse(data) {
 
 function buildMedicalRecordRpcPayload(medicalRecord) {
   const { record_id, ...medicalRecordFields } = medicalRecord;
-  const normalizedMedicalRecord = normalizeMedicalRecordFields(medicalRecordFields);
+  const normalizedMedicalRecord =
+    normalizeMedicalRecordFields(medicalRecordFields);
 
   if (record_id !== undefined) {
     normalizedMedicalRecord.record_id = record_id;
@@ -542,18 +592,23 @@ function buildMedicalRecordRpcPayload(medicalRecord) {
 async function updateAnimalWithMedicalRecordsTransactionById(
   aid,
   animalUpdates,
-  medicalRecords
+  medicalRecords,
 ) {
   try {
     const client = getSupabaseClient();
     const normalizedAnimalUpdates = normalizeAnimalImageFields(animalUpdates);
-    const normalizedMedicalRecords = medicalRecords.map(buildMedicalRecordRpcPayload);
+    const normalizedMedicalRecords = medicalRecords.map(
+      buildMedicalRecordRpcPayload,
+    );
 
-    const { data, error } = await client.rpc("patch_animal_with_medical_records", {
-      p_aid: aid,
-      p_animal_updates: normalizedAnimalUpdates,
-      p_medical_records: normalizedMedicalRecords,
-    });
+    const { data, error } = await client.rpc(
+      "patch_animal_with_medical_records",
+      {
+        p_aid: aid,
+        p_animal_updates: normalizedAnimalUpdates,
+        p_medical_records: normalizedMedicalRecords,
+      },
+    );
 
     if (error) {
       if (error.message === "Animal not found") {
@@ -581,7 +636,7 @@ async function updateAnimalWithMedicalRecordsById(aid, updates) {
     return updateAnimalWithMedicalRecordsTransactionById(
       aid,
       animalUpdates,
-      medical_records
+      medical_records,
     );
   }
 
@@ -613,6 +668,7 @@ module.exports = {
   getAnimals,
   getAnimalById,
   getMedicalRecordsByAnimalId,
+  getAnimalsRecordView,
   getFilterOptions,
   createAnimal,
   createAnimalWithInitialMedicalRecords,
