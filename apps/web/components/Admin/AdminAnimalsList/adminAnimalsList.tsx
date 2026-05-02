@@ -9,15 +9,99 @@ import { ChevronDown, Search } from "lucide-react";
 import React from "react";
 import * as FileSaver from "file-saver";
 import * as XLSX from "xlsx";
+import type { MedicalRecord } from "@/types/animal";
 
 const fileType =
   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
+
 const fileExtension = ".xlsx";
 
-const exportToCSV = (excelData: Animal[], fileName: string) => {
-  const ws = XLSX.utils.json_to_sheet(excelData);
+type AnimalsRecordRow = Record<string, unknown>;
 
-  const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
+type ExportableAnimal = Animal & {
+  microchip_id?: string | null;
+  is_sterilized?: boolean | null;
+  estimated_age?: string | null;
+};
+
+const getCellValue = (
+  row: AnimalsRecordRow,
+  key: string,
+): string | number | boolean => {
+  const value = row[key];
+
+  if (value === null || value === undefined) {
+    return "";
+  }
+
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  if (typeof value === "string" || typeof value === "number") {
+    return value;
+  }
+
+  return String(value);
+};
+
+const formatExcelDate = (value: unknown) => {
+  if (typeof value !== "string" || !value.trim()) {
+    return "";
+  }
+
+  const parsedDate = new Date(value);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return value;
+  }
+
+  return parsedDate.toLocaleDateString();
+};
+
+const exportToCSV = (
+  excelData: ExportableAnimal[],
+  medicalRecords: AnimalsRecordRow[],
+  fileName: string,
+) => {
+  const excelAnimalData = excelData.map((excelData) => ({
+    ID: excelData.aid,
+    Nombre: excelData.name,
+    Descripción: excelData.description,
+    Especie: excelData.species,
+    Género: excelData.gender,
+    Tamaño: excelData.size,
+    Estado: excelData.status,
+    "Creado en": new Date(excelData.created_at).toLocaleDateString(),
+    Etiquetas: excelData.tags ? excelData.tags.join(", ") : "",
+    "Microchip ID": excelData.microchip_id || "",
+    Sterilizado: excelData.is_sterilized ? "Sí" : "No",
+    "Edad estimada": excelData.estimated_age || "",
+  }));
+
+  const excelMedicalRecordData = medicalRecords.map((medicalRecord) => ({
+    "Animal ID": getCellValue(medicalRecord, "aid"),
+    Animal:
+      getCellValue(medicalRecord, "animal_name") ||
+      getCellValue(medicalRecord, "name") ||
+      "",
+    "Record ID": getCellValue(medicalRecord, "record_id"),
+    Tipo: getCellValue(medicalRecord, "record_type"),
+    Fecha: formatExcelDate(getCellValue(medicalRecord, "date_given")),
+    Veterinario: getCellValue(medicalRecord, "vet_name"),
+    Notas: getCellValue(medicalRecord, "notes"),
+    "Creado en": formatExcelDate(getCellValue(medicalRecord, "created_at")),
+  }));
+
+  const animalSheet = XLSX.utils.json_to_sheet(excelAnimalData);
+  const medicalRecordsSheet = XLSX.utils.json_to_sheet(excelMedicalRecordData);
+
+  const wb = {
+    Sheets: {
+      Animales: animalSheet,
+      "Registros Médicos": medicalRecordsSheet,
+    },
+    SheetNames: ["Animales", "Registros Médicos"],
+  };
 
   const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
 
@@ -30,6 +114,7 @@ const ITEMS_PER_PAGE = 10;
 
 interface AdminAnimalsListProps {
   initialAnimals: Animal[];
+  initialMedicalRecords: MedicalRecord[];
 }
 
 interface DeleteConfirmModalProps {
@@ -87,8 +172,10 @@ function capitalize(text: string) {
 
 export default function AdminAnimalsList({
   initialAnimals,
+  initialMedicalRecords,
 }: AdminAnimalsListProps) {
   const [animals, setAnimals] = useState(initialAnimals);
+  const [medicalRecords] = useState(initialMedicalRecords);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Animal;
@@ -276,7 +363,13 @@ export default function AdminAnimalsList({
           <div className={styles.actionGroup}>
             <div className={styles.exportButtons}>
               <button
-                onClick={() => exportToCSV(sortedAnimals, "animales")}
+                onClick={() =>
+                  exportToCSV(
+                    sortedAnimals as ExportableAnimal[],
+                    medicalRecords,
+                    "animales",
+                  )
+                }
                 className={styles.exportButton}
                 title="Exportar a Excel"
               >

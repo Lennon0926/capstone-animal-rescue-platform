@@ -3,6 +3,7 @@ import AdminHeader from "@/components/Admin/AdminHeader/adminHeader";
 import AdminAnimalsList from "@/components/Admin/AdminAnimalsList/adminAnimalsList";
 import { useAuthRequired } from "@/lib/useAuthRequired";
 import type { Animal } from "@/types/animal";
+import type { MedicalRecord } from "@/types/animal";
 
 type ApiResponse = {
   success: boolean;
@@ -15,12 +16,21 @@ type ApiResponse = {
   };
 };
 
+type MedicalRecordsApiResponse = {
+  success: boolean;
+  data: MedicalRecord[];
+};
+
 type AdminAnimalsPageProps = {
   animals: Animal[];
+  medicalRecords: MedicalRecord[];
   fetchError?: boolean;
 };
 
-export default function AdminAnimalsPage({ animals }: AdminAnimalsPageProps) {
+export default function AdminAnimalsPage({
+  animals,
+  medicalRecords,
+}: AdminAnimalsPageProps) {
   const { isLoading } = useAuthRequired();
 
   if (isLoading) return <div>Loading...</div>;
@@ -28,38 +38,45 @@ export default function AdminAnimalsPage({ animals }: AdminAnimalsPageProps) {
   return (
     <>
       <AdminHeader />
-      <AdminAnimalsList initialAnimals={animals} />
+      <AdminAnimalsList
+        initialAnimals={animals}
+        initialMedicalRecords={medicalRecords}
+      />
     </>
   );
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals?limit=100`
-    );
+    const [animalsResponse, medicalRecordsResponse] = await Promise.all([
+      fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals?limit=100`),
+      fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals/records`),
+    ]);
 
-    if (!res.ok) {
-      return {
-        props: {
-          animals: [],
-        },
-      };
+    let animals: Animal[] = [];
+    let medicalRecords: MedicalRecord[] = [];
+
+    if (animalsResponse.ok) {
+      const result: ApiResponse = await animalsResponse.json();
+
+      if (result.success && result.data) {
+        animals = result.data;
+      }
     }
 
-    const result: ApiResponse = await res.json();
+    if (medicalRecordsResponse.ok) {
+      const result: MedicalRecordsApiResponse =
+        await medicalRecordsResponse.json();
 
-    if (!result.success || !result.data) {
-      return {
-        props: {
-          animals: [],
-        },
-      };
+      if (result.success && result.data) {
+        medicalRecords = result.data;
+      }
     }
 
     return {
       props: {
-        animals: result.data,
+        animals,
+        medicalRecords,
       },
     };
   } catch (err) {
@@ -67,6 +84,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     return {
       props: {
         animals: [],
+        medicalRecords: [],
         fetchError: true,
       },
     };
