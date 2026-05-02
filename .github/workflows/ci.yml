@@ -29,9 +29,7 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
 
       - run: npm ci
-      - name: npm audit (informational)
-        run: npm audit --audit-level=high
-        continue-on-error: true
+      - run: npm audit --audit-level=high
       - run: npm run lint
       - run: npm run build
       - run: npm test
@@ -54,9 +52,7 @@ jobs:
           cache-dependency-path: apps/server/package-lock.json
 
       - run: npm ci
-      - name: npm audit (informational)
-        run: npm audit --audit-level=high
-        continue-on-error: true
+      - run: npm audit --audit-level=high
       - run: node --check server.js
       - run: npm test
 
