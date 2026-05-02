@@ -30,6 +30,12 @@
   gap: var(--space-4);
 }
 
+.actionGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 .createButton {
   padding: var(--space-3) var(--space-5);
   background-color: var(--color-primary);
@@ -265,7 +271,17 @@
     flex-direction: column;
   }
 
+  .actionGroup {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .actions {
+    width: 100%;
+  }
+
+  .exportButtons {
     width: 100%;
   }
 
@@ -462,4 +478,24 @@
 .modalConfirmButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.exportButtons {
+  padding: var(--space-3) var(--space-5);
+  color: var(--color-text-inverse);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: background-color var(--transition-normal);
+  white-space: nowrap;
+  display: inline-block;
+  text-decoration: none;
+  background-color: #00BA38;
+}
+
+.exportButtons,
+.actions {
+  flex-shrink: 0;
 }
