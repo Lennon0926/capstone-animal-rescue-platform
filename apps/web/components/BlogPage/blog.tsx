@@ -15,6 +15,7 @@ import {
   Heart,
   ChevronDown,
   ChevronUp,
+  Pin,
 } from "lucide-react";
 import type { FacebookPost, FacebookComment } from "@/pages/api/facebook-posts";
 import styles from "./blog.module.css";
@@ -90,6 +91,8 @@ function getImages(post: FacebookPost): string[] {
   if (post.full_picture) return [post.full_picture];
   return [];
 }
+
+const BODY_LIMIT = 500;
 
 function splitPost(text: string): { title: string; paragraphs: string[] } {
   const lines = text.split("\n").filter((l) => l.trim());
@@ -280,8 +283,17 @@ function Composer() {
 
 // ── Post Card ────────────────────────────────────────────────────────────────
 
-function PostCard({ post }: { post: FacebookPost }) {
+function PostCard({
+  post,
+  isPinned,
+  onPin,
+}: {
+  post: FacebookPost;
+  isPinned: boolean;
+  onPin: () => void;
+}) {
   const [showComments, setShowComments] = useState(false);
+  const [expanded, setExpanded] = useState(false);
   const text = post.message ?? post.story ?? "";
   const comments = post.comments?.data ?? [];
   const images = getImages(post);
@@ -289,6 +301,13 @@ function PostCard({ post }: { post: FacebookPost }) {
   const badge = POST_TYPE_BADGE[postType];
   const { title, paragraphs } = splitPost(text);
   const likeCount = post.likes?.summary?.total_count ?? 0;
+
+  const bodyText = paragraphs.join("\n");
+  const isLong = bodyText.length > BODY_LIMIT;
+  const visibleParagraphs =
+    isLong && !expanded
+      ? bodyText.slice(0, BODY_LIMIT).trimEnd().split("\n").filter(Boolean)
+      : paragraphs;
 
   return (
     <article className={styles.post}>
@@ -304,17 +323,34 @@ function PostCard({ post }: { post: FacebookPost }) {
             {badge.label}
           </span>
         )}
+        <button
+          className={`${styles.pinBtn} ${isPinned ? styles.pinBtnActive : ""}`}
+          onClick={onPin}
+          title={isPinned ? "Quitar destacado" : "Fijar como destacado"}
+          aria-label={isPinned ? "Quitar destacado" : "Fijar como destacado"}
+        >
+          <Pin size={14} />
+        </button>
       </div>
 
       {title && <h2 className={styles.postTitle}>{title}</h2>}
 
       {paragraphs.length > 0 && (
         <div className={styles.postBody}>
-          {paragraphs.map((p, i) => (
+          {visibleParagraphs.map((p, i) => (
             <p key={i} className={styles.postPara}>
               {p}
             </p>
           ))}
+          {isLong && (
+            <button
+              className={styles.readMore}
+              onClick={() => setExpanded((e) => !e)}
+            >
+              {expanded ? "Ver menos" : "Ver más"}
+              {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+            </button>
+          )}
         </div>
       )}
 
@@ -444,7 +480,7 @@ function SkeletonCard() {
 
 // ── Scroll reveal ────────────────────────────────────────────────────────────
 
-function useScrollReveal(dep: number) {
+function useScrollReveal(dep: unknown) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -468,7 +504,8 @@ export default function Blog() {
   const [posts, setPosts] = useState<FacebookPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const feedRef = useScrollReveal(posts.length);
+  const [pinnedPostId, setPinnedPostId] = useState<string | null>(null);
+  const feedRef = useScrollReveal(`${posts.length}:${pinnedPostId}`);
 
   async function loadPosts() {
     setLoading(true);
@@ -492,7 +529,14 @@ export default function Blog() {
     loadPosts();
   }, []);
 
-  const [featured, ...feedPosts] = posts;
+  function handlePin(postId: string) {
+    setPinnedPostId((prev) => (prev === postId ? null : postId));
+  }
+
+  const featured =
+    (pinnedPostId ? posts.find((p) => p.id === pinnedPostId) : null) ??
+    posts[0];
+  const feedPosts = posts.filter((p) => p.id !== featured?.id);
 
   return (
     <div className={`${styles.page} ${serif.variable} ${mono.variable}`}>
@@ -571,7 +615,11 @@ export default function Blog() {
                   className={`${styles.feedItem} ${styles.fadeInUp}`}
                   style={{ transitionDelay: `${Math.min(i * 60, 300)}ms` }}
                 >
-                  <PostCard post={post} />
+                  <PostCard
+                    post={post}
+                    isPinned={pinnedPostId === post.id}
+                    onPin={() => handlePin(post.id)}
+                  />
                 </div>
               ))}
             </div>

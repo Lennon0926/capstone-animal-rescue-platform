@@ -285,6 +285,35 @@
 }
 .badgeReel   { background: rgba(231, 111, 81, 0.1); color: var(--color-accent); }
 .badgeShared { background: var(--color-primary-soft); color: var(--color-primary); }
+/* pin button — admin only prototype */
+.pinBtn {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: none;
+  color: var(--color-text-soft);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
+}
+.pinBtn:hover {
+  background: var(--color-border);
+  color: var(--color-primary);
+}
+.pinBtnActive {
+  color: var(--color-accent);
+  background: rgba(231, 111, 81, 0.1);
+}
+.pinBtnActive:hover {
+  background: rgba(231, 111, 81, 0.18);
+  color: var(--color-accent-hover);
+}
+
 .postTitle {
   font-family: var(--serif);
   font-weight: 500;
@@ -308,6 +337,24 @@
 .postPara + .postPara {
   margin-top: 16px;
 }
+.readMore {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--color-accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.15s ease;
+}
+.readMore:hover { color: var(--color-accent-hover); }
 
 /* ── Post images ───────────────────────────────────────────────────── */
 .postImage {
