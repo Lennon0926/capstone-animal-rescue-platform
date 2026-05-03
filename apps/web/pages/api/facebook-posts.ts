@@ -20,6 +20,7 @@ export interface FacebookPost {
   full_picture?: string;
   created_time: string;
   permalink_url: string;
+  likes?: { summary: { total_count: number } };
   comments?: { data: FacebookComment[] };
   attachments?: { data: FacebookAttachment[] };
 }
@@ -57,7 +58,7 @@ export default async function handler(
   const limit = Number(req.query.limit ?? 12);
 
   try {
-    const fields = "message,story,full_picture,created_time,permalink_url,comments{message,from{name,id},created_time},attachments{type,media,subattachments{type,media}}";
+    const fields = "message,story,full_picture,created_time,permalink_url,likes.summary(true),comments{message,from{name,id},created_time},attachments{type,media,subattachments{type,media}}";
     const url = `https://graph.facebook.com/v21.0/${pageId}/posts?fields=${fields}&limit=${limit}&access_token=${accessToken}`;
 
     const fbRes = await fetch(url);
