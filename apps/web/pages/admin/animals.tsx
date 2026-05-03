@@ -1,8 +1,7 @@
 import { GetServerSideProps } from "next";
-import Head from "next/head";
-import HeaderSection from "@/components/Header/headerSection";
-import FooterSection from "@/components/Footer/footerSection";
+import AdminHeader from "@/components/Admin/AdminHeader/adminHeader";
 import AdminAnimalsList from "@/components/Admin/AdminAnimalsList/adminAnimalsList";
+import { useAuthRequired } from "@/lib/useAuthRequired";
 import type { Animal } from "@/types/animal";
 
 type ApiResponse = {
@@ -22,14 +21,14 @@ type AdminAnimalsPageProps = {
 };
 
 export default function AdminAnimalsPage({ animals }: AdminAnimalsPageProps) {
+  const { isLoading } = useAuthRequired();
+
+  if (isLoading) return <div>Loading...</div>;
+
   return (
     <>
-      <Head>
-        <title>Administrar Animales | Huellitas Sin Hogar</title>
-      </Head>
-      <HeaderSection />
+      <AdminHeader />
       <AdminAnimalsList initialAnimals={animals} />
-      <FooterSection />
     </>
   );
 }

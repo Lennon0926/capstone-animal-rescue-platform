@@ -51,6 +51,15 @@ test.describe("Animal detail page (/adopt/[id])", () => {
     await expect(page.getByText(fluffy.description, { exact: true })).toBeVisible();
   });
 
+  test("medical records are displayed when available", async ({ page }) => {
+    await expect(
+      page.getByRole("heading", { name: /Registros médicos/i })
+    ).toBeVisible();
+    await expect(page.getByText("Vacunación", { exact: true })).toBeVisible();
+    await expect(page.getByText(/Veterinario: Dr\. Rivera/i)).toBeVisible();
+    await expect(page.getByText(/Descripción:\s*Primary vaccine/i)).toBeVisible();
+  });
+
   // --- Tags ---
   test("tags section is visible with correct tags", async ({ page }) => {
     await expect(page.getByText(/Etiquetas:/i)).toBeVisible();

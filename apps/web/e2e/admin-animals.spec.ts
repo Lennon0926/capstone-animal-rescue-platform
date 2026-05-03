@@ -24,9 +24,8 @@ test.describe("Admin Animals List (/admin/animals)", () => {
   });
 
   // --- Page load ---
-  test("page loads with header and footer", async ({ page }) => {
+  test("page loads with header", async ({ page }) => {
     await expect(page.locator("header")).toBeVisible();
-    await expect(page.locator("footer")).toBeVisible();
   });
 
   test("page title 'Gestión de Animales' is visible", async ({ page }) => {
@@ -231,9 +230,8 @@ test.describe("Admin Create Animal (/admin/createAnimal)", () => {
   });
 
   // --- Page load ---
-  test("page loads with header and footer", async ({ page }) => {
+  test("page loads with header", async ({ page }) => {
     await expect(page.locator("header")).toBeVisible();
-    await expect(page.locator("footer")).toBeVisible();
   });
 
   test("form title 'Crear Nuevo Animal' is visible", async ({ page }) => {
@@ -258,6 +256,12 @@ test.describe("Admin Create Animal (/admin/createAnimal)", () => {
     await expect(page.locator("#status")).toBeVisible();
     await expect(page.locator("#image")).toBeVisible();
     await expect(page.locator("#tagInput")).toBeVisible();
+    await expect(
+      page.getByRole("group", { name: "Registros Médicos Iniciales" })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: /Agregar otro registro médico/i })
+    ).toBeVisible();
   });
 
   // --- Dropdown options ---
@@ -350,8 +354,43 @@ test.describe("Admin Create Animal (/admin/createAnimal)", () => {
   });
 
   // --- Happy path: successful creation ---
-  test("filling all fields and submitting shows success and redirects", async ({ page }) => {
+  test("filling animal and multiple medical fields shows full success and redirects", async ({ page }) => {
     await page.locator("#name").fill("Buddy Test");
+    await page.locator("#description").fill("Un perro muy amigable");
+    await page.locator("#species").selectOption("perro");
+    await page.locator("#size").selectOption("mediano");
+    await page.locator("#gender").selectOption("macho");
+    await page.locator("#status").selectOption("disponible");
+    await page.locator("#medical_records_0_record_type").selectOption("vacunación");
+    await page.locator("#medical_records_0_date_given").fill("2026-04-14T10:00");
+    await page.locator("#medical_records_0_vet_name").fill("Dr. Rivera");
+    await page.locator("#medical_records_0_notes").fill("Initial intake vaccination");
+    await page.getByRole("button", { name: /Agregar otro registro médico/i }).click();
+    await page.locator("#medical_records_1_record_type").selectOption("examen");
+    await page.locator("#medical_records_1_date_given").fill("2026-04-15T11:30");
+    await page.locator("#medical_records_1_vet_name").fill("Dr. Soto");
+    await page.locator("#medical_records_1_notes").fill("Initial wellness exam");
+    await page.locator("#image").setInputFiles({
+      name: "buddy.jpg",
+      mimeType: "image/jpeg",
+      buffer: fakePngBuffer(),
+    });
+
+    await page.getByRole("button", { name: /Crear Animal/i }).click();
+
+    // Success popup should appear — contains the checkmark icon text and success message
+    await expect(page.getByText(/¡Éxito!/i)).toBeVisible();
+    await expect(
+      page.getByText(/animal y 2 registros médicos iniciales se crearon exitosamente con imagen/i)
+    ).toBeVisible();
+
+    // Should redirect to /admin/animals after the popup auto-closes
+    await page.waitForURL(/\/admin\/animals/, { timeout: 10000 });
+    await expect(page).toHaveURL(/\/admin\/animals/);
+  });
+
+  test("leaving the medical fields blank still creates the animal and redirects", async ({ page }) => {
+    await page.locator("#name").fill("Buddy Without Medical");
     await page.locator("#description").fill("Un perro muy amigable");
     await page.locator("#species").selectOption("perro");
     await page.locator("#size").selectOption("mediano");
@@ -365,10 +404,36 @@ test.describe("Admin Create Animal (/admin/createAnimal)", () => {
 
     await page.getByRole("button", { name: /Crear Animal/i }).click();
 
-    // Success popup should appear — contains the checkmark icon text and success message
     await expect(page.getByText(/¡Éxito!/i)).toBeVisible();
+    await expect(
+      page.getByText(/animal creado exitosamente con imagen/i)
+    ).toBeVisible();
+    await page.waitForURL(/\/admin\/animals/, { timeout: 10000 });
+  });
 
-    // Should redirect to /admin/animals after the popup auto-closes
+  test("backend partial success shows the warning message before redirecting", async ({ page }) => {
+    await page.locator("#name").fill("Buddy Partial Medical");
+    await page.locator("#description").fill("Un perro muy amigable");
+    await page.locator("#species").selectOption("perro");
+    await page.locator("#size").selectOption("mediano");
+    await page.locator("#gender").selectOption("macho");
+    await page.locator("#status").selectOption("disponible");
+    await page.locator("#medical_records_0_record_type").selectOption("vacunación");
+    await page.locator("#medical_records_0_notes").fill("Primary medical record");
+    await page.getByRole("button", { name: /Agregar otro registro médico/i }).click();
+    await page.locator("#medical_records_1_record_type").selectOption("examen");
+    await page.locator("#medical_records_1_notes").fill("FORCE_MEDICAL_FAILURE");
+    await page.locator("#image").setInputFiles({
+      name: "buddy.jpg",
+      mimeType: "image/jpeg",
+      buffer: fakePngBuffer(),
+    });
+
+    await page.getByRole("button", { name: /Crear Animal/i }).click();
+
+    await expect(
+      page.getByText(/animal se creó con imagen, pero solo se pudieron crear 1 de 2 registros médicos iniciales/i)
+    ).toBeVisible();
     await page.waitForURL(/\/admin\/animals/, { timeout: 10000 });
     await expect(page).toHaveURL(/\/admin\/animals/);
   });
@@ -381,9 +446,8 @@ test.describe("Admin Edit Animal (/admin/editAnimal)", () => {
   });
 
   // --- Page load ---
-  test("page loads with header and footer", async ({ page }) => {
+  test("page loads with header", async ({ page }) => {
     await expect(page.locator("header")).toBeVisible();
-    await expect(page.locator("footer")).toBeVisible();
   });
 
   test("form title 'Editar Detalles del Animal' is visible", async ({ page }) => {
@@ -407,6 +471,12 @@ test.describe("Admin Edit Animal (/admin/editAnimal)", () => {
     await expect(page.locator("#description")).toHaveValue(
       MOCK_ANIMALS[0].description
     );
+  });
+
+  test("medical records are pre-populated in the edit form", async ({ page }) => {
+    await expect(page.locator("#medical_records_0_record_type")).toHaveValue("vacunación");
+    await expect(page.locator("#medical_records_0_vet_name")).toHaveValue("Dr. Rivera");
+    await expect(page.locator("#medical_records_0_notes")).toHaveValue("Primary vaccine");
   });
 
   test("animal ID field is read-only and shows correct ID", async ({ page }) => {
@@ -462,6 +532,18 @@ test.describe("Admin Edit Animal (/admin/editAnimal)", () => {
 
     await expect(page.getByText(/¡Éxito!/i)).toBeVisible({ timeout: 8000 });
 
+    await page.waitForURL(/\/admin\/animals/, { timeout: 10000 });
+    await expect(page).toHaveURL(/\/admin\/animals/);
+  });
+
+  test("can edit medical records and add a new one before saving", async ({ page }) => {
+    await page.locator("#medical_records_0_notes").fill("Updated vaccine note");
+    await page.getByRole("button", { name: /Agregar otro registro médico/i }).click();
+    await page.locator("#medical_records_1_record_type").selectOption("examen");
+    await page.locator("#medical_records_1_notes").fill("New exam note");
+    await page.getByRole("button", { name: /Guardar Cambios/i }).click();
+
+    await expect(page.getByText(/¡Éxito!/i)).toBeVisible({ timeout: 8000 });
     await page.waitForURL(/\/admin\/animals/, { timeout: 10000 });
     await expect(page).toHaveURL(/\/admin\/animals/);
   });

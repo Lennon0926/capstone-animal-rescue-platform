@@ -1,3 +1,13 @@
+export type MedicalRecord = {
+  record_id?: number;
+  aid?: number;
+  record_type?: string;
+  date_given?: string | null;
+  vet_name?: string | null;
+  notes?: string | null;
+  created_at?: string;
+};
+
 export type Animal = {
   aid: number;
   name: string;
@@ -11,4 +21,5 @@ export type Animal = {
   tags: string[];
   created_at: string;
   record_id: number | null;
+  medical_records?: MedicalRecord[];
 };

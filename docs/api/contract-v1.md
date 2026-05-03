@@ -355,53 +355,73 @@ Error 500
 ## Admin Endpoints
 
 ### Animals (Admin)
-- POST `/admin/animals`
+- POST `/api/animals`
 
-Description: Create a new animal.
+Description: Create a new animal and optionally attach one or more initial medical records.
 Authentication: Admin (Authorization: Bearer <token>)
 Request body
   name (string) — required
+  description (string) — required
   species (string) — required
-  breed (string) — optional
-  age (integer) — optional
-  sex (string) — optional (male | female | unknown)
-  status (string) — required (available | adopted | pending)
-  description (string) — optional
-  images (string[]) — optional
+  size (string) — required (`pequeño` | `mediano` | `grande` | `muy grande`)
+  gender (string) — required (`macho` | `hembra` | `desconocido`)
+  status (string) — required (`disponible` | `adoptado` | `pendiente` | `en hogar temporal` | `atención médica`)
+  tags (string[]) — optional
+  image_object_key (string) — optional
+  medical_records (object[]) — optional
+    record_type (string) — optional (`vacunación` | `desparasitación` | `esterilización` | `tratamiento` | `examen` | `cirugía`)
+    date_given (string) — optional ISO-8601 timestamp
+    vet_name (string) — optional
+    notes (string) — optional
 
 Request example
-- POST /api/v1/admin/animals
+- POST /api/animals
 {
   "name": "Luna",
-  "species": "dog",
-  "breed": "Mixed",
-  "age": 2,
-  "sex": "female",
-  "status": "available",
   "description": "Friendly and energetic dog",
-  "images": [
-    "https://cdn.shelter.org/animals/luna-1.jpg"
+  "species": "perro",
+  "size": "mediano",
+  "gender": "hembra",
+  "status": "disponible",
+  "tags": ["friendly", "energetic"],
+  "medical_records": [
+    {
+      "record_type": "vacunación",
+      "date_given": "2026-04-14T10:00:00.000Z",
+      "vet_name": "Dr. Rivera",
+      "notes": "Initial intake vaccination"
+    },
+    {
+      "record_type": "examen",
+      "date_given": "2026-04-15T11:30:00.000Z",
+      "vet_name": "Dr. Soto",
+      "notes": "Initial wellness exam"
+    }
   ]
 }
 
 Response 201
 {
+  "success": true,
+  "medicalRecordsAttempted": true,
+  "medicalRecordsRequested": 2,
+  "medicalRecordsCreatedCount": 2,
+  "medicalRecordCreated": true,
   "data": {
-    "id": "a1f9c2e4-8c3a-4b2f-9c5d-1f3e7a9b2d10",
+    "aid": 1,
     "name": "Luna",
-    "species": "dog",
-    "breed": "Mixed",
-    "age": 2,
-    "sex": "female",
-    "status": "available",
     "description": "Friendly and energetic dog",
-    "images": [
-      "https://cdn.shelter.org/animals/luna-1.jpg"
-    ],
-    "created_at": "2026-02-20T14:30:00Z",
-    "updated_at": "2026-02-20T14:30:00Z"
+    "species": "perro",
+    "size": "mediano",
+    "gender": "hembra",
+    "status": "disponible",
+    "tags": ["friendly", "energetic"],
+    "record_id": null,
+    "created_at": "2026-02-20T14:30:00.000Z"
   }
 }
+
+If the animal is created but one or more medical-record inserts fail, the API still returns success with the created animal, `medicalRecordCreated: false`, record counts, and a `warnings` array describing the failed medical records.
 
 Error 400
 {

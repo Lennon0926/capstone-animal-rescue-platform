@@ -1,0 +1,302 @@
+/* Main Container */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* Metric Section - groups cards and graph together */
+.metricSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.metricSection:not(:first-of-type) {
+  margin-top: var(--space-20);
+}
+
+/* Header Section */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-6);
+}
+
+.header h1 {
+  font-size: var(--text-hero-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin: 0;
+  margin-bottom: var(--space-2);
+}
+
+.subtitle {
+  color: var(--color-text-muted);
+  margin: 0;
+  font-size: var(--text-base);
+}
+
+/* Stats Grid */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-4);
+}
+
+.statCard {
+  border: 1px solid var(--color-border);
+  background-color: var(--color-bg);
+  transition: all 0.2s ease;
+}
+
+.statCard:hover {
+  box-shadow: var(--shadow-lg);
+  transform: scale(1.02);
+}
+
+.statCard :global(.card-content),
+.statCardContent {
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.statLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statValue {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+/* Card Styling */
+.card {
+  padding-top: 0;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-4) var(--space-5);
+  flex-direction: column;
+}
+
+.cardHeaderContent {
+  display: grid;
+  flex: 1;
+  gap: var(--space-1);
+  width: 100%;
+}
+
+.cardTitle {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+/* Select Dropdown Styling */
+.selectTrigger {
+  width: 180px !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--space-2) var(--space-3) !important;
+  font-size: var(--text-sm) !important;
+  font-weight: var(--font-weight-medium) !important;
+  min-height: 40px !important;
+  background-color: var(--color-bg) !important;
+  border: 1px solid var(--color-border) !important;
+  transition: background-color 0.15s ease !important;
+  cursor: pointer !important;
+}
+
+.selectTrigger:hover {
+  background-color: var(--color-surface) !important;
+}
+
+.selectContent {
+  border-radius: var(--radius-lg) !important;
+  border: 1px solid var(--color-border) !important;
+  box-shadow: var(--shadow-md) !important;
+  background-color: var(--color-bg) !important;
+  min-width: 180px !important;
+}
+
+.selectItem {
+  border-radius: var(--radius-md) !important;
+  padding: var(--space-2) var(--space-3) !important;
+  font-size: var(--text-sm) !important;
+  cursor: pointer !important;
+  min-height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  transition: all 0.12s ease !important;
+  color: var(--color-text) !important;
+  margin: var(--space-1) !important;
+  border: none !important;
+  background-color: transparent !important;
+}
+
+.selectItem:hover,
+.selectItem:focus {
+  background-color: var(--color-surface) !important;
+  color: var(--color-primary) !important;
+  font-weight: var(--font-weight-medium) !important;
+  outline: none !important;
+}
+
+.selectItem:focus {
+  background-color: var(--color-primary-soft);
+}
+
+/* Card Content */
+.cardContent {
+  padding: var(--space-2);
+  padding-top: var(--space-4);
+}
+
+/* Chart Wrapper */
+.chartWrapper {
+  width: 100%;
+}
+
+/* Chart Container */
+.chartContainer {
+  aspect-ratio: auto;
+  height: 250px;
+  width: 100%;
+  font-size: 16px;
+}
+
+/* Desktop/Tablet Styles */
+@media (min-width: 640px) {
+  .cardHeader {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .selectTrigger {
+    display: flex !important;
+  }
+
+  .cardContent {
+    padding: var(--space-6);
+    padding-top: var(--space-6);
+  }
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+  }
+
+  .header h1 {
+    font-size: var(--text-hero-md);
+  }
+
+  .subtitle {
+    font-size: var(--text-sm);
+  }
+
+  .chartContainer {
+    height: 200px;
+  }
+
+  .cardContent {
+    padding: var(--space-2);
+  }
+
+  .selectTrigger {
+    display: none !important;
+  }
+}
+
+/* Ensure proper spacing for small screens */
+@media (max-width: 640px) {
+  .selectTrigger {
+    display: flex;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .cardHeaderContent {
+    text-align: center;
+  }
+}
+
+/* Custom Tooltip Styles */
+.customTooltip {
+  background-color: white;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-lg);
+  min-width: 220px;
+}
+
+.tooltipLabel {
+  font-size: 16px;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin: 0 0 var(--space-3) 0;
+  padding-bottom: var(--space-2);
+  border-bottom: 2px solid var(--color-border);
+}
+
+.tooltipContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tooltipItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 15px;
+}
+
+.tooltipDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tooltipName {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.tooltipValue {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+  margin-left: auto;
+  font-size: 16px;
+}
+
+/* Loading and Empty States */
+.loadingState,
+.emptyState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 250px;
+  color: var(--color-text-muted);
+  font-size: var(--text-base);
+  background-color: var(--color-surface);
+  border-radius: var(--radius-md);
+}

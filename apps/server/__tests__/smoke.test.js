@@ -42,6 +42,7 @@ afterAll(() => {
 beforeEach(() => {
   jest.clearAllMocks();
   mockVerifyConnection.mockResolvedValue({ connected: true });
+  require("../repositories/animalsRepository").clearAnimalsCache();
 });
 
 const getApp = () => require("../server");
@@ -145,17 +146,33 @@ describe("Smoke: core animal flow", () => {
 
     const firstAnimalId = list.body.data[0].aid;
 
-    const singleChain = buildChainableMock({
-      data: MOCK_ANIMALS[0],
-      error: null,
+    mockFrom.mockImplementation((table) => {
+      if (table === "animals") {
+        return buildChainableMock({
+          data: MOCK_ANIMALS[0],
+          error: null,
+        });
+      }
+
+      if (table === "medical_records") {
+        return buildChainableMock({
+          data: [],
+          error: null,
+        });
+      }
+
+      return buildChainableMock({
+        data: null,
+        error: { message: `Unknown table: ${table}` },
+      });
     });
-    mockFrom.mockReturnValue(singleChain);
 
     const detail = await request(app).get(`/api/animals/${firstAnimalId}`);
     expect(detail.status).toBe(200);
     expect(detail.body.success).toBe(true);
     expect(detail.body.data.aid).toBe(firstAnimalId);
     expect(detail.body.data.name).toBeDefined();
+    expect(detail.body.data.medical_records).toEqual([]);
   });
 
   it("animal fetch: invalid ID returns 400", async () => {
