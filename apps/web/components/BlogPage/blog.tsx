@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { Source_Serif_4, JetBrains_Mono } from "next/font/google";
 import {
   Facebook,
   ExternalLink,
@@ -19,21 +18,6 @@ import {
 } from "lucide-react";
 import type { FacebookPost, FacebookComment } from "@/pages/api/facebook-posts";
 import styles from "./blog.module.css";
-
-const serif = Source_Serif_4({
-  subsets: ["latin"],
-  variable: "--font-serif",
-  weight: ["400", "500", "600"],
-  style: ["normal", "italic"],
-  display: "swap",
-});
-
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-  weight: ["400", "500"],
-  display: "swap",
-});
 
 const AUTHOR_NAME = "Ciudadanos Pro Albergue";
 const FB_PAGE_URL =
@@ -539,7 +523,7 @@ export default function Blog() {
   const feedPosts = posts.filter((p) => p.id !== featured?.id);
 
   return (
-    <div className={`${styles.page} ${serif.variable} ${mono.variable}`}>
+    <div className={styles.page}>
       {/* ── Masthead ─────────────────────────────────────────────────── */}
       <section className={styles.masthead}>
         <div className={styles.mastheadInner}>
