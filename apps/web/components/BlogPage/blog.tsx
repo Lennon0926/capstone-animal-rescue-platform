@@ -226,37 +226,51 @@ function Composer() {
           ×
         </button>
       </div>
-      <textarea
-        className={styles.composerBody}
-        placeholder="Escribe algo para compartir con la comunidad..."
-        readOnly
-      />
-      <div className={styles.composerTools}>
-        <div className={styles.composerAttach}>
-          <button
-            className={styles.composerAttachBtn}
-            disabled
-            title="Próximamente"
-          >
-            <ImageIcon size={14} /> Foto
-          </button>
-          <button
-            className={styles.composerAttachBtn}
-            disabled
-            title="Próximamente"
-          >
-            <Video size={14} /> Video
-          </button>
+
+      {/* Header — optional */}
+      <div className={styles.composerField}>
+        <label className={styles.composerFieldLabel}>
+          Encabezado <span className={styles.composerRequired}>(opcional)</span>
+        </label>
+        <input
+          className={styles.composerInput}
+          placeholder="Título de la publicación..."
+          readOnly
+        />
+      </div>
+
+      {/* Body — required */}
+      <div className={styles.composerField}>
+        <label className={styles.composerFieldLabel}>
+          Contenido <span className={styles.composerRequired}>*</span>
+        </label>
+        <textarea
+          className={styles.composerBody}
+          placeholder="Escribe algo para compartir con la comunidad..."
+          readOnly
+        />
+      </div>
+
+      {/* Image — required */}
+      <div className={styles.composerField}>
+        <label className={styles.composerFieldLabel}>
+          Imagen <span className={styles.composerRequired}>*</span>
+        </label>
+        <div className={styles.composerImageUpload}>
+          <ImageIcon size={20} className={styles.composerImageUploadIcon} />
+          <div>
+            <div className={styles.composerImageUploadText}>Subir imagen</div>
+            <div className={styles.composerImageUploadHint}>JPG, PNG · Próximamente</div>
+          </div>
         </div>
+      </div>
+
+      <div className={styles.composerTools}>
         <div className={styles.composerSubmit}>
           <button className={styles.btnGhost} onClick={() => setOpen(false)}>
             Cancelar
           </button>
-          <button
-            className={styles.btnPrimary}
-            disabled
-            title="Próximamente"
-          >
+          <button className={styles.btnPrimary} disabled title="Próximamente">
             Publicar
           </button>
         </div>
@@ -389,11 +403,16 @@ function PostCard({
 // ── Featured Post ────────────────────────────────────────────────────────────
 
 function FeaturedPost({ post }: { post: FacebookPost }) {
+  const [expanded, setExpanded] = useState(false);
   const text = post.message ?? post.story ?? "";
   const images = getImages(post);
-  const excerpt = extractExcerpt(text);
-  const { title } = splitPost(text);
-  const displayTitle = title || excerpt;
+  const { title, paragraphs } = splitPost(text);
+  const displayTitle = title || extractExcerpt(text);
+  const bodyText = paragraphs.join("\n");
+  const isLong = bodyText.length > BODY_LIMIT;
+  const visibleParagraphs = isLong && !expanded
+    ? bodyText.slice(0, BODY_LIMIT).trimEnd().split("\n").filter(Boolean)
+    : paragraphs;
 
   return (
     <section className={styles.featured}>
@@ -401,9 +420,9 @@ function FeaturedPost({ post }: { post: FacebookPost }) {
         <span className={styles.featuredDot} />
         Publicación destacada
       </div>
-      <div className={styles.featuredGrid}>
-        <div className={styles.featuredMedia}>
-          {images[0] ? (
+      <div className={images[0] ? styles.featuredGrid : undefined}>
+        {images[0] && (
+          <div className={styles.featuredMedia}>
             <div className={styles.featuredImage}>
               <Image
                 src={images[0]}
@@ -414,20 +433,26 @@ function FeaturedPost({ post }: { post: FacebookPost }) {
                 unoptimized
               />
             </div>
-          ) : (
-            <div
-              className={`${styles.featuredImage} ${styles.imgPlaceholder}`}
-            >
-              <span className={styles.imgPlaceholderLabel}>Sin imagen</span>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
         <div>
           <span className={styles.featuredDate}>
             {formatDate(post.created_time)}
           </span>
           <h2 className={styles.featuredTitle}>{displayTitle}</h2>
-          {title && <p className={styles.featuredExcerpt}>{excerpt}</p>}
+          {visibleParagraphs.length > 0 && (
+            <div className={styles.postBody}>
+              {visibleParagraphs.map((p, i) => (
+                <p key={i} className={styles.featuredExcerpt}>{p}</p>
+              ))}
+              {isLong && (
+                <button className={styles.readMore} onClick={() => setExpanded((e) => !e)}>
+                  {expanded ? "Ver menos" : "Ver más"}
+                  {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                </button>
+              )}
+            </div>
+          )}
           <div className={styles.featuredMeta}>
             <span>{AUTHOR_NAME}</span>
             <span>{getRelativeTime(post.created_time)}</span>
@@ -528,15 +553,6 @@ export default function Blog() {
       <section className={styles.masthead}>
         <div className={styles.mastheadInner}>
           <div className={styles.mastheadEyebrow}>Nuestras publicaciones</div>
-          <h1 className={styles.mastheadTitle}>
-            Cada animal merece
-            <br />
-            una <em>segunda oportunidad</em>
-          </h1>
-          <p className={styles.mastheadLede}>
-            Espejo de nuestra página oficial de Facebook. Seguimos nuestra
-            misión de rescate, rehabilitación y adopción animal en Aguadilla.
-          </p>
           <div className={styles.mastheadMeta}>
             <strong>{AUTHOR_NAME}</strong>
             <span className={styles.mastheadMetaDot} />
