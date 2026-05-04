@@ -17,6 +17,7 @@
   --radius-sm: 4px;
   --radius-md: 8px;
   --col-width: 720px;
+  --feed-width: 1100px;
 
   background-color: var(--color-surface);
   min-height: 100vh;
@@ -117,7 +118,7 @@
 
 /* ── Feed layout ───────────────────────────────────────────────────── */
 .feed {
-  max-width: var(--col-width);
+  max-width: var(--feed-width);
   margin: 0 auto;
   padding: 56px 24px 96px;
 }
