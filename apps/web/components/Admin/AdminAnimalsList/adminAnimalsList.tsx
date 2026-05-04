@@ -6,126 +6,11 @@ import { getAnimalImageUrl } from "@/utils/animalImages";
 import { getAuthenticatedHeaders } from "@/lib/apiAuth";
 import styles from "./adminAnimalsList.module.css";
 import { ChevronDown, Search } from "lucide-react";
-import React from "react";
-import * as FileSaver from "file-saver";
-import ExcelJS from "exceljs";
-import type { MedicalRecord } from "@/types/animal";
-
-const fileType =
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-
-const fileExtension = ".xlsx";
-
-type AnimalsRecordRow = Record<string, unknown>;
-
-type ExportableAnimal = Animal & {
-  microchip_id?: string | null;
-  is_sterilized?: boolean | null;
-  estimated_age?: string | null;
-};
-
-const getCellValue = (
-  row: AnimalsRecordRow,
-  key: string,
-): string | number | boolean => {
-  const value = row[key];
-
-  if (value === null || value === undefined) {
-    return "";
-  }
-
-  if (typeof value === "boolean") {
-    return value;
-  }
-
-  if (typeof value === "string" || typeof value === "number") {
-    return value;
-  }
-
-  return String(value);
-};
-
-const formatExcelDate = (value: unknown) => {
-  if (typeof value !== "string" || !value.trim()) {
-    return "";
-  }
-
-  const parsedDate = new Date(value);
-  if (Number.isNaN(parsedDate.getTime())) {
-    return value;
-  }
-
-  return parsedDate.toLocaleDateString();
-};
-
-const exportToExcel = async (
-  excelData: ExportableAnimal[],
-  medicalRecords: AnimalsRecordRow[],
-  fileName: string,
-) => {
-  const excelAnimalData = excelData.map((excelData) => ({
-    ID: excelData.aid,
-    Nombre: excelData.name,
-    Descripción: excelData.description,
-    Especie: excelData.species,
-    Género: excelData.gender,
-    Tamaño: excelData.size,
-    Estado: excelData.status,
-    "Creado en": new Date(excelData.created_at).toLocaleDateString(),
-    Etiquetas: excelData.tags ? excelData.tags.join(", ") : "",
-    "Microchip ID": excelData.microchip_id || "",
-    Sterilizado: excelData.is_sterilized ? "Sí" : "No",
-    "Edad estimada": excelData.estimated_age || "",
-  }));
-
-  const excelMedicalRecordData = medicalRecords.map((medicalRecord) => ({
-    "Animal ID": getCellValue(medicalRecord, "aid"),
-    Animal:
-      getCellValue(medicalRecord, "animal_name") ||
-      getCellValue(medicalRecord, "name") ||
-      "",
-    "Record ID": getCellValue(medicalRecord, "record_id"),
-    Tipo: getCellValue(medicalRecord, "record_type"),
-    Fecha: formatExcelDate(getCellValue(medicalRecord, "date_given")),
-    Veterinario: getCellValue(medicalRecord, "vet_name"),
-    Notas: getCellValue(medicalRecord, "notes"),
-    "Creado en": formatExcelDate(getCellValue(medicalRecord, "created_at")),
-  }));
-
-  const workbook = new ExcelJS.Workbook();
-  const animalsSheet = workbook.addWorksheet("Animales");
-  const medicalRecordsSheet = workbook.addWorksheet("Registros Médicos");
-
-  if (excelAnimalData.length > 0) {
-    animalsSheet.columns = Object.keys(excelAnimalData[0]).map((key) => ({
-      header: key,
-      key,
-    }));
-    excelAnimalData.forEach((row) => animalsSheet.addRow(row));
-  }
-
-  if (excelMedicalRecordData.length > 0) {
-    medicalRecordsSheet.columns = Object.keys(excelMedicalRecordData[0]).map(
-      (key) => ({
-        header: key,
-        key,
-      }),
-    );
-    excelMedicalRecordData.forEach((row) => medicalRecordsSheet.addRow(row));
-  }
-
-  const excelBuffer = await workbook.xlsx.writeBuffer();
-
-  const data = new Blob([excelBuffer], { type: fileType });
-
-  FileSaver.saveAs(data, fileName + fileExtension);
-};
 
 const ITEMS_PER_PAGE = 10;
 
 interface AdminAnimalsListProps {
   initialAnimals: Animal[];
-  initialMedicalRecords: MedicalRecord[];
 }
 
 interface DeleteConfirmModalProps {
@@ -183,10 +68,8 @@ function capitalize(text: string) {
 
 export default function AdminAnimalsList({
   initialAnimals,
-  initialMedicalRecords,
 }: AdminAnimalsListProps) {
   const [animals, setAnimals] = useState(initialAnimals);
-  const [medicalRecords] = useState(initialMedicalRecords);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Animal;
@@ -372,21 +255,13 @@ export default function AdminAnimalsList({
             </p>
           </div>
           <div className={styles.actionGroup}>
-            <div className={styles.exportButtons}>
-              <button
-                onClick={() =>
-                    void exportToExcel(
-                      sortedAnimals as ExportableAnimal[],
-                      medicalRecords,
-                      "animales",
-                  )
-                }
-                className={styles.exportButton}
-                title="Exportar a Excel"
-              >
-                Exportar a Excel
-              </button>
-            </div>
+            <a
+              href="/api/export/animals"
+              className={styles.exportButtons}
+              title="Exportar a Excel"
+            >
+              Exportar a Excel
+            </a>
             <div className={styles.actions}>
               <Link href="/admin/createAnimal" className={styles.createButton}>
                 + Crear Nuevo Animal
