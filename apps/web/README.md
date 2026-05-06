@@ -12,7 +12,6 @@ The animal rescue platform frontend, built with Next.js (Pages Router), React, T
 | `/about` | Organization info — mission, history, values, team, contact |
 | `/blog` | Blog |
 
-
 ## Development
 
 ```bash
