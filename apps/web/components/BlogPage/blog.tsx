@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import {
@@ -9,19 +7,107 @@ import {
   MessageCircle,
   Share2,
   Clapperboard,
-  ImageIcon,
-  Video,
   Heart,
   ChevronDown,
   ChevronUp,
+  Globe,
   Pin,
+  PinOff,
+  LogIn,
+  LogOut,
+  Plus,
+  X,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import type { FacebookPost, FacebookComment } from "@/pages/api/facebook-posts";
+import type { Post } from "@/types/post";
+import { supabase } from "@/lib/supabase";
+import { getAuthenticatedHeaders } from "@/lib/apiAuth";
+import { fetchUploadConfig, isUploadStorageAvailable } from "@/services/animalImageUploadService";
+import { createPost, uploadPostImage, updatePost } from "@/services/postService";
+import { fetchPinnedFbPostId, setPinnedFbPostId } from "@/services/settingsService";
 import styles from "./blog.module.css";
 
 const AUTHOR_NAME = "Ciudadanos Pro Albergue";
 const FB_PAGE_URL =
   "https://www.facebook.com/Ciudadanos-Pro-Albergue-de-Animales-de-Aguadilla-Inc-147815628577682/";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+// ── Types ────────────────────────────────────────────────────────────────────
+
+type BlogFeedPost = {
+  id: string;
+  source: "local" | "facebook";
+  header: string;
+  body: string;
+  imageUrls: string[];
+  createdAt: string;
+  isPinned: boolean;
+  pid?: number;
+  externalUrl?: string;
+  metadata?: {
+    likes?: number;
+    comments?: number;
+    facebookType?: "reel" | "shared" | "normal";
+    rawComments?: FacebookComment[];
+  };
+};
+
+// ── Normalizers ──────────────────────────────────────────────────────────────
+
+function getFbPostType(post: FacebookPost): "reel" | "shared" | "normal" {
+  const attachType = post.attachments?.data[0]?.type ?? "";
+  if (post.story || attachType === "share") return "shared";
+  if (attachType === "video_inline" || attachType === "video" || attachType === "reel") return "reel";
+  return "normal";
+}
+
+function getFbImages(post: FacebookPost): string[] {
+  const attachment = post.attachments?.data[0];
+  if (attachment?.subattachments?.data.length) {
+    return attachment.subattachments.data
+      .map((s) => s.media?.image?.src)
+      .filter((src): src is string => Boolean(src));
+  }
+  if (post.full_picture) return [post.full_picture];
+  return [];
+}
+
+function normalizeFacebookPost(post: FacebookPost): BlogFeedPost {
+  const text = post.message ?? post.story ?? "";
+  return {
+    id: `fb-${post.id}`,
+    source: "facebook",
+    header: text.split("\n")[0]?.slice(0, 160) || "",
+    body: text,
+    imageUrls: getFbImages(post),
+    createdAt: post.created_time,
+    isPinned: false,
+    externalUrl: post.permalink_url,
+    metadata: {
+      likes: post.likes?.summary?.total_count ?? 0,
+      comments: post.comments?.data?.length ?? 0,
+      facebookType: getFbPostType(post),
+      rawComments: post.comments?.data ?? [],
+    },
+  };
+}
+
+function normalizeLocalPost(post: Post): BlogFeedPost {
+  return {
+    id: `local-${post.pid}`,
+    source: "local",
+    header: post.header,
+    body: post.body,
+    imageUrls: post.image_url ? [post.image_url] : [],
+    createdAt: post.created_at,
+    isPinned: post.is_pinned,
+    pid: post.pid,
+  };
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("es-PR", {
@@ -42,71 +128,17 @@ function getRelativeTime(iso: string): string {
   return formatDate(iso);
 }
 
-type PostType = "reel" | "shared" | "normal";
-
-function getPostType(post: FacebookPost): PostType {
-  const attachType = post.attachments?.data[0]?.type ?? "";
-  if (post.story || attachType === "share") return "shared";
-  if (
-    attachType === "video_inline" ||
-    attachType === "video" ||
-    attachType === "reel"
-  )
-    return "reel";
-  return "normal";
-}
-
-const POST_TYPE_BADGE: Record<
-  PostType,
-  { label: string; icon: React.ReactNode } | null
-> = {
-  reel: { label: "Reel", icon: <Clapperboard size={11} /> },
-  shared: { label: "Compartido", icon: <Share2 size={11} /> },
-  normal: null,
-};
-
-function getImages(post: FacebookPost): string[] {
-  const attachment = post.attachments?.data[0];
-  if (attachment?.subattachments?.data.length) {
-    return attachment.subattachments.data
-      .map((s) => s.media?.image?.src)
-      .filter((src): src is string => Boolean(src));
-  }
-  if (post.full_picture) return [post.full_picture];
-  return [];
-}
-
 const BODY_LIMIT = 500;
 
-function splitPost(text: string): { title: string; paragraphs: string[] } {
-  const lines = text.split("\n").filter((l) => l.trim());
-  if (lines.length === 0) return { title: "", paragraphs: [] };
-  const [first, ...rest] = lines;
-  const title = first.length > 100 ? first.slice(0, 100) + "…" : first;
-  return { title, paragraphs: rest };
-}
+// ── Image Grid ───────────────────────────────────────────────────────────────
 
-function extractExcerpt(text: string, maxLen = 200): string {
-  const clean = text.replace(/\n+/g, " ").trim();
-  return clean.length > maxLen ? clean.slice(0, maxLen) + "…" : clean;
-}
-
-// ── Image Grid ──────────────────────────────────────────────────────────────
-
-function ImageGrid({ images }: { images: string[] }) {
+function ImageGrid({ images, unoptimized = false }: { images: string[]; unoptimized?: boolean }) {
   if (images.length === 0) return null;
 
   if (images.length === 1) {
     return (
       <div className={styles.postImage}>
-        <Image
-          src={images[0]}
-          alt="Publicación"
-          fill
-          style={{ objectFit: "cover" }}
-          sizes="(max-width: 720px) 100vw, 720px"
-          unoptimized
-        />
+        <Image src={images[0]} alt="Publicación" fill style={{ objectFit: "cover" }} sizes="(max-width: 720px) 100vw, 720px" unoptimized={unoptimized} />
       </div>
     );
   }
@@ -115,26 +147,12 @@ function ImageGrid({ images }: { images: string[] }) {
     return (
       <div className={styles.postImageGrid3}>
         <div className={styles.postImageGrid3Left}>
-          <Image
-            src={images[0]}
-            alt="Foto 1"
-            fill
-            style={{ objectFit: "cover" }}
-            sizes="480px"
-            unoptimized
-          />
+          <Image src={images[0]} alt="Foto 1" fill style={{ objectFit: "cover" }} sizes="480px" unoptimized={unoptimized} />
         </div>
         <div className={styles.postImageGrid3Right}>
           {images.slice(1).map((src, i) => (
             <div key={i} className={styles.postImageGrid3Small}>
-              <Image
-                src={src}
-                alt={`Foto ${i + 2}`}
-                fill
-                style={{ objectFit: "cover" }}
-                sizes="240px"
-                unoptimized
-              />
+              <Image src={src} alt={`Foto ${i + 2}`} fill style={{ objectFit: "cover" }} sizes="240px" unoptimized={unoptimized} />
             </div>
           ))}
         </div>
@@ -143,46 +161,29 @@ function ImageGrid({ images }: { images: string[] }) {
   }
 
   const count = Math.min(images.length, 4);
-  const gridClass =
-    count === 2 ? styles.postImageGrid2 : styles.postImageGrid4;
-
+  const gridClass = count === 2 ? styles.postImageGrid2 : styles.postImageGrid4;
   return (
     <div className={`${styles.postImageGrid} ${gridClass}`}>
       {images.slice(0, 4).map((src, i) => (
         <div key={i} className={styles.postImageGridTile}>
-          {i === 3 && images.length > 4 && (
-            <div className={styles.postImageGridMore}>+{images.length - 4}</div>
-          )}
-          <Image
-            src={src}
-            alt={`Foto ${i + 1}`}
-            fill
-            style={{ objectFit: "cover" }}
-            sizes="360px"
-            unoptimized
-          />
+          {i === 3 && images.length > 4 && <div className={styles.postImageGridMore}>+{images.length - 4}</div>}
+          <Image src={src} alt={`Foto ${i + 1}`} fill style={{ objectFit: "cover" }} sizes="360px" unoptimized={unoptimized} />
         </div>
       ))}
     </div>
   );
 }
 
-// ── Comment ─────────────────────────────────────────────────────────────────
+// ── Comment ──────────────────────────────────────────────────────────────────
 
 function Comment({ comment }: { comment: FacebookComment }) {
   return (
     <div className={styles.comment}>
-      <div className={styles.commentAvatar}>
-        {(comment.from?.name ?? "A")[0].toUpperCase()}
-      </div>
+      <div className={styles.commentAvatar}>{(comment.from?.name ?? "A")[0].toUpperCase()}</div>
       <div className={styles.commentBody}>
         <div className={styles.commentHead}>
-          <span className={styles.commentName}>
-            {comment.from?.name ?? "Anónimo"}
-          </span>
-          <span className={styles.commentDate}>
-            {formatDate(comment.created_time)}
-          </span>
+          <span className={styles.commentName}>{comment.from?.name ?? "Anónimo"}</span>
+          <span className={styles.commentDate}>{formatDate(comment.created_time)}</span>
         </div>
         <p className={styles.commentText}>{comment.message}</p>
       </div>
@@ -190,289 +191,409 @@ function Comment({ comment }: { comment: FacebookComment }) {
   );
 }
 
-// ── Composer (UI only — no backend) ─────────────────────────────────────────
+// ── Source Badge ─────────────────────────────────────────────────────────────
 
-function Composer() {
-  const [open, setOpen] = useState(false);
-
-  if (!open) {
-    return (
-      <button
-        className={styles.composerCollapsed}
-        onClick={() => setOpen(true)}
-      >
-        <div className={styles.composerAvatar}>C</div>
-        <div className={styles.composerPrompt}>
-          <span>¿Qué quieres compartir?</span>
-          <span className={styles.composerHint}>
-            Conectar con Facebook próximamente
-          </span>
-        </div>
-        <span className={styles.composerCta}>Publicar →</span>
-      </button>
-    );
+function SourceBadge({ post }: { post: BlogFeedPost }) {
+  if (post.source === "facebook") {
+    const type = post.metadata?.facebookType;
+    if (type === "reel") return <span className={`${styles.badge} ${styles.badgeReel}`}><Clapperboard size={11} /> Reel</span>;
+    if (type === "shared") return <span className={`${styles.badge} ${styles.badgeShared}`}><Share2 size={11} /> Compartido</span>;
+    return <span className={`${styles.badge} ${styles.badgeFacebook}`}><Facebook size={11} /> Facebook</span>;
   }
-
-  return (
-    <div className={styles.composerOpen}>
-      <div className={styles.composerHead}>
-        <div className={styles.composerAvatar}>C</div>
-        <span className={styles.composerName}>{AUTHOR_NAME}</span>
-        <button
-          className={styles.composerClose}
-          onClick={() => setOpen(false)}
-          aria-label="Cerrar compositor"
-        >
-          ×
-        </button>
-      </div>
-
-      {/* Header — optional */}
-      <div className={styles.composerField}>
-        <label className={styles.composerFieldLabel}>
-          Encabezado <span className={styles.composerRequired}>(opcional)</span>
-        </label>
-        <input
-          className={styles.composerInput}
-          placeholder="Título de la publicación..."
-          readOnly
-        />
-      </div>
-
-      {/* Body — required */}
-      <div className={styles.composerField}>
-        <label className={styles.composerFieldLabel}>
-          Contenido <span className={styles.composerRequired}>*</span>
-        </label>
-        <textarea
-          className={styles.composerBody}
-          placeholder="Escribe algo para compartir con la comunidad..."
-          readOnly
-        />
-      </div>
-
-      {/* Image — required */}
-      <div className={styles.composerField}>
-        <label className={styles.composerFieldLabel}>
-          Imagen <span className={styles.composerRequired}>*</span>
-        </label>
-        <div className={styles.composerImageUpload}>
-          <ImageIcon size={20} className={styles.composerImageUploadIcon} />
-          <div>
-            <div className={styles.composerImageUploadText}>Subir imagen</div>
-            <div className={styles.composerImageUploadHint}>JPG, PNG · Próximamente</div>
-          </div>
-        </div>
-      </div>
-
-      <div className={styles.composerTools}>
-        <div className={styles.composerSubmit}>
-          <button className={styles.btnGhost} onClick={() => setOpen(false)}>
-            Cancelar
-          </button>
-          <button className={styles.btnPrimary} disabled title="Próximamente">
-            Publicar
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+  return <span className={`${styles.badge} ${styles.badgeWeb}`}><Globe size={11} /> Web</span>;
 }
 
-// ── Post Card ────────────────────────────────────────────────────────────────
+// ── Post Card ─────────────────────────────────────────────────────────────────
 
 function PostCard({
   post,
-  isPinned,
-  onPin,
+  isAdmin,
+  onPinToggle,
 }: {
-  post: FacebookPost;
-  isPinned: boolean;
-  onPin: () => void;
+  post: BlogFeedPost;
+  isAdmin: boolean;
+  onPinToggle?: (postId: string, pin: boolean) => Promise<void>;
 }) {
   const [showComments, setShowComments] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const text = post.message ?? post.story ?? "";
-  const comments = post.comments?.data ?? [];
-  const images = getImages(post);
-  const postType = getPostType(post);
-  const badge = POST_TYPE_BADGE[postType];
-  const { title, paragraphs } = splitPost(text);
-  const likeCount = post.likes?.summary?.total_count ?? 0;
+  const [pinning, setPinning] = useState(false);
 
-  const bodyText = paragraphs.join("\n");
-  const isLong = bodyText.length > BODY_LIMIT;
-  const visibleParagraphs =
-    isLong && !expanded
-      ? bodyText.slice(0, BODY_LIMIT).trimEnd().split("\n").filter(Boolean)
-      : paragraphs;
+  const comments = post.metadata?.rawComments ?? [];
+  const isLong = post.body.length > BODY_LIMIT;
+  const visibleBody = isLong && !expanded ? post.body.slice(0, BODY_LIMIT).trimEnd() + "…" : post.body;
+  const likeCount = post.metadata?.likes ?? 0;
+
+  const handlePin = async () => {
+    if (pinning) return;
+    setPinning(true);
+    try {
+      await onPinToggle?.(post.id, !post.isPinned);
+    } catch {
+      // pin failed silently
+    } finally {
+      setPinning(false);
+    }
+  };
 
   return (
     <article className={styles.post}>
       <div className={styles.postHeader}>
-        <span className={styles.postDate}>{formatDate(post.created_time)}</span>
-        {badge && (
-          <span
-            className={`${styles.badge} ${
-              postType === "reel" ? styles.badgeReel : styles.badgeShared
-            }`}
+        <span className={styles.postDate}>{formatDate(post.createdAt)}</span>
+        <SourceBadge post={post} />
+        {isAdmin && (
+          <button
+            className={`${styles.pinBtn} ${post.isPinned ? styles.pinBtnActive : ""}`}
+            onClick={handlePin}
+            disabled={pinning}
+            title={post.isPinned ? "Quitar destacado" : "Destacar publicación"}
           >
-            {badge.icon}
-            {badge.label}
-          </span>
+            {post.isPinned ? <PinOff size={14} /> : <Pin size={14} />}
+          </button>
         )}
-        <button
-          className={`${styles.pinBtn} ${isPinned ? styles.pinBtnActive : ""}`}
-          onClick={onPin}
-          title={isPinned ? "Quitar destacado" : "Fijar como destacado"}
-          aria-label={isPinned ? "Quitar destacado" : "Fijar como destacado"}
-        >
-          <Pin size={14} />
-        </button>
       </div>
 
-      {title && <h2 className={styles.postTitle}>{title}</h2>}
+      {post.header && <h2 className={styles.postTitle}>{post.header}</h2>}
 
-      {paragraphs.length > 0 && (
-        <div className={styles.postBody}>
-          {visibleParagraphs.map((p, i) => (
-            <p key={i} className={styles.postPara}>
-              {p}
-            </p>
-          ))}
-          {isLong && (
-            <button
-              className={styles.readMore}
-              onClick={() => setExpanded((e) => !e)}
-            >
-              {expanded ? "Ver menos" : "Ver más"}
-              {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-            </button>
-          )}
-        </div>
-      )}
+      <div className={styles.postBody}>
+        <p className={styles.postPara}>{visibleBody}</p>
+        {isLong && (
+          <button className={styles.readMore} onClick={() => setExpanded((e) => !e)}>
+            {expanded ? "Ver menos" : "Ver más"}
+            {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+          </button>
+        )}
+      </div>
 
-      <ImageGrid images={images} />
+      <ImageGrid images={post.imageUrls} unoptimized={post.source === "facebook"} />
 
       <footer className={styles.postFooter}>
-        <div className={styles.postActions}>
-          <span className={styles.action}>
-            <Heart size={13} />
-            {likeCount}
-          </span>
-          {comments.length > 0 ? (
-            <button
-              className={styles.action}
-              onClick={() => setShowComments((s) => !s)}
-              aria-expanded={showComments}
-            >
-              <MessageCircle size={13} />
-              {comments.length}
-              {showComments ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
-            </button>
-          ) : (
-            <span className={styles.action}>
-              <MessageCircle size={13} />
-              0
-            </span>
-          )}
-        </div>
-        <a
-          href={post.permalink_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={styles.postSource}
-        >
-          <Facebook size={12} />
-          Ver en Facebook
-          <ExternalLink size={10} />
-        </a>
+        {post.source === "facebook" && (
+          <div className={styles.postActions}>
+            <span className={styles.action}><Heart size={13} />{likeCount}</span>
+            {comments.length > 0 ? (
+              <button className={styles.action} onClick={() => setShowComments((s) => !s)} aria-expanded={showComments}>
+                <MessageCircle size={13} />{comments.length}
+                {showComments ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+              </button>
+            ) : (
+              <span className={styles.action}><MessageCircle size={13} />0</span>
+            )}
+          </div>
+        )}
+        {post.externalUrl && (
+          <a href={post.externalUrl} target="_blank" rel="noopener noreferrer" className={styles.postSource}>
+            <Facebook size={12} />Ver en Facebook<ExternalLink size={10} />
+          </a>
+        )}
       </footer>
 
       {showComments && comments.length > 0 && (
         <div className={styles.comments}>
-          {comments.map((c) => (
-            <Comment key={c.id} comment={c} />
-          ))}
+          {comments.map((c) => <Comment key={c.id} comment={c} />)}
         </div>
       )}
     </article>
   );
 }
 
-// ── Featured Post ────────────────────────────────────────────────────────────
+// ── Featured Post ─────────────────────────────────────────────────────────────
 
-function FeaturedPost({ post }: { post: FacebookPost }) {
+function FeaturedPost({
+  post,
+  isAdmin,
+  onPinToggle,
+}: {
+  post: BlogFeedPost;
+  isAdmin: boolean;
+  onPinToggle?: (postId: string, pin: boolean) => Promise<void>;
+}) {
   const [expanded, setExpanded] = useState(false);
-  const text = post.message ?? post.story ?? "";
-  const images = getImages(post);
-  const { title, paragraphs } = splitPost(text);
-  const displayTitle = title || extractExcerpt(text);
-  const bodyText = paragraphs.join("\n");
-  const isLong = bodyText.length > BODY_LIMIT;
-  const visibleParagraphs = isLong && !expanded
-    ? bodyText.slice(0, BODY_LIMIT).trimEnd().split("\n").filter(Boolean)
-    : paragraphs;
+  const [pinning, setPinning] = useState(false);
+
+  const isLong = post.body.length > BODY_LIMIT;
+  const visibleBody = isLong && !expanded ? post.body.slice(0, BODY_LIMIT).trimEnd() + "…" : post.body;
+
+  const handlePin = async () => {
+    if (pinning) return;
+    setPinning(true);
+    try {
+      await onPinToggle?.(post.id, !post.isPinned);
+    } catch {
+      // silent
+    } finally {
+      setPinning(false);
+    }
+  };
 
   return (
     <section className={styles.featured}>
       <div className={styles.featuredLabel}>
         <span className={styles.featuredDot} />
         Publicación destacada
+        <SourceBadge post={post} />
+        {isAdmin && (
+          <button
+            className={`${styles.pinBtn} ${post.isPinned ? styles.pinBtnActive : ""}`}
+            onClick={handlePin}
+            disabled={pinning}
+            title={post.isPinned ? "Quitar destacado" : "Destacar"}
+          >
+            {post.isPinned ? <PinOff size={14} /> : <Pin size={14} />}
+          </button>
+        )}
       </div>
-      <div className={images[0] ? styles.featuredGrid : undefined}>
-        {images[0] && (
+      <div className={post.imageUrls[0] ? styles.featuredGrid : undefined}>
+        {post.imageUrls[0] && (
           <div className={styles.featuredMedia}>
             <div className={styles.featuredImage}>
-              <Image
-                src={images[0]}
-                alt="Publicación destacada"
-                fill
-                style={{ objectFit: "cover" }}
-                sizes="(max-width: 640px) 100vw, 400px"
-                unoptimized
-              />
+              <Image src={post.imageUrls[0]} alt="Publicación destacada" fill priority style={{ objectFit: "cover" }} sizes="(max-width: 640px) 100vw, 400px" unoptimized={post.source === "facebook"} />
             </div>
           </div>
         )}
         <div>
-          <span className={styles.featuredDate}>
-            {formatDate(post.created_time)}
-          </span>
-          <h2 className={styles.featuredTitle}>{displayTitle}</h2>
-          {visibleParagraphs.length > 0 && (
-            <div className={styles.postBody}>
-              {visibleParagraphs.map((p, i) => (
-                <p key={i} className={styles.featuredExcerpt}>{p}</p>
-              ))}
-              {isLong && (
-                <button className={styles.readMore} onClick={() => setExpanded((e) => !e)}>
-                  {expanded ? "Ver menos" : "Ver más"}
-                  {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-                </button>
-              )}
-            </div>
-          )}
+          <span className={styles.featuredDate}>{formatDate(post.createdAt)}</span>
+          <h2 className={styles.featuredTitle}>{post.header || post.body.slice(0, 100)}</h2>
+          <div className={styles.postBody}>
+            <p className={styles.featuredExcerpt}>{visibleBody}</p>
+            {isLong && (
+              <button className={styles.readMore} onClick={() => setExpanded((e) => !e)}>
+                {expanded ? "Ver menos" : "Ver más"}
+                {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+              </button>
+            )}
+          </div>
           <div className={styles.featuredMeta}>
             <span>{AUTHOR_NAME}</span>
-            <span>{getRelativeTime(post.created_time)}</span>
+            <span>{getRelativeTime(post.createdAt)}</span>
           </div>
-          <a
-            href={post.permalink_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.featuredLink}
-          >
-            Leer publicación
-            <ExternalLink size={13} />
-          </a>
+          {post.externalUrl && (
+            <a href={post.externalUrl} target="_blank" rel="noopener noreferrer" className={styles.featuredLink}>
+              Leer publicación<ExternalLink size={13} />
+            </a>
+          )}
         </div>
       </div>
     </section>
   );
 }
 
-// ── Skeleton Card ────────────────────────────────────────────────────────────
+// ── Login Modal ───────────────────────────────────────────────────────────────
+
+function LoginModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      });
+      if (signInError) {
+        setError(signInError.message === "Invalid login credentials"
+          ? "Correo o contraseña incorrectos."
+          : signInError.message);
+        return;
+      }
+      if (!data?.session) {
+        setError("No se pudo crear la sesión. Intenta de nuevo.");
+        return;
+      }
+      onSuccess();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error inesperado.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.loginModal} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.loginModalHeader}>
+          <h2 className={styles.loginModalTitle}>Acceso Admin</h2>
+          <button className={styles.loginModalClose} onClick={onClose} aria-label="Cerrar">
+            <X size={18} />
+          </button>
+        </div>
+
+        {error && <p className={styles.loginModalError}>{error}</p>}
+
+        <form onSubmit={handleSubmit} className={styles.loginModalForm}>
+          <input
+            type="email"
+            placeholder="Correo electrónico"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={styles.loginModalInput}
+            required
+            disabled={loading}
+            autoFocus
+          />
+          <div className={styles.loginModalPasswordWrapper}>
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={styles.loginModalInput}
+              required
+              disabled={loading}
+            />
+            <button type="button" className={styles.loginModalEyeBtn} onClick={() => setShowPassword((v) => !v)}>
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
+          <button type="submit" className={styles.loginModalSubmit} disabled={loading}>
+            {loading ? "Ingresando..." : "Ingresar"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── Inline Create Form ────────────────────────────────────────────────────────
+
+function CreatePostForm({ onCreated }: { onCreated: (post: BlogFeedPost) => void }) {
+  const [open, setOpen] = useState(false);
+  const [header, setHeader] = useState("");
+  const [body, setBody] = useState("");
+  const [isPinned, setIsPinned] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!selectedFile) { setPreviewUrl(null); return; }
+    const url = URL.createObjectURL(selectedFile);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [selectedFile]);
+
+  const reset = () => {
+    setHeader(""); setBody(""); setIsPinned(false);
+    setSelectedFile(null); setPreviewUrl(null); setError("");
+    setOpen(false);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    if (!header.trim()) { setError("El título es requerido."); return; }
+    if (!body.trim()) { setError("El contenido es requerido."); return; }
+    if (!selectedFile) { setError("La imagen es requerida."); return; }
+
+    setLoading(true);
+    try {
+      const config = await fetchUploadConfig().catch(() => null);
+      if (!isUploadStorageAvailable(config)) {
+        setError("El almacenamiento de imágenes no está disponible.");
+        return;
+      }
+
+      const post = await createPost({ header: header.trim(), body: body.trim(), is_pinned: isPinned });
+      const uploadResult = await uploadPostImage(post.pid, selectedFile);
+      const updated = await updatePost(post.pid, { image_object_key: uploadResult.objectKey });
+
+      onCreated(normalizeLocalPost(updated));
+      reset();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al crear la publicación.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!open) {
+    return (
+      <button className={styles.createPostBtn} onClick={() => setOpen(true)}>
+        <Plus size={16} /> Nueva publicación
+      </button>
+    );
+  }
+
+  return (
+    <div className={styles.createPostForm}>
+      <div className={styles.createPostFormHeader}>
+        <h3 className={styles.createPostFormTitle}>Nueva Publicación</h3>
+        <button className={styles.createPostFormClose} onClick={reset} aria-label="Cancelar">
+          <X size={18} />
+        </button>
+      </div>
+
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Título (máx. 160 caracteres)"
+          value={header}
+          maxLength={160}
+          onChange={(e) => setHeader(e.target.value)}
+          className={styles.createPostInput}
+          disabled={loading}
+        />
+        <textarea
+          placeholder="Contenido de la publicación..."
+          value={body}
+          maxLength={5000}
+          onChange={(e) => setBody(e.target.value)}
+          rows={5}
+          className={styles.createPostTextarea}
+          disabled={loading}
+        />
+
+        <div className={styles.createPostImageRow}>
+          <label className={styles.createPostFileLabel}>
+            {selectedFile ? selectedFile.name : "Seleccionar imagen *"}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={(e) => setSelectedFile(e.target.files?.[0] ?? null)}
+              disabled={loading}
+              hidden
+            />
+          </label>
+          {previewUrl && (
+            <div style={{ position: "relative", width: 60, height: 60, flexShrink: 0 }}>
+              <Image src={previewUrl} alt="Vista previa" fill style={{ objectFit: "cover", borderRadius: 6 }} />
+            </div>
+          )}
+        </div>
+
+        <label className={styles.createPostPinLabel}>
+          <input
+            type="checkbox"
+            checked={isPinned}
+            onChange={(e) => setIsPinned(e.target.checked)}
+            disabled={loading}
+          />
+          Marcar como publicación destacada
+        </label>
+
+        {error && <p className={styles.createPostError}>{error}</p>}
+
+        <div className={styles.createPostActions}>
+          <button type="button" className={styles.createPostCancel} onClick={reset} disabled={loading}>
+            Cancelar
+          </button>
+          <button type="submit" className={styles.createPostSubmit} disabled={loading}>
+            {loading ? "Publicando..." : "Publicar"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+// ── Skeleton Card ─────────────────────────────────────────────────────────────
 
 function SkeletonCard() {
   return (
@@ -487,69 +608,163 @@ function SkeletonCard() {
   );
 }
 
-// ── Scroll reveal ────────────────────────────────────────────────────────────
+// ── Scroll Reveal ─────────────────────────────────────────────────────────────
 
 function useScrollReveal(dep: unknown) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((e) => {
-          if (e.isIntersecting) e.target.classList.add(styles.visible);
-        }),
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add(styles.visible); }),
       { threshold: 0.05, rootMargin: "0px 0px -20px 0px" }
     );
-    ref.current
-      ?.querySelectorAll(`.${styles.fadeInUp}`)
-      .forEach((el) => observer.observe(el));
+    ref.current?.querySelectorAll(`.${styles.fadeInUp}`).forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, [dep]);
   return ref;
 }
 
-// ── Main Blog ────────────────────────────────────────────────────────────────
+// ── Main Blog ─────────────────────────────────────────────────────────────────
 
 export default function Blog() {
-  const [posts, setPosts] = useState<FacebookPost[]>([]);
+  const [allPosts, setAllPosts] = useState<BlogFeedPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [pinnedPostId, setPinnedPostId] = useState<string | null>(null);
-  const feedRef = useScrollReveal(`${posts.length}:${pinnedPostId}`);
+  const [fbError, setFbError] = useState<string | null>(null);
+  const [localError, setLocalError] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const feedRef = useScrollReveal(`${allPosts.length}:${allPosts.find((p) => p.isPinned)?.id ?? ""}`);
+
+  // Track auth state
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsAdmin(!!session);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAdmin(!!session);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   async function loadPosts() {
     setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/facebook-posts?limit=100");
-      if (!res.ok) {
+    setFbError(null);
+    setLocalError(null);
+
+    const [fbResult, localResult, fbPinResult] = await Promise.allSettled([
+      fetch("/api/facebook-posts?limit=100").then(async (res) => {
+        if (!res.ok) {
+          const json = await res.json().catch(() => ({}));
+          throw new Error(json.error ?? "Error al cargar publicaciones de Facebook");
+        }
+        return res.json() as Promise<FacebookPost[]>;
+      }),
+      fetch("/api/posts?limit=100").then(async (res) => {
+        if (!res.ok) throw new Error("Error al cargar publicaciones locales");
         const json = await res.json();
-        throw new Error(json.error ?? "Error al cargar publicaciones");
+        return (json.data ?? []) as Post[];
+      }),
+      fetchPinnedFbPostId(),
+    ]);
+
+    const pinnedFbId = fbPinResult.status === "fulfilled" ? fbPinResult.value : null;
+
+    const fbPosts: BlogFeedPost[] =
+      fbResult.status === "fulfilled"
+        ? fbResult.value.map((p) => {
+            const normalized = normalizeFacebookPost(p);
+            if (pinnedFbId && normalized.id === `fb-${pinnedFbId}`) {
+              return { ...normalized, isPinned: true };
+            }
+            return normalized;
+          })
+        : (setFbError(fbResult.reason instanceof Error ? fbResult.reason.message : "Error de Facebook"), []);
+
+    const localPosts: BlogFeedPost[] =
+      localResult.status === "fulfilled"
+        ? localResult.value.map(normalizeLocalPost)
+        : (setLocalError(localResult.reason instanceof Error ? localResult.reason.message : "Error al cargar publicaciones"), []);
+
+    const merged = [...localPosts, ...fbPosts].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    setAllPosts(merged);
+    setLoading(false);
+  }
+
+  useEffect(() => { loadPosts(); }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setIsAdmin(false);
+  };
+
+  const handlePostCreated = (newPost: BlogFeedPost) => {
+    setAllPosts((prev) => {
+      const list = newPost.isPinned
+        ? prev.map((p) => ({ ...p, isPinned: false }))
+        : prev;
+      return [newPost, ...list].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    });
+  };
+
+  const handlePinToggle = async (postId: string, nowPinned: boolean): Promise<void> => {
+    // Optimistic update — UI reflects change immediately
+    setAllPosts((prev) =>
+      prev.map((p) => {
+        if (p.id === postId) return { ...p, isPinned: nowPinned };
+        if (nowPinned) return { ...p, isPinned: false };
+        return p;
+      })
+    );
+
+    if (postId.startsWith("local-")) {
+      const pid = Number(postId.replace("local-", ""));
+      await updatePost(pid, { is_pinned: nowPinned });
+      if (nowPinned) setPinnedFbPostId(null).catch(() => {});
+    } else {
+      const fbId = postId.replace("fb-", "");
+      if (nowPinned) {
+        const pinnedLocal = allPosts.find((p) => p.source === "local" && p.isPinned);
+        if (pinnedLocal?.pid) updatePost(pinnedLocal.pid, { is_pinned: false }).catch(() => {});
+        await setPinnedFbPostId(fbId);
+      } else {
+        await setPinnedFbPostId(null);
       }
-      const data: FacebookPost[] = await res.json();
-      setPosts(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error desconocido");
-    } finally {
-      setLoading(false);
     }
-  }
+  };
 
-  useEffect(() => {
-    loadPosts();
-  }, []);
-
-  function handlePin(postId: string) {
-    setPinnedPostId((prev) => (prev === postId ? null : postId));
-  }
-
-  const featured =
-    (pinnedPostId ? posts.find((p) => p.id === pinnedPostId) : null) ??
-    posts[0];
-  const feedPosts = posts.filter((p) => p.id !== featured?.id);
+  const pinned = allPosts.find((p) => p.isPinned);
+  const featured = pinned ?? null;
+  const feedPosts = featured ? allPosts.filter((p) => p.id !== featured.id) : allPosts;
+  const bothFailed = fbError !== null && localError !== null;
+  const hasPosts = allPosts.length > 0;
 
   return (
     <div className={styles.page}>
-      {/* ── Masthead ─────────────────────────────────────────────────── */}
+      {/* ── Admin bar ─────────────────────────────────────────────── */}
+      <div className={styles.adminBar}>
+        {isAdmin ? (
+          <button className={styles.adminBarLogout} onClick={handleLogout}>
+            <LogOut size={14} /> Cerrar sesión
+          </button>
+        ) : (
+          <button className={styles.adminBarLogin} onClick={() => setShowLoginModal(true)}>
+            <LogIn size={14} /> Admin
+          </button>
+        )}
+      </div>
+
+      {showLoginModal && (
+        <LoginModal
+          onClose={() => setShowLoginModal(false)}
+          onSuccess={() => setShowLoginModal(false)}
+        />
+      )}
+
+      {/* ── Masthead ───────────────────────────────────────────────── */}
       <section className={styles.masthead}>
         <div className={styles.mastheadInner}>
           <div className={styles.mastheadEyebrow}>Nuestras publicaciones</div>
@@ -557,57 +772,56 @@ export default function Blog() {
             <strong>{AUTHOR_NAME}</strong>
             <span className={styles.mastheadMetaDot} />
             <span>Aguadilla, PR</span>
-            {posts.length > 0 && (
+            {hasPosts && (
               <>
                 <span className={styles.mastheadMetaDot} />
-                <span>{posts.length} publicaciones</span>
+                <span>{allPosts.length} publicaciones</span>
               </>
             )}
           </div>
         </div>
       </section>
 
-      {/* ── Feed ─────────────────────────────────────────────────────── */}
+      {/* ── Feed ───────────────────────────────────────────────────── */}
       <main className={styles.feed} ref={feedRef}>
+        {isAdmin && <CreatePostForm onCreated={handlePostCreated} />}
+
         {loading && (
           <div className={styles.feedList}>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <SkeletonCard key={i} />
-            ))}
+            {Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={i} />)}
           </div>
         )}
 
-        {!loading && error && (
+        {!loading && bothFailed && (
           <div className={styles.errorState}>
-            <p className={styles.errorText}>{error}</p>
+            <p className={styles.errorText}>No se pudieron cargar las publicaciones.</p>
             <button className={styles.retryBtn} onClick={loadPosts}>
-              <RefreshCw size={16} />
-              Intentar de nuevo
+              <RefreshCw size={16} /> Intentar de nuevo
             </button>
           </div>
         )}
 
-        {!loading && !error && posts.length === 0 && (
+        {!loading && !bothFailed && fbError && (
+          <p className={styles.sourceWarning}>Las publicaciones de Facebook no están disponibles en este momento.</p>
+        )}
+
+        {!loading && !bothFailed && localError && (
+          <p className={styles.sourceWarning}>Las publicaciones del sitio web no están disponibles en este momento.</p>
+        )}
+
+        {!loading && !bothFailed && !hasPosts && (
           <div className={styles.emptyState}>
             <Facebook size={40} color="#ccc" />
             <p>No hay publicaciones disponibles en este momento.</p>
-            <a
-              href={FB_PAGE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.postSource}
-            >
+            <a href={FB_PAGE_URL} target="_blank" rel="noopener noreferrer" className={styles.postSource}>
               Ver en Facebook
             </a>
           </div>
         )}
 
-        {!loading && !error && posts.length > 0 && (
+        {!loading && !bothFailed && hasPosts && (
           <>
-            <Composer />
-
-            {featured && <FeaturedPost post={featured} />}
-
+            {featured && <FeaturedPost post={featured} isAdmin={isAdmin} onPinToggle={handlePinToggle} />}
             <div className={styles.feedList}>
               {feedPosts.map((post, i) => (
                 <div
@@ -615,11 +829,7 @@ export default function Blog() {
                   className={`${styles.feedItem} ${styles.fadeInUp}`}
                   style={{ transitionDelay: `${Math.min(i * 60, 300)}ms` }}
                 >
-                  <PostCard
-                    post={post}
-                    isPinned={pinnedPostId === post.id}
-                    onPin={() => handlePin(post.id)}
-                  />
+                  <PostCard post={post} isAdmin={isAdmin} onPinToggle={handlePinToggle} />
                 </div>
               ))}
             </div>

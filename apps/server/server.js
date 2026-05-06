@@ -14,7 +14,9 @@ validateEnv();
 
 const healthRouter = require("./routes/health");
 const animalsRouter = require("./routes/animals");
+const postsRouter = require("./routes/posts");
 const uploadsRouter = require("./routes/uploads");
+const settingsRouter = require("./routes/settings");
 const { errorHandler, notFoundHandler } = require("./middleware/errorHandler");
 
 const app = express();
@@ -50,7 +52,7 @@ app.set("trust proxy", 1);
 app.use(
   cors({
     origin: process.env.ALLOWED_ORIGINS?.split(",").map((o) => o.trim()).filter(Boolean) ?? [],
-    methods: ["GET", "POST", "PATCH", "DELETE"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
@@ -59,7 +61,10 @@ app.use(express.json());
 
 // Routes
 app.use("/api/animals", animalsRouter);
+app.use("/api/posts", postsRouter);
+app.use("/api/settings", settingsRouter);
 app.post("/api/uploads/animals/:animalId/image", uploadLimiter);
+app.post("/api/uploads/posts/:postId/image", uploadLimiter);
 app.use("/api/uploads", uploadsRouter);
 app.use("/", healthRouter);
 

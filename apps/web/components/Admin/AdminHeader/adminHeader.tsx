@@ -45,6 +45,9 @@ export default function AdminHeader() {
           <Link href="/admin/animals" className={styles.navLink}>
             Animals
           </Link>
+          <Link href="/admin/posts" className={styles.navLink}>
+            Posts
+          </Link>
           <button onClick={handleLogout} className={styles.logoutButton}>
             Logout
           </button>
@@ -66,6 +69,9 @@ export default function AdminHeader() {
           </Link>
           <Link href="/admin/animals" className={styles.navLinkMobile}>
             Animals
+          </Link>
+          <Link href="/admin/posts" className={styles.navLinkMobile}>
+            Posts
           </Link>
           <button onClick={handleLogout} className={styles.logoutButtonMobile}>
             Logout

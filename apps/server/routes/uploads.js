@@ -10,6 +10,7 @@ const router = express.Router();
 const {
   ALLOWED_MIME_TYPES,
   ANIMAL_ID_PATTERN,
+  POST_ID_PATTERN,
   maxImageSizeBytes,
   isR2Configured,
   missingR2EnvVars,
@@ -18,6 +19,7 @@ const {
   checkR2Health,
   isR2DependencyError,
   uploadAnimalImage,
+  uploadPostImage,
 } = require("../services/r2Service");
 const { asyncHandler } = require("../middleware/errorHandler");
 const { requireAuth } = require("../middleware/auth");
@@ -135,6 +137,95 @@ router.post(
     try {
       const result = await uploadAnimalImage(
         animalId,
+        req.file.buffer,
+        req.file.originalname,
+        req.file.mimetype
+      );
+
+      return res.status(201).json({ data: result });
+    } catch (error) {
+      if (isR2DependencyError(error)) {
+        return res
+          .status(error.statusCode)
+          .json(getErrorPayload(error.code, error.message));
+      }
+
+      return next(error);
+    }
+  }
+);
+
+/**
+ * POST /api/uploads/posts/:postId/image
+ * Uploads an image for a post to Cloudflare R2.
+ */
+router.post(
+  "/posts/:postId/image",
+  asyncHandler(requireAuth),
+  upload.single("image"),
+  async (req, res, next) => {
+    const postId = String(req.params.postId || "").trim();
+
+    if (!POST_ID_PATTERN.test(postId)) {
+      return res
+        .status(400)
+        .json(
+          getErrorPayload(
+            "INVALID_POST_ID",
+            "postId must be 1-64 chars using only letters, numbers, underscores, or dashes."
+          )
+        );
+    }
+
+    if (!req.file) {
+      return res
+        .status(400)
+        .json(
+          getErrorPayload(
+            "MISSING_IMAGE_FILE",
+            'No upload file found. Send one file using multipart field name "image".'
+          )
+        );
+    }
+
+    if (!ALLOWED_MIME_TYPES.has(req.file.mimetype)) {
+      return res
+        .status(415)
+        .json(
+          getErrorPayload(
+            "INVALID_IMAGE_TYPE",
+            `Unsupported content type "${req.file.mimetype}". Allowed types: ${ALLOWED_MIME_TYPES_ARRAY.join(", ")}.`
+          )
+        );
+    }
+
+    if (!isR2Configured) {
+      return res
+        .status(500)
+        .json(
+          getErrorPayload(
+            "R2_NOT_CONFIGURED",
+            "Cloudflare R2 is not configured on the server.",
+            { missingEnvVars: missingR2EnvVars }
+          )
+        );
+    }
+
+    if (!isPublicObjectUrlConfigured) {
+      return res
+        .status(500)
+        .json(
+          getErrorPayload(
+            "R2_PUBLIC_URL_NOT_CONFIGURED",
+            "R2_PUBLIC_BASE_URL must be configured for persistent post image uploads.",
+            { missingEnvVars: missingPublicObjectUrlEnvVars }
+          )
+        );
+    }
+
+    try {
+      const result = await uploadPostImage(
+        postId,
         req.file.buffer,
         req.file.originalname,
         req.file.mimetype

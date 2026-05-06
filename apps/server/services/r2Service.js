@@ -372,17 +372,9 @@ function getPublicObjectUrl(objectKey) {
   return `${r2Config.publicBaseUrl}/${encodedObjectKey}`;
 }
 
-/**
- * Uploads a file buffer to R2 and returns the object key and URL.
- * @param {string} animalId - Animal ID used in the object key path
- * @param {Buffer} buffer - File buffer
- * @param {string} originalname - Original filename
- * @param {string} mimetype - MIME type
- * @returns {Promise<{objectKey: string, url: string, urlType: string, contentType: string, size: number}>}
- */
-async function uploadAnimalImage(animalId, buffer, originalname, mimetype) {
+async function _uploadImage(prefix, buffer, originalname, mimetype) {
   const safeFilename = sanitizeFilename(originalname, mimetype);
-  const objectKey = `animals/${animalId}/${Date.now()}-${safeFilename}`;
+  const objectKey = `${prefix}/${Date.now()}-${safeFilename}`;
 
   try {
     await r2Client.send(
@@ -405,23 +397,28 @@ async function uploadAnimalImage(animalId, buffer, originalname, mimetype) {
   const url = getPublicObjectUrl(objectKey);
   if (!url) {
     throw new Error(
-      "R2_PUBLIC_BASE_URL must be configured for persistent animal image uploads."
+      "R2_PUBLIC_BASE_URL must be configured for persistent image uploads."
     );
   }
 
-  return {
-    objectKey,
-    url,
-    urlType: "public",
-    contentType: mimetype,
-    size: buffer.length,
-  };
+  return { objectKey, url, urlType: "public", contentType: mimetype, size: buffer.length };
 }
+
+async function uploadAnimalImage(animalId, buffer, originalname, mimetype) {
+  return _uploadImage(`animals/${animalId}`, buffer, originalname, mimetype);
+}
+
+async function uploadPostImage(postId, buffer, originalname, mimetype) {
+  return _uploadImage(`posts/${postId}`, buffer, originalname, mimetype);
+}
+
+const POST_ID_PATTERN = /^[a-zA-Z0-9_-]{1,64}$/;
 
 module.exports = {
   ALLOWED_MIME_TYPES,
   MIME_TYPE_EXTENSION_MAP,
   ANIMAL_ID_PATTERN,
+  POST_ID_PATTERN,
   maxImageSizeBytes,
   isR2Configured,
   missingR2EnvVars,
@@ -434,4 +431,5 @@ module.exports = {
   checkR2Health,
   isR2DependencyError,
   uploadAnimalImage,
+  uploadPostImage,
 };
