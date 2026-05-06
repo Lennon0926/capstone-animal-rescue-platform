@@ -258,4 +258,3 @@ test.describe('Home page (/home)', () => {
         .toBeVisible();
   });
 });
-})
