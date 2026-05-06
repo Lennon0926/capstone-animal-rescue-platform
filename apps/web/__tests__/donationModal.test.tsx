@@ -91,19 +91,7 @@ describe("DonationModal", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "Ir a PayPal", hidden: true }),
-    ).toHaveAttribute("href", "https://www.paypal.com/us/home");
-
-    fireEvent.click(screen.getByRole("button", { name: "Tarjeta", hidden: true }));
-    expect(
-      screen.getByRole("heading", {
-        name: "Pagar con tarjeta",
-        level: 3,
-        hidden: true,
-      }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", { name: "Pagar con tarjeta", hidden: true }),
-    ).toHaveAttribute("href", "https://stripe.com/payments/payment-links");
+    ).toHaveAttribute("href", "https://www.paypal.com/donate");
   });
 
   it("calls onClose from the close button, overlay click, and Escape key", () => {

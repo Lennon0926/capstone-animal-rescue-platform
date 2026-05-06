@@ -47,7 +47,7 @@
 
 .paymentTabs {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--space-4);
   margin-bottom: var(--space-6);
 }
@@ -75,11 +75,6 @@
 .paymentTabPaypalActive {
   background: rgb(26, 159, 222);
   border-color: rgb(26, 159, 222);
-}
-
-.paymentTabStripeActive {
-  background: rgb(104, 97, 255);
-  border-color: rgb(104, 97, 255);
 }
 
 .modalBody {
@@ -137,10 +132,6 @@
 
 .panelActionPaypal {
   background: rgb(26, 159, 222);
-}
-
-.panelActionStripe {
-  background: rgb(104, 97, 255);
 }
 
 .panelAction:hover {

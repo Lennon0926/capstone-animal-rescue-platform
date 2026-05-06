@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import styles from "./donationModal.module.css";
 
-type PaymentMethod = "ath" | "paypal" | "card";
+type PaymentMethod = "ath" | "paypal";
 
 type DonationModalProps = {
   isOpen: boolean;
@@ -99,17 +99,6 @@ export default function DonationModal({
             PayPal
           </button>
 
-          <button
-            type="button"
-            onClick={() => setPaymentMethod("card")}
-            className={`${styles.paymentTab} ${
-              paymentMethod === "card"
-                ? `${styles.paymentTabActive} ${styles.paymentTabStripeActive}`
-                : ""
-            }`}
-          >
-            Tarjeta
-          </button>
         </div>
 
         <div className={styles.modalBody}>
@@ -144,7 +133,7 @@ export default function DonationModal({
               </p>
 
               <a
-                href="https://www.paypal.com/us/home"
+                href="https://www.paypal.com/donate"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`${styles.panelAction} ${styles.panelActionPaypal}`}
@@ -154,24 +143,6 @@ export default function DonationModal({
             </div>
           )}
 
-          {paymentMethod === "card" && (
-            <div className={styles.paymentPanel}>
-              <h3 className={styles.panelTitle}>Pagar con tarjeta</h3>
-              <p className={styles.panelText}>
-                Aquí puedes conectar tu formulario o enlace de Stripe para
-                procesar la donación.
-              </p>
-
-              <a
-                href="https://stripe.com/payments/payment-links"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`${styles.panelAction} ${styles.panelActionStripe}`}
-              >
-                Pagar con tarjeta
-              </a>
-            </div>
-          )}
         </div>
       </div>
     </div>
