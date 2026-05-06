@@ -184,7 +184,7 @@ test.describe('About page (/about)', () => {
     await button.click();
     await expect(page.getByRole('dialog')).toBeVisible({timeout: 10000});
     await expect(page.getByRole('heading', {
-      name: 'Donación — $10'
+      name: 'Donaciones'
     })).toBeVisible();
   });
 });

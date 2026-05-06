@@ -54,7 +54,7 @@ describe("DonationModal", () => {
     expect(screen.getByRole("dialog", { hidden: true })).toBeInTheDocument();
     expect(
       screen.getByRole("heading", {
-        name: "Donación — $25",
+        name: "Donaciones",
         level: 2,
         hidden: true,
       }),

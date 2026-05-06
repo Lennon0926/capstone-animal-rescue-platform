@@ -61,7 +61,7 @@ export default function DonationModal({
       >
         <div className={styles.modalHeader}>
           <h2 id="donation-modal-title" className={styles.modalTitle}>
-            Donación — {selectedAmount}
+            Donaciones
           </h2>
 
           <button
