@@ -19,6 +19,8 @@ const {
   isR2DependencyError,
   uploadAnimalImage,
 } = require("../services/r2Service");
+const { asyncHandler } = require("../middleware/errorHandler");
+const { requireAuth } = require("../middleware/auth");
 
 const ALLOWED_MIME_TYPES_ARRAY = Array.from(ALLOWED_MIME_TYPES);
 
@@ -68,6 +70,7 @@ router.get("/config", async (req, res, next) => {
  */
 router.post(
   "/animals/:animalId/image",
+  asyncHandler(requireAuth),
   upload.single("image"),
   async (req, res, next) => {
     const animalId = String(req.params.animalId || "").trim();
