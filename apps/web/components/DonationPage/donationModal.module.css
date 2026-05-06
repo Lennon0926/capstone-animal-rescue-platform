@@ -28,19 +28,19 @@
 }
 
 .modalTitle {
-  font-size: clamp(28px, 3vw, 40px);
+  font-size: var(--text-3xl);
   color: var(--color-text);
   line-height: 1.2;
 }
 
 .modalClose {
-  width: 48px;
-  height: 48px;
+  width: var(--space-12);
+  height: var(--space-12);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-bg);
   color: var(--color-text-muted);
-  font-size: 32px;
+  font-size: var(--text-2xl);
   line-height: 1;
   cursor: pointer;
 }
@@ -53,7 +53,7 @@
 }
 
 .paymentTab {
-  padding: 18px 16px;
+  padding: var(--space-5) var(--space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-bg);
@@ -61,6 +61,7 @@
   font-size: var(--text-lg);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
 }
 
 .paymentTabActive {
@@ -68,13 +69,13 @@
 }
 
 .paymentTabAthActive {
-  background: rgb(242, 129, 36);
-  border-color: rgb(242, 129, 36);
+  background: var(--color-ath-movil);
+  border-color: var(--color-ath-movil);
 }
 
 .paymentTabPaypalActive {
-  background: rgb(26, 159, 222);
-  border-color: rgb(26, 159, 222);
+  background: var(--color-paypal);
+  border-color: var(--color-paypal);
 }
 
 .modalBody {
@@ -89,7 +90,7 @@
 }
 
 .panelTitle {
-  font-size: clamp(24px, 3vw, 34px);
+  font-size: var(--text-2xl);
   color: var(--color-text);
   margin-bottom: var(--space-6);
 }
@@ -104,8 +105,8 @@
   width: min(100%, 220px);
   height: auto;
   border: 1px solid var(--color-border);
-  padding: 10px;
-  background: rgb(242, 129, 36);
+  padding: var(--space-2);
+  background: var(--color-ath-movil);
 }
 
 .panelText {
@@ -122,16 +123,17 @@
   justify-content: center;
   margin-top: var(--space-6);
   min-width: 240px;
-  padding: 16px 24px;
+  padding: var(--space-4) var(--space-6);
   border-radius: var(--radius-md);
   background: var(--color-primary);
   color: var(--color-text-inverse);
   font-weight: var(--font-weight-semibold);
   text-decoration: none;
+  transition: background var(--transition-fast);
 }
 
 .panelActionPaypal {
-  background: rgb(26, 159, 222);
+  background: var(--color-paypal);
 }
 
 .panelAction:hover {
