@@ -51,7 +51,7 @@ export default function DonationModal({
   }
 
   const modalContent = (
-    <div className={styles.modalOverlay} onClick={onClose} aria-hidden="true">
+    <div className={styles.modalOverlay} onClick={onClose}>
       <div
         className={styles.modalCard}
         role="dialog"
@@ -61,7 +61,7 @@ export default function DonationModal({
       >
         <div className={styles.modalHeader}>
           <h2 id="donation-modal-title" className={styles.modalTitle}>
-            Donación 
+            Donación — {selectedAmount}
           </h2>
 
           <button

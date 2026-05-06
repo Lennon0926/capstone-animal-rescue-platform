@@ -193,6 +193,8 @@ test.describe("Home page (/home)", () => {
     await link.scrollIntoViewIfNeeded();
     await expect(link).toBeVisible();
     await expect(link).toHaveAttribute("href", "tel:+17875058255");
+  });
+
   test("donation banner Donar Ahora opens donation modal", async ({ page }) => {
     const button = page.getByRole("button", { name: "Donar Ahora", exact: true });
     await button.scrollIntoViewIfNeeded();
@@ -225,6 +227,6 @@ test.describe("Home page (/home)", () => {
     await expect(
       footer.getByRole("link", { name: "Animales Disponibles", exact: true })
     ).toBeVisible();
-    await expect(footer.getByRole("link", { name: "Donar", exact: true })).toBeVisible();
+    await expect(footer.getByRole("button", { name: "Donar", exact: true })).toBeVisible();
   });
-});})
+});
