@@ -133,7 +133,7 @@ export default function DonationModal({
               </p>
 
               <a
-                href="https://www.paypal.com/donate"
+                href="https://www.paypal.com/donate?token=PWap2_X7g39qEq-0OeWcPX6erlploV4njS3a-pox-ena8sDChwp5TxxV0pBXeCjxAf30QgZ0kenLfrOR"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`${styles.panelAction} ${styles.panelActionPaypal}`}
