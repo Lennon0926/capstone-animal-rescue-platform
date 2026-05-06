@@ -16,6 +16,7 @@ jest.mock("next/image", () => ({
     alt: string;
     [key: string]: unknown;
   }) => (
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={typeof src === "string" ? src : src.src}
       alt={alt}
@@ -123,7 +124,7 @@ describe("DonationModal", () => {
   });
 
   it("restores body scroll when the modal closes", () => {
-    const { rerender, unmount } = render(
+    const { rerender } = render(
       <DonationModal
         isOpen
         onClose={jest.fn()}
