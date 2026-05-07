@@ -25,7 +25,6 @@ import {
 import type { FacebookPost, FacebookComment } from "@/pages/api/facebook-posts";
 import type { Post } from "@/types/post";
 import { supabase } from "@/lib/supabase";
-import { getAuthenticatedHeaders } from "@/lib/apiAuth";
 import { fetchUploadConfig, isUploadStorageAvailable } from "@/services/animalImageUploadService";
 import { createPost, uploadPostImage, updatePost, deletePost } from "@/services/postService";
 import { fetchPinnedFbPostId, setPinnedFbPostId } from "@/services/settingsService";
@@ -34,8 +33,6 @@ import styles from "./blog.module.css";
 const AUTHOR_NAME = "Ciudadanos Pro Albergue";
 const FB_PAGE_URL =
   "https://www.facebook.com/Ciudadanos-Pro-Albergue-de-Animales-de-Aguadilla-Inc-147815628577682/";
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
 // ── Types ────────────────────────────────────────────────────────────────────
 
 type BlogFeedPost = {
@@ -787,7 +784,7 @@ function DeleteConfirmModal({
         <p className={styles.deleteModalText}>
           ¿Estás seguro que deseas eliminar esta publicación? Esta acción no se puede deshacer.
         </p>
-        {post.header && <p className={styles.deleteModalPostTitle}>"{post.header}"</p>}
+        {post.header && <p className={styles.deleteModalPostTitle}>&ldquo;{post.header}&rdquo;</p>}
         {error && <p className={styles.createPostError}>{error}</p>}
         <div className={styles.createPostActions}>
           <button className={styles.createPostCancel} onClick={onClose} disabled={loading}>Cancelar</button>
@@ -901,6 +898,7 @@ export default function Blog() {
     setLoading(false);
   }
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { loadPosts(); }, []);
 
   const handleLogout = async () => {
