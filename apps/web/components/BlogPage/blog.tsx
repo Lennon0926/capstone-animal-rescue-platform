@@ -644,8 +644,11 @@ function EditPostModal({
   const [body, setBody] = useState(post.body);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [removeImage, setRemoveImage] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const hasCurrentImage = post.imageUrls[0] && !removeImage;
 
   useEffect(() => {
     if (!selectedFile) { setPreviewUrl(null); return; }
@@ -653,6 +656,16 @@ function EditPostModal({
     setPreviewUrl(url);
     return () => URL.revokeObjectURL(url);
   }, [selectedFile]);
+
+  const handleRemoveImage = () => {
+    setRemoveImage(true);
+    setSelectedFile(null);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedFile(e.target.files?.[0] ?? null);
+    setRemoveImage(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -665,6 +678,8 @@ function EditPostModal({
       if (selectedFile) {
         const uploadResult = await uploadPostImage(post.pid!, selectedFile);
         extra = { image_object_key: uploadResult.objectKey };
+      } else if (removeImage) {
+        extra = { remove_image: true };
       }
       const updated = await updatePost(post.pid!, { header: header.trim(), body: body.trim(), ...extra });
       onSave(normalizeLocalPost(updated));
@@ -702,15 +717,25 @@ function EditPostModal({
             disabled={loading}
           />
           <div className={styles.createPostImageRow}>
-            {post.imageUrls[0] && !previewUrl && (
-              <div style={{ position: "relative", width: 60, height: 60, flexShrink: 0 }}>
-                <Image src={post.imageUrls[0]} alt="Imagen actual" fill style={{ objectFit: "cover", borderRadius: 6 }} />
-              </div>
+            {hasCurrentImage && (
+              <>
+                <div style={{ position: "relative", width: 60, height: 60, flexShrink: 0 }}>
+                  <Image src={post.imageUrls[0]} alt="Imagen actual" fill sizes="60px" style={{ objectFit: "cover", borderRadius: 6 }} />
+                </div>
+                <button type="button" className={styles.removeImageBtn} onClick={handleRemoveImage} disabled={loading}>
+                  <Trash2 size={13} /> Quitar imagen
+                </button>
+              </>
             )}
-            <label className={styles.createPostFileLabel}>
-              {selectedFile ? selectedFile.name : post.imageUrls[0] ? "Cambiar imagen (opcional)" : "Agregar imagen (opcional)"}
-              <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => setSelectedFile(e.target.files?.[0] ?? null)} disabled={loading} hidden />
-            </label>
+            {removeImage && !selectedFile && (
+              <span className={styles.removeImageNote}>Imagen será eliminada al guardar</span>
+            )}
+            {!removeImage && (
+              <label className={styles.createPostFileLabel}>
+                {selectedFile ? selectedFile.name : hasCurrentImage ? "Cambiar imagen" : "Agregar imagen (opcional)"}
+                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleFileChange} disabled={loading} hidden />
+              </label>
+            )}
             {previewUrl && (
               <div style={{ position: "relative", width: 60, height: 60, flexShrink: 0 }}>
                 <Image src={previewUrl} alt="Vista previa" fill style={{ objectFit: "cover", borderRadius: 6 }} />

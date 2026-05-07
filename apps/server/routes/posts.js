@@ -83,7 +83,11 @@ router.patch(
   validatePostId,
   validateUpdatePost,
   asyncHandler(async (req, res) => {
-    const result = await updatePostById(req.params.pid, req.validatedBody);
+    const updates = { ...req.validatedBody };
+    if (req.body.remove_image === true && !updates.image_object_key) {
+      updates.remove_image = true;
+    }
+    const result = await updatePostById(req.params.pid, updates);
 
     if (result.error === "Post not found") {
       throw new ApiError(404, `Post with ID ${req.params.pid} not found`);

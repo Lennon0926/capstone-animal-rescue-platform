@@ -1,5 +1,5 @@
 const { getSupabaseClient } = require("../lib/supabase");
-const { getPublicObjectUrl, normalizeObjectKey } = require("../services/r2Service");
+const { getPublicObjectUrl, normalizeObjectKey, deleteObject } = require("../services/r2Service");
 
 const _postsCache = new Map();
 const POSTS_TTL_MS = 10_000;
@@ -142,16 +142,35 @@ async function createPost(payload) {
 async function updatePostById(pid, updates) {
   try {
     const client = getSupabaseClient();
-    const { is_pinned, ...rest } = updates;
+    const { is_pinned, remove_image, ...rest } = updates;
 
     if (is_pinned === true) {
       await client.from("posts").update({ is_pinned: false }).eq("is_pinned", true).neq("pid", pid);
     }
 
-    const updateData = normalizePostImageFields({
+    if (remove_image) {
+      // Fetch current key before nulling so we can delete from R2
+      const { data: current } = await client
+        .from("posts")
+        .select("image_object_key")
+        .eq("pid", pid)
+        .single();
+      const existingKey = normalizeObjectKey(current?.image_object_key);
+      if (existingKey) {
+        deleteObject(existingKey).catch((err) =>
+          console.error(`[r2] Failed to delete post image ${existingKey}:`, err)
+        );
+      }
+    }
+
+    const baseFields = {
       ...rest,
       ...(is_pinned !== undefined ? { is_pinned: Boolean(is_pinned) } : {}),
-    });
+    };
+
+    const updateData = remove_image
+      ? { ...normalizePostImageFields(baseFields), image_object_key: null, image_url: null }
+      : normalizePostImageFields(baseFields);
 
     const { data, error } = await client
       .from("posts")
@@ -189,6 +208,13 @@ async function deletePost(pid) {
         return { data: null, error: "Post not found" };
       }
       return { data: null, error: error.message };
+    }
+
+    const deletedKey = normalizeObjectKey(data?.image_object_key);
+    if (deletedKey) {
+      deleteObject(deletedKey).catch((err) =>
+        console.error(`[r2] Failed to delete post image ${deletedKey}:`, err)
+      );
     }
 
     clearPostsCache();

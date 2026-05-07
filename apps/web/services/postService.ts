@@ -72,7 +72,7 @@ export async function createPost(
 
 export async function updatePost(
   pid: number,
-  payload: Partial<{ header: string; body: string; is_pinned: boolean; image_object_key: string }>
+  payload: Partial<{ header: string; body: string; is_pinned: boolean; image_object_key: string; remove_image: boolean }>
 ): Promise<Post> {
   const response = await fetch(`${getApiBaseUrl()}/api/posts/${pid}`, {
     method: "PATCH",

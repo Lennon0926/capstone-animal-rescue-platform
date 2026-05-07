@@ -589,6 +589,10 @@ function validateUpdatePost(req, res, next) {
       updates.image_object_key = key;
     }
 
+    if (req.body.remove_image === true) {
+      updates.remove_image = true;
+    }
+
     if (Object.keys(updates).length === 0) {
       throw new ApiError(400, "No valid fields provided for update.");
     }

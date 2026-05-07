@@ -414,6 +414,17 @@ async function uploadPostImage(postId, buffer, originalname, mimetype) {
 
 const POST_ID_PATTERN = /^[a-zA-Z0-9_-]{1,64}$/;
 
+async function deleteObject(objectKey) {
+  if (!isR2Configured) {
+    throw new Error("R2 is not configured");
+  }
+  const normalized = normalizeObjectKey(objectKey);
+  if (!normalized) return; // nothing to delete
+  await r2Client.send(
+    new DeleteObjectCommand({ Bucket: r2Config.bucketName, Key: normalized })
+  );
+}
+
 module.exports = {
   ALLOWED_MIME_TYPES,
   MIME_TYPE_EXTENSION_MAP,
@@ -432,4 +443,5 @@ module.exports = {
   isR2DependencyError,
   uploadAnimalImage,
   uploadPostImage,
+  deleteObject,
 };
