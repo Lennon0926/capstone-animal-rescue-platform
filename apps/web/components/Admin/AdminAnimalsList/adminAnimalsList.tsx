@@ -70,6 +70,7 @@ export default function AdminAnimalsList({
   initialAnimals,
 }: AdminAnimalsListProps) {
   const [animals, setAnimals] = useState(initialAnimals);
+  const [isExporting, setIsExporting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortConfig, setSortConfig] = useState<{
     key: keyof Animal;
@@ -195,6 +196,27 @@ export default function AdminAnimalsList({
     }
   };
 
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      const headers = await getAuthenticatedHeaders();
+      const res = await fetch("/api/export/animals", { headers });
+      if (!res.ok) throw new Error(`Export failed: ${res.status}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "animales.xlsx";
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Export failed:", err);
+      setError("No se pudo exportar. Intenta de nuevo.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const getStatusStyle = (status: string) => {
     switch (status.toLowerCase()) {
       case "disponible":
@@ -254,10 +276,20 @@ export default function AdminAnimalsList({
               {searchQuery && ` • Filtrados: ${sortedAnimals.length}`}
             </p>
           </div>
-          <div className={styles.actions}>
-            <Link href="/admin/createAnimal" className={styles.createButton}>
-              + Crear Nuevo Animal
-            </Link>
+          <div className={styles.actionGroup}>
+            <button
+              onClick={() => void handleExport()}
+              className={styles.exportButtons}
+              disabled={isExporting}
+              title="Exportar a Excel"
+            >
+              {isExporting ? "Exportando..." : "Exportar a Excel"}
+            </button>
+            <div className={styles.actions}>
+              <Link href="/admin/createAnimal" className={styles.createButton}>
+                + Crear Nuevo Animal
+              </Link>
+            </div>
           </div>
         </div>
 

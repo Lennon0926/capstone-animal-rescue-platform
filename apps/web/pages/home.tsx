@@ -7,6 +7,7 @@ import TimelineSection from "@/components/LandingPage/Timeline/timelineSection";
 import StoriesSection from "@/components/LandingPage/Stories/storiesSection";
 import GetInvolvedSection from "@/components/LandingPage/GetInvolved/getInvolvedSection";
 import AnimalsSection from "@/components/LandingPage/Animals/animalsSection";
+import DonationBanner from "@/components/LandingPage/Donate/donationBanner";
 import ContactSection from "@/components/LandingPage/Contact/contactSection";
 import FooterSection from "@/components/Footer/footerSection";
 import type { Animal } from "@/types/animal";
@@ -36,6 +37,7 @@ function Home({ animals, fetchError }: HomeProps) {
       <StoriesSection />
       <GetInvolvedSection />
       <AnimalsSection animals={animals} fetchError={fetchError} />
+      <DonationBanner />
       <ContactSection />
       <FooterSection />
     </div>

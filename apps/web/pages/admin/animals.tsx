@@ -36,39 +36,22 @@ export default function AdminAnimalsPage({ animals }: AdminAnimalsPageProps) {
 export const getServerSideProps: GetServerSideProps = async () => {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals?limit=100`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals?limit=1000`,
     );
 
     if (!res.ok) {
-      return {
-        props: {
-          animals: [],
-        },
-      };
+      return { props: { animals: [], fetchError: true } };
     }
 
     const result: ApiResponse = await res.json();
 
-    if (!result.success || !result.data) {
-      return {
-        props: {
-          animals: [],
-        },
-      };
-    }
-
     return {
       props: {
-        animals: result.data,
+        animals: result.success && result.data ? result.data : [],
       },
     };
   } catch (err) {
     console.error("[admin/animals] getServerSideProps failed:", err);
-    return {
-      props: {
-        animals: [],
-        fetchError: true,
-      },
-    };
+    return { props: { animals: [], fetchError: true } };
   }
 };
