@@ -10,7 +10,7 @@ async function resetPosts(request: import("@playwright/test").APIRequestContext)
 /** Intercept Next.js /api/facebook-posts and return empty so FB panel doesn't interfere. */
 async function mockFbPosts(page: import("@playwright/test").Page) {
   await page.route("**/api/facebook-posts**", (route) =>
-    route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ posts: [] }) })
+    route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify([]) })
   );
 }
 
