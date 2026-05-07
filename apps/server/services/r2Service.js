@@ -25,7 +25,7 @@ const MIME_TYPE_EXTENSION_MAP = {
 
 const ANIMAL_ID_PATTERN = /^[a-zA-Z0-9_-]{1,64}$/;
 
-const DEFAULT_MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
+const DEFAULT_MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024;
 const DEFAULT_HEALTHCHECK_CACHE_TTL_MS = 30 * 1000;
 
 function parsePositiveInteger(rawValue, fallback) {

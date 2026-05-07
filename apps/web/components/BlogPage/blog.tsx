@@ -939,19 +939,6 @@ export default function Blog() {
 
   return (
     <div className={styles.page}>
-      {/* ── Admin bar ─────────────────────────────────────────────── */}
-      <div className={styles.adminBar}>
-        {isAdmin ? (
-          <button className={styles.adminBarLogout} onClick={handleLogout}>
-            <LogOut size={14} /> Cerrar sesión
-          </button>
-        ) : (
-          <button className={styles.adminBarLogin} onClick={() => setShowLoginModal(true)}>
-            <LogIn size={14} /> Admin
-          </button>
-        )}
-      </div>
-
       {showLoginModal && (
         <LoginModal
           onClose={() => setShowLoginModal(false)}
@@ -988,6 +975,16 @@ export default function Blog() {
                 <span className={styles.mastheadMetaDot} />
                 <span>{allPosts.length} publicaciones</span>
               </>
+            )}
+            <span className={styles.mastheadMetaDot} />
+            {isAdmin ? (
+              <button className={styles.adminBarLogout} onClick={handleLogout}>
+                <LogOut size={14} /> Cerrar sesión
+              </button>
+            ) : (
+              <button className={styles.adminBarLogin} onClick={() => setShowLoginModal(true)}>
+                <LogIn size={14} /> Admin
+              </button>
             )}
           </div>
         </div>
