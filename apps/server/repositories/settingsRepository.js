@@ -4,7 +4,10 @@ const client = getSupabaseClient();
 
 async function getSetting(key) {
   const { data, error } = await client.from("settings").select("value").eq("key", key).single();
-  if (error) throw error;
+  if (error) {
+    if (error.code === "PGRST116") return null; // row not found — not an error condition
+    throw error;
+  }
   return data?.value ?? null;
 }
 

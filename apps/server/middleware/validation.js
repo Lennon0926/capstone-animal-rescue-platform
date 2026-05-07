@@ -542,7 +542,10 @@ function validateCreatePost(req, res, next) {
     const validated = { header, body };
 
     if (req.body.is_pinned !== undefined) {
-      validated.is_pinned = Boolean(req.body.is_pinned);
+      if (typeof req.body.is_pinned !== "boolean") {
+        throw new ApiError(400, "is_pinned must be a boolean.");
+      }
+      validated.is_pinned = req.body.is_pinned;
     }
 
     if (req.body.image_object_key !== undefined) {
@@ -576,7 +579,10 @@ function validateUpdatePost(req, res, next) {
     }
 
     if (req.body.is_pinned !== undefined) {
-      updates.is_pinned = Boolean(req.body.is_pinned);
+      if (typeof req.body.is_pinned !== "boolean") {
+        throw new ApiError(400, "is_pinned must be a boolean.");
+      }
+      updates.is_pinned = req.body.is_pinned;
     }
 
     if (req.body.image_url !== undefined) {

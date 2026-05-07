@@ -918,7 +918,10 @@ export default function Blog() {
   };
 
   const handlePinToggle = async (postId: string, nowPinned: boolean): Promise<void> => {
-    // Optimistic update — UI reflects change immediately
+    // Snapshot before optimistic update so we can rollback and read stale-free
+    const prevPosts = allPosts;
+    const pinnedLocalPre = prevPosts.find((p) => p.source === "local" && p.isPinned);
+
     setAllPosts((prev) =>
       prev.map((p) => {
         if (p.id === postId) return { ...p, isPinned: nowPinned };
@@ -927,19 +930,22 @@ export default function Blog() {
       })
     );
 
-    if (postId.startsWith("local-")) {
-      const pid = Number(postId.replace("local-", ""));
-      await updatePost(pid, { is_pinned: nowPinned });
-      if (nowPinned) setPinnedFbPostId(null).catch(() => {});
-    } else {
-      const fbId = postId.replace("fb-", "");
-      if (nowPinned) {
-        const pinnedLocal = allPosts.find((p) => p.source === "local" && p.isPinned);
-        if (pinnedLocal?.pid) updatePost(pinnedLocal.pid, { is_pinned: false }).catch(() => {});
-        await setPinnedFbPostId(fbId);
+    try {
+      if (postId.startsWith("local-")) {
+        const pid = Number(postId.replace("local-", ""));
+        await updatePost(pid, { is_pinned: nowPinned });
+        if (nowPinned) setPinnedFbPostId(null).catch(() => {});
       } else {
-        await setPinnedFbPostId(null);
+        const fbId = postId.replace("fb-", "");
+        if (nowPinned) {
+          if (pinnedLocalPre?.pid) updatePost(pinnedLocalPre.pid, { is_pinned: false }).catch(() => {});
+          await setPinnedFbPostId(fbId);
+        } else {
+          await setPinnedFbPostId(null);
+        }
       }
+    } catch {
+      setAllPosts(prevPosts); // rollback on failure
     }
   };
 
@@ -988,7 +994,7 @@ export default function Blog() {
       {/* ── Masthead ───────────────────────────────────────────────── */}
       <section className={styles.masthead}>
         <div className={styles.mastheadInner}>
-          <div className={styles.mastheadEyebrow}>Nuestras publicaciones</div>
+          <h1 className={styles.mastheadEyebrow}>Nuestras Publicaciones</h1>
           <div className={styles.mastheadMeta}>
             <strong>{AUTHOR_NAME}</strong>
             <span className={styles.mastheadMetaDot} />

@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import type { Post } from "@/types/post";
-import { getAuthenticatedHeaders } from "@/lib/apiAuth";
+import { deletePost as deletePostService } from "@/services/postService";
 import styles from "../AdminAnimalsList/adminAnimalsList.module.css";
 import { ChevronDown, Search, Pin } from "lucide-react";
 
@@ -117,14 +117,7 @@ export default function AdminPostsList({ initialPosts }: AdminPostsListProps) {
     setIsDeleting(true);
     setError("");
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/posts/${postToDelete.pid}`,
-        { method: "DELETE", headers: await getAuthenticatedHeaders() }
-      );
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error?.message || "Error al eliminar la publicación.");
-      }
+      await deletePostService(postToDelete.pid);
       setPosts((prev) => prev.filter((p) => p.pid !== postToDelete.pid));
       setDeleteModalOpen(false);
       setPostToDelete(null);

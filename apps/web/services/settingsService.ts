@@ -1,6 +1,10 @@
 import { getAuthenticatedHeaders } from "@/lib/apiAuth";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+function getApiBaseUrl(): string {
+  const url = process.env.NEXT_PUBLIC_API_BASE_URL;
+  if (!url) throw new Error("NEXT_PUBLIC_API_BASE_URL is not defined.");
+  return url;
+}
 
 export async function fetchPinnedFbPostId(): Promise<string | null> {
   const res = await fetch("/api/settings/pinned-fb-post");
@@ -11,13 +15,17 @@ export async function fetchPinnedFbPostId(): Promise<string | null> {
 
 export async function setPinnedFbPostId(postId: string | null): Promise<void> {
   const headers = await getAuthenticatedHeaders({ "Content-Type": "application/json" });
-  const res = await fetch(`${API_BASE_URL}/api/settings/pinned-fb-post`, {
+  const res = await fetch(`${getApiBaseUrl()}/api/settings/pinned-fb-post`, {
     method: "PUT",
     headers,
     body: JSON.stringify({ postId }),
   });
   if (!res.ok) {
-    const data = await res.json().catch(() => ({}));
-    throw new Error((data as { error?: string }).error ?? "Failed to update pinned FB post");
+    const data: { error?: string | { message?: string } } = await res.json().catch(() => ({}));
+    const msg =
+      typeof data.error === "string"
+        ? data.error
+        : data.error?.message ?? "Failed to update pinned FB post";
+    throw new Error(msg);
   }
 }

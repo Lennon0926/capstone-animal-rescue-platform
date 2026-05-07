@@ -69,6 +69,12 @@ export async function compressIfNeeded(file: File, maxBytes: number): Promise<Fi
       best = await canvasToBlob(canvas, 0.1);
     }
 
+    if (best.size > maxBytes) {
+      throw new Error(
+        `La imagen no pudo comprimirse por debajo del límite de ${Math.round(maxBytes / 1024 / 1024)} MB. Usa una imagen más pequeña.`
+      );
+    }
+
     const ext = file.name.replace(/\.[^.]+$/, "");
     return new File([best], `${ext}.jpg`, { type: "image/jpeg" });
   } finally {
