@@ -280,6 +280,7 @@
 /* pin button — admin only prototype */
 .pinBtn {
   margin-left: auto;
+  margin-right: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -305,6 +306,84 @@
   background: rgba(231, 111, 81, 0.18);
   color: var(--color-accent-hover);
 }
+
+/* edit / delete buttons */
+.editBtn,
+.deleteBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
+}
+.editBtn {
+  color: var(--color-text-soft);
+  margin-left: 2px;
+}
+.editBtn:hover {
+  background: var(--color-border);
+  color: var(--color-primary);
+}
+.deleteBtn {
+  color: var(--color-text-soft);
+  margin-left: 2px;
+}
+.deleteBtn:hover {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+}
+
+/* edit post modal */
+.editPostModal {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  padding: 28px;
+  width: 100%;
+  max-width: 560px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+}
+
+/* delete confirm modal */
+.deleteModal {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  padding: 28px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+}
+.deleteModalText {
+  font-size: 15px;
+  color: var(--color-text);
+  margin: 12px 0 8px;
+  line-height: 1.5;
+}
+.deleteModalPostTitle {
+  font-size: 14px;
+  color: var(--color-text-soft);
+  font-style: italic;
+  margin-bottom: 16px;
+}
+.deleteConfirmBtn {
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  background: #dc2626;
+  color: #fff;
+  font-weight: 500;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s ease;
+}
+.deleteConfirmBtn:hover:not(:disabled) { background: #b91c1c; }
+.deleteConfirmBtn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .postTitle {
   font-family: var(--serif);

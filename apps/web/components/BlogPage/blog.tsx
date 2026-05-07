@@ -19,13 +19,15 @@ import {
   X,
   Eye,
   EyeOff,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import type { FacebookPost, FacebookComment } from "@/pages/api/facebook-posts";
 import type { Post } from "@/types/post";
 import { supabase } from "@/lib/supabase";
 import { getAuthenticatedHeaders } from "@/lib/apiAuth";
 import { fetchUploadConfig, isUploadStorageAvailable } from "@/services/animalImageUploadService";
-import { createPost, uploadPostImage, updatePost } from "@/services/postService";
+import { createPost, uploadPostImage, updatePost, deletePost } from "@/services/postService";
 import { fetchPinnedFbPostId, setPinnedFbPostId } from "@/services/settingsService";
 import styles from "./blog.module.css";
 
@@ -209,10 +211,14 @@ function PostCard({
   post,
   isAdmin,
   onPinToggle,
+  onEdit,
+  onDelete,
 }: {
   post: BlogFeedPost;
   isAdmin: boolean;
   onPinToggle?: (postId: string, pin: boolean) => Promise<void>;
+  onEdit?: (post: BlogFeedPost) => void;
+  onDelete?: (post: BlogFeedPost) => void;
 }) {
   const [showComments, setShowComments] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -241,14 +247,26 @@ function PostCard({
         <span className={styles.postDate}>{formatDate(post.createdAt)}</span>
         <SourceBadge post={post} />
         {isAdmin && (
-          <button
-            className={`${styles.pinBtn} ${post.isPinned ? styles.pinBtnActive : ""}`}
-            onClick={handlePin}
-            disabled={pinning}
-            title={post.isPinned ? "Quitar destacado" : "Destacar publicación"}
-          >
-            {post.isPinned ? <PinOff size={14} /> : <Pin size={14} />}
-          </button>
+          <>
+            <button
+              className={`${styles.pinBtn} ${post.isPinned ? styles.pinBtnActive : ""}`}
+              onClick={handlePin}
+              disabled={pinning}
+              title={post.isPinned ? "Quitar destacado" : "Destacar publicación"}
+            >
+              {post.isPinned ? <PinOff size={14} /> : <Pin size={14} />}
+            </button>
+            {post.source === "local" && (
+              <>
+                <button className={styles.editBtn} onClick={() => onEdit?.(post)} title="Editar publicación">
+                  <Pencil size={14} />
+                </button>
+                <button className={styles.deleteBtn} onClick={() => onDelete?.(post)} title="Eliminar publicación">
+                  <Trash2 size={14} />
+                </button>
+              </>
+            )}
+          </>
         )}
       </div>
 
@@ -302,10 +320,14 @@ function FeaturedPost({
   post,
   isAdmin,
   onPinToggle,
+  onEdit,
+  onDelete,
 }: {
   post: BlogFeedPost;
   isAdmin: boolean;
   onPinToggle?: (postId: string, pin: boolean) => Promise<void>;
+  onEdit?: (post: BlogFeedPost) => void;
+  onDelete?: (post: BlogFeedPost) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [pinning, setPinning] = useState(false);
@@ -332,14 +354,26 @@ function FeaturedPost({
         Publicación destacada
         <SourceBadge post={post} />
         {isAdmin && (
-          <button
-            className={`${styles.pinBtn} ${post.isPinned ? styles.pinBtnActive : ""}`}
-            onClick={handlePin}
-            disabled={pinning}
-            title={post.isPinned ? "Quitar destacado" : "Destacar"}
-          >
-            {post.isPinned ? <PinOff size={14} /> : <Pin size={14} />}
-          </button>
+          <>
+            <button
+              className={`${styles.pinBtn} ${post.isPinned ? styles.pinBtnActive : ""}`}
+              onClick={handlePin}
+              disabled={pinning}
+              title={post.isPinned ? "Quitar destacado" : "Destacar"}
+            >
+              {post.isPinned ? <PinOff size={14} /> : <Pin size={14} />}
+            </button>
+            {post.source === "local" && (
+              <>
+                <button className={styles.editBtn} onClick={() => onEdit?.(post)} title="Editar publicación">
+                  <Pencil size={14} />
+                </button>
+                <button className={styles.deleteBtn} onClick={() => onDelete?.(post)} title="Eliminar publicación">
+                  <Trash2 size={14} />
+                </button>
+              </>
+            )}
+          </>
         )}
       </div>
       <div className={post.imageUrls[0] ? styles.featuredGrid : undefined}>
@@ -595,6 +629,154 @@ function CreatePostForm({ onCreated }: { onCreated: (post: BlogFeedPost) => void
 
 // ── Skeleton Card ─────────────────────────────────────────────────────────────
 
+// ── Edit Post Modal ───────────────────────────────────────────────────────────
+
+function EditPostModal({
+  post,
+  onSave,
+  onClose,
+}: {
+  post: BlogFeedPost;
+  onSave: (updated: BlogFeedPost) => void;
+  onClose: () => void;
+}) {
+  const [header, setHeader] = useState(post.header);
+  const [body, setBody] = useState(post.body);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!selectedFile) { setPreviewUrl(null); return; }
+    const url = URL.createObjectURL(selectedFile);
+    setPreviewUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [selectedFile]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    if (!header.trim()) { setError("El título es requerido."); return; }
+    if (!body.trim()) { setError("El contenido es requerido."); return; }
+    setLoading(true);
+    try {
+      let extra: Record<string, unknown> = {};
+      if (selectedFile) {
+        const uploadResult = await uploadPostImage(post.pid!, selectedFile);
+        extra = { image_object_key: uploadResult.objectKey };
+      }
+      const updated = await updatePost(post.pid!, { header: header.trim(), body: body.trim(), ...extra });
+      onSave(normalizeLocalPost(updated));
+      onClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al actualizar la publicación.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.editPostModal} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.loginModalHeader}>
+          <h2 className={styles.loginModalTitle}>Editar publicación</h2>
+          <button className={styles.loginModalClose} onClick={onClose} aria-label="Cerrar"><X size={18} /></button>
+        </div>
+        {error && <p className={styles.createPostError}>{error}</p>}
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            value={header}
+            maxLength={160}
+            onChange={(e) => setHeader(e.target.value)}
+            className={styles.createPostInput}
+            disabled={loading}
+          />
+          <textarea
+            value={body}
+            maxLength={5000}
+            onChange={(e) => setBody(e.target.value)}
+            rows={6}
+            className={styles.createPostTextarea}
+            disabled={loading}
+          />
+          <div className={styles.createPostImageRow}>
+            {post.imageUrls[0] && !previewUrl && (
+              <div style={{ position: "relative", width: 60, height: 60, flexShrink: 0 }}>
+                <Image src={post.imageUrls[0]} alt="Imagen actual" fill style={{ objectFit: "cover", borderRadius: 6 }} />
+              </div>
+            )}
+            <label className={styles.createPostFileLabel}>
+              {selectedFile ? selectedFile.name : post.imageUrls[0] ? "Cambiar imagen (opcional)" : "Agregar imagen (opcional)"}
+              <input type="file" accept="image/jpeg,image/png,image/webp" onChange={(e) => setSelectedFile(e.target.files?.[0] ?? null)} disabled={loading} hidden />
+            </label>
+            {previewUrl && (
+              <div style={{ position: "relative", width: 60, height: 60, flexShrink: 0 }}>
+                <Image src={previewUrl} alt="Vista previa" fill style={{ objectFit: "cover", borderRadius: 6 }} />
+              </div>
+            )}
+          </div>
+          <div className={styles.createPostActions}>
+            <button type="button" className={styles.createPostCancel} onClick={onClose} disabled={loading}>Cancelar</button>
+            <button type="submit" className={styles.createPostSubmit} disabled={loading}>{loading ? "Guardando..." : "Guardar"}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ── Delete Confirm Modal ──────────────────────────────────────────────────────
+
+function DeleteConfirmModal({
+  post,
+  onConfirm,
+  onClose,
+}: {
+  post: BlogFeedPost;
+  onConfirm: () => void;
+  onClose: () => void;
+}) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleDelete = async () => {
+    setLoading(true);
+    try {
+      await deletePost(post.pid!);
+      onConfirm();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al eliminar la publicación.");
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className={styles.modalOverlay} onClick={onClose}>
+      <div className={styles.deleteModal} onClick={(e) => e.stopPropagation()}>
+        <div className={styles.loginModalHeader}>
+          <h2 className={styles.loginModalTitle}>Eliminar publicación</h2>
+          <button className={styles.loginModalClose} onClick={onClose} aria-label="Cerrar"><X size={18} /></button>
+        </div>
+        <p className={styles.deleteModalText}>
+          ¿Estás seguro que deseas eliminar esta publicación? Esta acción no se puede deshacer.
+        </p>
+        {post.header && <p className={styles.deleteModalPostTitle}>"{post.header}"</p>}
+        {error && <p className={styles.createPostError}>{error}</p>}
+        <div className={styles.createPostActions}>
+          <button className={styles.createPostCancel} onClick={onClose} disabled={loading}>Cancelar</button>
+          <button className={styles.deleteConfirmBtn} onClick={handleDelete} disabled={loading}>
+            {loading ? "Eliminando..." : "Eliminar"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Skeleton Card ─────────────────────────────────────────────────────────────
+
 function SkeletonCard() {
   return (
     <div className={styles.skeleton}>
@@ -632,6 +814,8 @@ export default function Blog() {
   const [localError, setLocalError] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [editingPost, setEditingPost] = useState<BlogFeedPost | null>(null);
+  const [deletingPost, setDeletingPost] = useState<BlogFeedPost | null>(null);
   const feedRef = useScrollReveal(`${allPosts.length}:${allPosts.find((p) => p.isPinned)?.id ?? ""}`);
 
   // Track auth state
@@ -736,6 +920,17 @@ export default function Blog() {
     }
   };
 
+  const handleEditSave = (updated: BlogFeedPost) => {
+    setAllPosts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
+    setEditingPost(null);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!deletingPost) return;
+    setAllPosts((prev) => prev.filter((p) => p.id !== deletingPost.id));
+    setDeletingPost(null);
+  };
+
   const pinned = allPosts.find((p) => p.isPinned);
   const featured = pinned ?? null;
   const feedPosts = featured ? allPosts.filter((p) => p.id !== featured.id) : allPosts;
@@ -761,6 +956,22 @@ export default function Blog() {
         <LoginModal
           onClose={() => setShowLoginModal(false)}
           onSuccess={() => setShowLoginModal(false)}
+        />
+      )}
+
+      {editingPost && (
+        <EditPostModal
+          post={editingPost}
+          onSave={handleEditSave}
+          onClose={() => setEditingPost(null)}
+        />
+      )}
+
+      {deletingPost && (
+        <DeleteConfirmModal
+          post={deletingPost}
+          onConfirm={handleDeleteConfirm}
+          onClose={() => setDeletingPost(null)}
         />
       )}
 
@@ -821,7 +1032,15 @@ export default function Blog() {
 
         {!loading && !bothFailed && hasPosts && (
           <>
-            {featured && <FeaturedPost post={featured} isAdmin={isAdmin} onPinToggle={handlePinToggle} />}
+            {featured && (
+              <FeaturedPost
+                post={featured}
+                isAdmin={isAdmin}
+                onPinToggle={handlePinToggle}
+                onEdit={setEditingPost}
+                onDelete={setDeletingPost}
+              />
+            )}
             <div className={styles.feedList}>
               {feedPosts.map((post, i) => (
                 <div
@@ -829,7 +1048,13 @@ export default function Blog() {
                   className={`${styles.feedItem} ${styles.fadeInUp}`}
                   style={{ transitionDelay: `${Math.min(i * 60, 300)}ms` }}
                 >
-                  <PostCard post={post} isAdmin={isAdmin} onPinToggle={handlePinToggle} />
+                  <PostCard
+                    post={post}
+                    isAdmin={isAdmin}
+                    onPinToggle={handlePinToggle}
+                    onEdit={setEditingPost}
+                    onDelete={setDeletingPost}
+                  />
                 </div>
               ))}
             </div>
