@@ -1,6 +1,7 @@
 import styles from "./footerSection.module.css";
 import { Mail, Phone, MapPin } from "lucide-react";
 import Link from "next/link";
+import DonationModalTrigger from "../DonationPage/DonationModalTrigger";
 
 export default function Footer() {
   return (
@@ -28,7 +29,11 @@ export default function Footer() {
         <div className={styles.column}>
           <h4 className={styles.heading}>Apoyo</h4>
           <ul>
-            <li><Link href="/donation">Donar</Link></li>
+            <li>
+              <DonationModalTrigger className={styles.footerDonateButton}>
+                Donar
+              </DonationModalTrigger>
+            </li>
             {/* <li><Link href="/volunteer">Ser Voluntario</Link></li>
             <li><Link href="/foster">Programa de Hogar Temporal</Link></li> */}
           </ul>

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
-import Link from "next/link";
+import DonationModalTrigger from "../DonationPage/DonationModalTrigger";
 import {
   Heart,
   Target,
@@ -396,10 +396,10 @@ export default function AboutPage() {
             con tus ideas, comentarios y donativos. Juntos podemos ayudar a más
             animales.
           </p>
-          <Link href="/donation" className={styles.ctaButton}>
+          <DonationModalTrigger className={styles.ctaButton}>
             Ayúdanos a Ayudar
             <ArrowRight size={20} />
-          </Link>
+          </DonationModalTrigger>
         </div>
       </section>
     </div>

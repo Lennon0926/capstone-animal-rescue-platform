@@ -1,0 +1,155 @@
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(3px);
+}
+
+.modalCard {
+  width: min(100%, 760px);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-8);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.modalTitle {
+  font-size: var(--text-3xl);
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.modalClose {
+  width: var(--space-12);
+  height: var(--space-12);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  font-size: var(--text-2xl);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.paymentTabs {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.paymentTab {
+  padding: var(--space-5) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: var(--text-lg);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.paymentTabActive {
+  color: var(--color-text-inverse);
+}
+
+.paymentTabAthActive {
+  background: var(--color-ath-movil);
+  border-color: var(--color-ath-movil);
+}
+
+.paymentTabPaypalActive {
+  background: var(--color-paypal);
+  border-color: var(--color-paypal);
+}
+
+.modalBody {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-surface) 60%, var(--color-bg));
+  padding: var(--space-8);
+}
+
+.paymentPanel {
+  text-align: center;
+}
+
+.panelTitle {
+  font-size: var(--text-2xl);
+  color: var(--color-text);
+  margin-bottom: var(--space-6);
+}
+
+.qrBox {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-6);
+}
+
+.qrImage {
+  width: min(100%, 220px);
+  height: auto;
+  border: 1px solid var(--color-border);
+  padding: var(--space-2);
+  background: var(--color-ath-movil);
+}
+
+.panelText {
+  max-width: 560px;
+  margin: 0 auto;
+  font-size: var(--text-lg);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.panelAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: var(--space-6);
+  min-width: 240px;
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  transition: background var(--transition-fast);
+}
+
+.panelActionPaypal {
+  background: var(--color-paypal);
+}
+
+.panelAction:hover {
+  color: var(--color-text-inverse);
+}
+
+@media (max-width: 700px) {
+  .modalCard {
+    padding: var(--space-6);
+  }
+
+  .paymentTabs {
+    grid-template-columns: 1fr;
+  }
+
+  .modalBody {
+    padding: var(--space-6);
+  }
+}

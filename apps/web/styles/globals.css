@@ -195,6 +195,11 @@
 
   --sidebar-ring: oklch(0.708 0 0);
 
+  /* ================= BRAND PARTNERS ================= */
+
+  --color-ath-movil: rgb(242, 129, 36);
+  --color-paypal: rgb(26, 159, 222);
+
   /* ================= VIDEO OVERLAYS ================= */
 
   --overlay-dark: rgba(0, 0, 0, 0.50);
