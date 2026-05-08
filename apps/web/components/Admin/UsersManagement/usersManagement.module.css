@@ -70,13 +70,14 @@
   vertical-align: middle;
 }
 
-.actionsHeader {
+.table th.actionsHeader {
   width: 10px;
+  text-align: center;
 }
 
 .actionButtons {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   gap: var(--space-2);
 }
 
