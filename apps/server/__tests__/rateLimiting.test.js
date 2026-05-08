@@ -6,7 +6,7 @@ jest.mock("../lib/supabase", () => ({
 jest.mock("../services/r2Service", () => ({
   ALLOWED_MIME_TYPES: new Set(["image/jpeg"]),
   ANIMAL_ID_PATTERN: /^[a-zA-Z0-9_-]{1,64}$/,
-  maxImageSizeBytes: 5242880,
+  maxImageSizeBytes: 10485760,
   isR2Configured: false,
   missingR2EnvVars: ["R2_BUCKET"],
   isPublicObjectUrlConfigured: false,

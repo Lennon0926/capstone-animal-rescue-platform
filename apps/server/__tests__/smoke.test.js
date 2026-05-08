@@ -24,9 +24,15 @@ function buildChainableMock(resolvedValue) {
 
 const mockFrom = jest.fn();
 const mockVerifyConnection = jest.fn();
+const mockAuthGetUser = jest.fn();
 
 jest.mock("../lib/supabase", () => ({
-  getSupabaseClient: () => ({ from: mockFrom }),
+  getSupabaseClient: () => ({
+    from: mockFrom,
+    auth: {
+      getUser: mockAuthGetUser,
+    },
+  }),
   verifyConnection: (...args) => mockVerifyConnection(...args),
 }));
 
@@ -42,10 +48,16 @@ afterAll(() => {
 beforeEach(() => {
   jest.clearAllMocks();
   mockVerifyConnection.mockResolvedValue({ connected: true });
+  mockAuthGetUser.mockResolvedValue({
+    data: { user: { id: "test-user-id" } },
+    error: null,
+  });
   require("../repositories/animalsRepository").clearAnimalsCache();
 });
 
 const getApp = () => require("../server");
+const asAuthenticated = (req) =>
+  req.set("Authorization", "Bearer test-auth-token");
 
 describe("GET /api/health", () => {
   it("returns 200 with healthy status when database is connected", async () => {
@@ -102,14 +114,24 @@ describe("Smoke: core animal flow", () => {
   it("animal image upload rejects invalid input and accepts valid input shape", async () => {
     const app = getApp();
 
-    const noFile = await request(app).post(
-      "/api/uploads/animals/smoke-test-1/image"
+    const noAuth = await request(app)
+      .post("/api/uploads/animals/smoke-test-1/image")
+      .attach("image", Buffer.from("fake-image-bytes"), {
+        filename: "test.jpg",
+        contentType: "image/jpeg",
+      });
+    expect(noAuth.status).toBe(401);
+    expect(noAuth.body.error.message).toMatch(/authentication required/i);
+
+    const noFile = await asAuthenticated(
+      request(app).post("/api/uploads/animals/smoke-test-1/image")
     );
     expect(noFile.status).toBe(400);
     expect(noFile.body.error.code).toBe("MISSING_IMAGE_FILE");
 
-    const badType = await request(app)
-      .post("/api/uploads/animals/smoke-test-1/image")
+    const badType = await asAuthenticated(
+      request(app).post("/api/uploads/animals/smoke-test-1/image")
+    )
       .attach("image", Buffer.from("fake-image-bytes"), {
         filename: "test.bmp",
         contentType: "image/bmp",
@@ -117,8 +139,9 @@ describe("Smoke: core animal flow", () => {
     expect(badType.status).toBe(415);
     expect(badType.body.error.code).toBe("INVALID_IMAGE_TYPE");
 
-    const badId = await request(app)
-      .post("/api/uploads/animals/!!!/image")
+    const badId = await asAuthenticated(
+      request(app).post("/api/uploads/animals/!!!/image")
+    )
       .attach("image", Buffer.from("fake"), {
         filename: "test.jpg",
         contentType: "image/jpeg",

@@ -1,6 +1,6 @@
 import http from "http";
 import type { IncomingMessage, ServerResponse } from "http";
-import { MOCK_ANIMALS, MOCK_MEDICAL_RECORDS_BY_AID } from "./fixtures/testData";
+import { MOCK_ANIMALS, MOCK_MEDICAL_RECORDS_BY_AID, MOCK_POSTS } from "./fixtures/testData";
 
 const MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024;
 const MEDICAL_RECORD_CREATE_FAILED_CODE = "MEDICAL_RECORD_CREATE_FAILED";
@@ -10,6 +10,10 @@ const MEDICAL_RECORD_CREATE_FAILED_CODE = "MEDICAL_RECORD_CREATE_FAILED";
 const BASE_ANIMALS = MOCK_ANIMALS.map((a) => ({ ...a }));
 let ANIMALS = BASE_ANIMALS.map((a) => ({ ...a }));
 let CREATED_ANIMALS = new Map<number, (typeof MOCK_ANIMALS)[number]>();
+
+const BASE_POSTS = MOCK_POSTS.map((p) => ({ ...p }));
+let POSTS = BASE_POSTS.map((p) => ({ ...p }));
+function nextPostId() { return Math.max(...POSTS.map((p) => p.pid), 0) + 1; }
 const cloneMedicalRecords = () =>
   new Map(
     Object.entries(MOCK_MEDICAL_RECORDS_BY_AID).map(([aid, records]) => [
@@ -52,8 +56,97 @@ async function handleRequest(req: IncomingMessage, res: ServerResponse) {
     ANIMALS = BASE_ANIMALS.map((a) => ({ ...a }));
     CREATED_ANIMALS = new Map();
     MEDICAL_RECORDS_BY_ANIMAL = cloneMedicalRecords();
+    POSTS = BASE_POSTS.map((p) => ({ ...p }));
     res.writeHead(200);
     res.end(JSON.stringify({ success: true }));
+    return;
+  }
+
+  // ── Posts endpoints ────────────────────────────────────────────────────────
+
+  // Single post: /api/posts/:pid
+  const singlePostMatch = url.match(/^\/api\/posts\/(\d+)$/);
+  if (singlePostMatch) {
+    const pid = parseInt(singlePostMatch[1], 10);
+    const post = POSTS.find((p) => p.pid === pid);
+
+    if (method === "GET") {
+      if (!post) { res.writeHead(404); res.end(JSON.stringify({ success: false, error: "Post not found" })); return; }
+      res.writeHead(200);
+      res.end(JSON.stringify({ success: true, data: post }));
+      return;
+    }
+
+    if (method === "PATCH") {
+      if (!post) { res.writeHead(404); res.end(JSON.stringify({ success: false, error: "Post not found" })); return; }
+      const body = await readBody(req);
+      const updates = JSON.parse(body);
+      const { remove_image, ...rest } = updates;
+      if (updates.is_pinned === true) {
+        POSTS = POSTS.map((p) => ({ ...p, is_pinned: p.pid === pid ? true : false }));
+      }
+      const imageFields = remove_image ? { image_url: null, image_object_key: null } : {};
+      POSTS = POSTS.map((p) => p.pid === pid ? { ...p, ...rest, ...imageFields } : p);
+      const updated = POSTS.find((p) => p.pid === pid)!;
+      res.writeHead(200);
+      res.end(JSON.stringify({ success: true, data: updated }));
+      return;
+    }
+
+    if (method === "DELETE") {
+      if (!post) { res.writeHead(404); res.end(JSON.stringify({ success: false, error: "Post not found" })); return; }
+      const deleted = { ...post };
+      POSTS = POSTS.filter((p) => p.pid !== pid);
+      res.writeHead(200);
+      res.end(JSON.stringify({ success: true, data: deleted }));
+      return;
+    }
+  }
+
+  // Post upload: POST /api/uploads/posts/:pid/image
+  const postUploadMatch = url.match(/^\/api\/uploads\/posts\/([^/]+)\/image$/);
+  if (postUploadMatch && method === "POST") {
+    const pid = postUploadMatch[1];
+    res.writeHead(200);
+    res.end(JSON.stringify({
+      data: {
+        objectKey: `posts/${pid}/image.jpg`,
+        url: `https://test-bucket.r2.dev/posts/${pid}/image.jpg`,
+        urlType: "public",
+        contentType: "image/jpeg",
+        size: 12345,
+      },
+    }));
+    return;
+  }
+
+  // Posts list: GET /api/posts
+  if (method === "GET" && url.startsWith("/api/posts")) {
+    const sorted = [...POSTS].sort((a, b) => {
+      if (a.is_pinned !== b.is_pinned) return a.is_pinned ? -1 : 1;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+    res.writeHead(200);
+    res.end(JSON.stringify({
+      success: true,
+      data: sorted,
+      pagination: { total: sorted.length, limit: 100, offset: 0, hasMore: false },
+    }));
+    return;
+  }
+
+  // POST /api/posts (create)
+  if (method === "POST" && url === "/api/posts") {
+    const body = await readBody(req);
+    const payload = JSON.parse(body);
+    const now = new Date().toISOString();
+    if (payload.is_pinned) {
+      POSTS = POSTS.map((p) => ({ ...p, is_pinned: false }));
+    }
+    const newPost = { pid: nextPostId(), is_pinned: false, image_url: null, image_object_key: null, created_at: now, updated_at: now, ...payload };
+    POSTS.push(newPost);
+    res.writeHead(201);
+    res.end(JSON.stringify({ success: true, data: newPost }));
     return;
   }
 
