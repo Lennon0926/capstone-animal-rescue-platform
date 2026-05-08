@@ -3,6 +3,7 @@ import type { AppProps } from "next/app";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Source_Serif_4, JetBrains_Mono } from "next/font/google";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const serif = Source_Serif_4({
   subsets: ["latin"],
@@ -21,10 +22,12 @@ const mono = JetBrains_Mono({
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <div className={`${serif.variable} ${mono.variable}`}>
-      <Component {...pageProps} />
-      {process.env.NEXT_PUBLIC_IS_VERCEL && <Analytics />}
-      {process.env.NEXT_PUBLIC_IS_VERCEL && <SpeedInsights />}
-    </div>
+    <ErrorBoundary>
+      <div className={`${serif.variable} ${mono.variable}`}>
+        <Component {...pageProps} />
+        {process.env.NEXT_PUBLIC_IS_VERCEL && <Analytics />}
+        {process.env.NEXT_PUBLIC_IS_VERCEL && <SpeedInsights />}
+      </div>
+    </ErrorBoundary>
   );
 }
