@@ -1,8 +1,8 @@
 import AdminHeader from "@/components/Admin/AdminHeader/adminHeader";
-import UsersManagement from "@/components/Admin/UsersManagement/usersManagement";
+import CreateUserForm from "@/components/Admin/CreateUser/createUserForm";
 import { useAuthRequired } from "@/lib/useAuthRequired";
 
-export default function CreateUserPage() {
+export default function NewUserPage() {
   const { isLoading } = useAuthRequired();
 
   if (isLoading) return <div>Loading...</div>;
@@ -10,7 +10,7 @@ export default function CreateUserPage() {
   return (
     <>
       <AdminHeader />
-      <UsersManagement />
+      <CreateUserForm />
     </>
   );
 }

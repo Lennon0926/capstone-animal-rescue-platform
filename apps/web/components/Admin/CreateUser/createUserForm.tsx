@@ -194,7 +194,7 @@ export default function CreateUserForm() {
       <section className={styles.container}>
         <div className={styles.formWrapper}>
           <div className={styles.headerWithBackButton}>
-            <Link href="/admin/home" className={styles.backButton}>
+            <Link href="/admin/createUser" className={styles.backButton}>
               <ArrowLeft size={18} />
               Back to dashboard
             </Link>

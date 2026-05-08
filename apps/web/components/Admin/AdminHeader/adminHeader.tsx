@@ -68,10 +68,10 @@ export default function AdminHeader() {
             Dashboard
           </Link>
           <Link href="/admin/animals" className={styles.navLinkMobile}>
-            Animals
+            Animales
           </Link>
           <Link href="/admin/createUser" className={styles.navLinkMobile}>
-            Users
+            Usuarios
           </Link>
           <button onClick={handleLogout} className={styles.logoutButtonMobile}>
             Logout

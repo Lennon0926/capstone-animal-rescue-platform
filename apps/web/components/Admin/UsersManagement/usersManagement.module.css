@@ -1,0 +1,181 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-6) 0;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-hero-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+.subtitle {
+  margin: var(--space-2) 0 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-base);
+}
+
+.createButton {
+  padding: var(--space-3) var(--space-5);
+  background-color: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-semibold);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--transition-normal);
+}
+
+.createButton:hover {
+  background-color: var(--color-primary-hover);
+  color: var(--color-primary-soft);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--color-bg);
+}
+
+.table th {
+  padding: var(--space-4);
+  text-align: left;
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+}
+
+.table td {
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+  vertical-align: middle;
+}
+
+.actionsHeader {
+  width: 10px;
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.input,
+.select {
+  width: 100%;
+  min-width: 180px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-secondary) 20%, transparent);
+}
+
+.editButton,
+.deleteButton,
+.cancelButton {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  border: none;
+  font-size: var(--text-xs);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+}
+
+.editButton {
+  background-color: #1a7a6e;
+  color: var(--color-text-inverse);
+}
+
+.deleteButton {
+  background-color: var(--color-error);
+  color: var(--color-text-inverse);
+}
+
+.cancelButton {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.editButton:disabled,
+.deleteButton:disabled,
+.cancelButton:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.emptyState {
+  padding: var(--space-8);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  text-align: center;
+}
+
+.errorMessage,
+.successMessage {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.errorMessage {
+  color: var(--color-error);
+  background-color: color-mix(in srgb, var(--color-error) 12%, white);
+  border: 1px solid color-mix(in srgb, var(--color-error) 35%, white);
+}
+
+.successMessage {
+  color: var(--color-primary);
+  background-color: var(--color-primary-soft);
+  border: 1px solid color-mix(in srgb, var(--color-secondary) 45%, white);
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+  }
+
+  .createButton {
+    width: 100%;
+    text-align: center;
+  }
+
+  .actionsHeader {
+    width: auto;
+  }
+
+  .actionButtons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

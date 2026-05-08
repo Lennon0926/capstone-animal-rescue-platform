@@ -3,7 +3,13 @@ const express = require("express");
 const { asyncHandler, ApiError } = require("../middleware/errorHandler");
 const { requireAuth } = require("../middleware/auth");
 const { requireJson } = require("../middleware/requireJson");
-const { createUserWithRoles, getRoles } = require("../repositories/usersRepository");
+const {
+  createUserWithRoles,
+  getRoles,
+  listUsersWithRoles,
+  updateUserWithRoles,
+  deleteUserById,
+} = require("../repositories/usersRepository");
 
 const router = express.Router();
 
@@ -55,6 +61,66 @@ function validateCreateUserPayload(req, res, next) {
   return next();
 }
 
+function validateUserIdParam(req, res, next) {
+  const userId = typeof req.params.userId === "string" ? req.params.userId.trim() : "";
+
+  if (!userId) {
+    return next(new ApiError(400, "userId is required."));
+  }
+
+  req.validatedParams = {
+    userId,
+  };
+
+  return next();
+}
+
+function validateUpdateUserPayload(req, res, next) {
+  const email = typeof req.body.email === "string" ? req.body.email.trim().toLowerCase() : "";
+  const fullName =
+    typeof req.body.full_name === "string" ? req.body.full_name.trim() : "";
+
+  if (!email) {
+    return next(new ApiError(400, "Email is required."));
+  }
+
+  if (!fullName) {
+    return next(new ApiError(400, "full_name is required."));
+  }
+
+  let roleIds;
+  try {
+    roleIds = parseRoleIds(req.body.role_ids);
+  } catch (error) {
+    return next(error);
+  }
+
+  req.validatedBody = {
+    userId: req.validatedParams.userId,
+    email,
+    fullName,
+    roleIds,
+  };
+
+  return next();
+}
+
+router.get(
+  "/",
+  asyncHandler(requireAuth),
+  asyncHandler(async (req, res) => {
+    const result = await listUsersWithRoles();
+    if (result.error) {
+      throw new ApiError(500, "Failed to fetch users.", result.error);
+    }
+
+    res.json({
+      success: true,
+      data: result.data,
+    });
+  }),
+);
+
 router.get(
   "/roles",
   asyncHandler(requireAuth),
@@ -62,6 +128,39 @@ router.get(
     const result = await getRoles();
     if (result.error) {
       throw new ApiError(500, "Failed to fetch roles.", result.error);
+    }
+
+    res.json({
+      success: true,
+      data: result.data,
+    });
+  }),
+);
+
+router.patch(
+  "/:userId",
+  requireJson,
+  asyncHandler(requireAuth),
+  validateUserIdParam,
+  validateUpdateUserPayload,
+  asyncHandler(async (req, res) => {
+    const result = await updateUserWithRoles(req.validatedBody);
+    if (result.error) {
+      const lowerError = result.error.toLowerCase();
+
+      if (lowerError.includes("already") && lowerError.includes("registered")) {
+        throw new ApiError(409, "A user with this email already exists.");
+      }
+
+      if (lowerError.includes("not found")) {
+        throw new ApiError(404, "User not found.");
+      }
+
+      if (lowerError.includes("some roles do not exist")) {
+        throw new ApiError(400, result.error);
+      }
+
+      throw new ApiError(500, "Failed to update user.", result.error);
     }
 
     res.json({
@@ -95,6 +194,30 @@ router.post(
     res.status(201).json({
       success: true,
       data: result.data,
+    });
+  }),
+);
+
+router.delete(
+  "/:userId",
+  asyncHandler(requireAuth),
+  validateUserIdParam,
+  asyncHandler(async (req, res) => {
+    const result = await deleteUserById(req.validatedParams.userId);
+    if (result.error) {
+      const lowerError = result.error.toLowerCase();
+      if (lowerError.includes("not found")) {
+        throw new ApiError(404, "User not found.");
+      }
+
+      throw new ApiError(500, "Failed to delete user.", result.error);
+    }
+
+    res.json({
+      success: true,
+      data: {
+        id: req.validatedParams.userId,
+      },
     });
   }),
 );
