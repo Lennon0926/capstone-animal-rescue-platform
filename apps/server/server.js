@@ -15,6 +15,7 @@ validateEnv();
 const healthRouter = require("./routes/health");
 const animalsRouter = require("./routes/animals");
 const uploadsRouter = require("./routes/uploads");
+const usersRouter = require("./routes/users");
 const { errorHandler, notFoundHandler } = require("./middleware/errorHandler");
 
 const app = express();
@@ -59,6 +60,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/animals", animalsRouter);
+app.use("/api/users", usersRouter);
 app.post("/api/uploads/animals/:animalId/image", uploadLimiter);
 app.use("/api/uploads", uploadsRouter);
 app.use("/", healthRouter);

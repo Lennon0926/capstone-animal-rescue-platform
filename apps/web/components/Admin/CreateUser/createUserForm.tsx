@@ -1,6 +1,7 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { getAuthenticatedHeaders } from "@/lib/apiAuth";
 import styles from "./createUserForm.module.css";
 
 type CreateUserFormValues = {
@@ -8,34 +9,54 @@ type CreateUserFormValues = {
   email: string;
   password: string;
   confirmPassword: string;
-  role: string;
+  roleId: string;
 };
 
-const ROLE_OPTIONS = [
-  { value: "admin", label: "Admin" },
-  { value: "staff", label: "Staff" },
-  { value: "volunteer", label: "Volunteer" },
-];
+type RoleOption = {
+  id: number;
+  name: string;
+  description?: string | null;
+};
+
+type RolesResponse = {
+  success: boolean;
+  data: RoleOption[];
+};
+
+type CreateUserResponse = {
+  success: boolean;
+  data?: {
+    id: string;
+    email: string;
+    full_name: string;
+    role_ids: number[];
+  };
+  error?: {
+    message?: string;
+  };
+};
 
 const getInitialValues = (): CreateUserFormValues => ({
   fullName: "",
   email: "",
   password: "",
   confirmPassword: "",
-  role: "",
+  roleId: "",
 });
 
 export default function CreateUserForm() {
   const [formValues, setFormValues] = useState<CreateUserFormValues>(getInitialValues);
+  const [roleOptions, setRoleOptions] = useState<RoleOption[]>([]);
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingRoles, setIsLoadingRoles] = useState(true);
 
   const selectedRoleLabel = useMemo(
     () =>
-      ROLE_OPTIONS.find((roleOption) => roleOption.value === formValues.role)?.label ??
-      formValues.role,
-    [formValues.role],
+      roleOptions.find((roleOption) => String(roleOption.id) === formValues.roleId)?.name ??
+      formValues.roleId,
+    [formValues.roleId, roleOptions],
   );
 
   const handleInputChange = (
@@ -70,12 +91,55 @@ export default function CreateUserForm() {
       return "Passwords do not match.";
     }
 
-    if (!formValues.role) {
+    if (!formValues.roleId) {
       return "Role is required.";
     }
 
     return null;
   };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadRoles = async () => {
+      try {
+        const headers = await getAuthenticatedHeaders();
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/roles`,
+          { headers },
+        );
+        const responseBody: RolesResponse = await response.json();
+
+        if (!response.ok || !responseBody.success) {
+          throw new Error("Failed to load roles.");
+        }
+
+        if (!isMounted) {
+          return;
+        }
+
+        setRoleOptions(responseBody.data);
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        const message =
+          error instanceof Error ? error.message : "Failed to load role options.";
+        setErrorMessage(message);
+      } finally {
+        if (isMounted) {
+          setIsLoadingRoles(false);
+        }
+      }
+    };
+
+    loadRoles();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -91,24 +155,39 @@ export default function CreateUserForm() {
     setIsSubmitting(true);
 
     try {
-      // Frontend-only scaffold for the future API integration:
-      // - create user in Supabase Auth
-      // - assign selected role in app role table
-      console.log("Create user payload (frontend scaffold):", {
-        full_name: formValues.fullName.trim(),
-        email: formValues.email.trim().toLowerCase(),
-        password: formValues.password,
-        role: formValues.role,
+      const headers = await getAuthenticatedHeaders({
+        "Content-Type": "application/json",
       });
 
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          full_name: formValues.fullName.trim(),
+          email: formValues.email.trim().toLowerCase(),
+          password: formValues.password,
+          role_ids: [Number.parseInt(formValues.roleId, 10)],
+        }),
+      });
+
+      const responseBody: CreateUserResponse = await response.json();
+      if (!response.ok || !responseBody.success) {
+        throw new Error(responseBody.error?.message || "Failed to create user.");
+      }
+
       setSuccessMessage(
-        `User form is ready. "${formValues.fullName.trim()}" will be created with role "${selectedRoleLabel}" once backend integration is connected.`,
+        `User "${formValues.fullName.trim()}" was created with role "${selectedRoleLabel}".`,
       );
       setFormValues(getInitialValues());
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to create user.";
+      setErrorMessage(message);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const controlsDisabled = isSubmitting || isLoadingRoles;
 
   return (
     <main className="container">
@@ -142,7 +221,7 @@ export default function CreateUserForm() {
                 value={formValues.fullName}
                 onChange={handleInputChange}
                 required
-                disabled={isSubmitting}
+                disabled={controlsDisabled}
               />
             </div>
 
@@ -160,29 +239,29 @@ export default function CreateUserForm() {
                   value={formValues.email}
                   onChange={handleInputChange}
                   required
-                  disabled={isSubmitting}
+                  disabled={controlsDisabled}
                 />
               </div>
 
               <div className={styles.formGroup}>
-                <label htmlFor="role" className={styles.label}>
+                <label htmlFor="roleId" className={styles.label}>
                   Role <span className={styles.required}>*</span>
                 </label>
                 <select
-                  id="role"
-                  name="role"
+                  id="roleId"
+                  name="roleId"
                   className={styles.select}
-                  value={formValues.role}
+                  value={formValues.roleId}
                   onChange={handleInputChange}
                   required
-                  disabled={isSubmitting}
+                  disabled={controlsDisabled}
                 >
                   <option value="" disabled>
-                    Select a role
+                    {isLoadingRoles ? "Loading roles..." : "Select a role"}
                   </option>
-                  {ROLE_OPTIONS.map((roleOption) => (
-                    <option key={roleOption.value} value={roleOption.value}>
-                      {roleOption.label}
+                  {roleOptions.map((roleOption) => (
+                    <option key={roleOption.id} value={String(roleOption.id)}>
+                      {roleOption.name}
                     </option>
                   ))}
                 </select>
@@ -204,7 +283,7 @@ export default function CreateUserForm() {
                   onChange={handleInputChange}
                   required
                   minLength={6}
-                  disabled={isSubmitting}
+                  disabled={controlsDisabled}
                 />
               </div>
 
@@ -222,13 +301,13 @@ export default function CreateUserForm() {
                   onChange={handleInputChange}
                   required
                   minLength={6}
-                  disabled={isSubmitting}
+                  disabled={controlsDisabled}
                 />
               </div>
             </div>
 
-            <button type="submit" className={styles.submitButton} disabled={isSubmitting}>
-              {isSubmitting ? "Preparing..." : "Create user"}
+            <button type="submit" className={styles.submitButton} disabled={controlsDisabled}>
+              {isSubmitting ? "Creating..." : "Create user"}
             </button>
           </form>
         </div>

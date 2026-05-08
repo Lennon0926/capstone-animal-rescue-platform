@@ -22,6 +22,7 @@ router.get("/", (req, res) => {
     version: "1.0.0",
     endpoints: {
       animals: "/api/animals",
+      users: "/api/users",
       health: "/api/health",
     },
   });
