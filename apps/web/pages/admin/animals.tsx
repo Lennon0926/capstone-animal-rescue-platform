@@ -24,28 +24,22 @@ type AdminAnimalsPageProps = {
 export default function AdminAnimalsPage({ animals }: AdminAnimalsPageProps) {
   const { isLoading } = useAuthRequired();
 
+  if (isLoading) return <div>Loading...</div>;
+
   return (
     <>
       <Head>
         <title>Administrar Animales | Huellitas Sin Hogar</title>
       </Head>
-      {isLoading ? (
-        <div>Loading...</div>
-      ) : (
-        <>
-          <AdminHeader />
-          <AdminAnimalsList initialAnimals={animals} />
-        </>
-      )}
+      <AdminHeader />
+      <AdminAnimalsList initialAnimals={animals} />
     </>
   );
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals?limit=1000`,
-    );
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals?limit=1000`);
 
     if (!res.ok) {
       return { props: { animals: [], fetchError: true } };
