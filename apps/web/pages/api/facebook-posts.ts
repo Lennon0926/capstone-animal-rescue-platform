@@ -59,9 +59,11 @@ export default async function handler(
 
   try {
     const fields = "message,story,full_picture,created_time,permalink_url,likes.summary(true),comments{message,from{name,id},created_time},attachments{type,media,subattachments{type,media}}";
-    const url = `https://graph.facebook.com/v21.0/${pageId}/posts?fields=${fields}&limit=${limit}&access_token=${accessToken}`;
+    const url = `https://graph.facebook.com/v21.0/${pageId}/posts?fields=${fields}&limit=${limit}`;
 
-    const fbRes = await fetch(url);
+    const fbRes = await fetch(url, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
     const json: FacebookGraphResponse = await fbRes.json();
 
     if (!fbRes.ok || json.error) {

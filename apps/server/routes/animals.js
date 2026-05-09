@@ -100,6 +100,7 @@ router.get(
  */
 router.get(
   "/records",
+  asyncHandler(requireAuth),
   asyncHandler(async (req, res) => {
     const result = await getAnimalsRecordView();
 
@@ -124,6 +125,7 @@ router.get(
  */
 router.get(
   "/:aid",
+  asyncHandler(requireAuth),
   validateAnimalId,
   asyncHandler(async (req, res) => {
     const result = await getAnimalById(req.params.aid);
