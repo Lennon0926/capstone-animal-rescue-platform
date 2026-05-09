@@ -4,7 +4,6 @@ A full-stack web application for animal rescue coordination, built with Next.js 
 
 ## Project Structure
 
-
 ```
 ├── apps/
 │   ├── server/          # Express API (Node.js)
