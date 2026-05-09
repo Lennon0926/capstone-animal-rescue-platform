@@ -125,7 +125,6 @@ router.get(
  */
 router.get(
   "/:aid",
-  asyncHandler(optionalAuth),
   validateAnimalId,
   asyncHandler(async (req, res) => {
     const result = await getAnimalById(req.params.aid);
@@ -138,14 +137,9 @@ router.get(
       throw new ApiError(500, "Failed to fetch animal", result.error);
     }
 
-    const data = { ...result.data };
-    if (!req.authenticatedUser) {
-      delete data.medical_records;
-    }
-
     res.json({
       success: true,
-      data,
+      data: result.data,
     });
   }),
 );

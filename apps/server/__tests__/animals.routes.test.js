@@ -264,7 +264,7 @@ describe("GET /api/animals/:aid", () => {
     ]);
   });
 
-  it("returns animal without medical_records when unauthenticated", async () => {
+  it("returns animal with medical_records when unauthenticated", async () => {
     mockFrom.mockImplementation((table) => {
       if (table === "animals") {
         return buildChainableMock({ data: MOCK_ANIMALS[0], error: null });
@@ -282,7 +282,9 @@ describe("GET /api/animals/:aid", () => {
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data.name).toBe("Buddy");
-    expect(res.body.data.medical_records).toBeUndefined();
+    expect(res.body.data.medical_records).toEqual([
+      expect.objectContaining({ record_id: 77, record_type: "vacunación" }),
+    ]);
   });
 
   it("returns 404 when animal is not found", async () => {
