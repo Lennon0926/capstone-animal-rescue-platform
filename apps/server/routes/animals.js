@@ -23,7 +23,7 @@ const {
   validateUpdateAnimal,
 } = require("../middleware/validation");
 const { asyncHandler, ApiError } = require("../middleware/errorHandler");
-const { requireAuth, optionalAuth } = require("../middleware/auth");
+const { requireAuth } = require("../middleware/auth");
 const { requireJson } = require("../middleware/requireJson");
 
 /**

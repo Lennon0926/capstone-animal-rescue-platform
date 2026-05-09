@@ -200,6 +200,29 @@ describe("GET /api/animals/records", () => {
     ]);
   });
 
+  it("returns 401 when auth token is missing", async () => {
+    const res = await request(getApp()).get("/api/animals/records");
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/authentication required/i);
+  });
+
+  it("returns 401 when auth token is invalid or expired", async () => {
+    mockAuthGetUser.mockResolvedValueOnce({
+      data: { user: null },
+      error: { message: "invalid JWT" },
+    });
+
+    const res = await request(getApp())
+      .get("/api/animals/records")
+      .set("Authorization", "Bearer invalid-token");
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/invalid or expired/i);
+  });
+
   it("returns 500 when the view query fails", async () => {
     mockFrom.mockImplementation((table) => {
       if (table === "animalsrecord") {
