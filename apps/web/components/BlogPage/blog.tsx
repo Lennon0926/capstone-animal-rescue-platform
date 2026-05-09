@@ -521,19 +521,23 @@ function CreatePostForm({ onCreated }: { onCreated: (post: BlogFeedPost) => void
 
     if (!header.trim()) { setError("El título es requerido."); return; }
     if (!body.trim()) { setError("El contenido es requerido."); return; }
-    if (!selectedFile) { setError("La imagen es requerida."); return; }
 
     setLoading(true);
     try {
-      const config = await fetchUploadConfig().catch(() => null);
-      if (!isUploadStorageAvailable(config)) {
-        setError("El almacenamiento de imágenes no está disponible.");
-        return;
+      if (selectedFile) {
+        const config = await fetchUploadConfig().catch(() => null);
+        if (!isUploadStorageAvailable(config)) {
+          setError("El almacenamiento de imágenes no está disponible.");
+          return;
+        }
       }
 
       const post = await createPost({ header: header.trim(), body: body.trim(), is_pinned: isPinned });
-      const uploadResult = await uploadPostImage(post.pid, selectedFile);
-      const updated = await updatePost(post.pid, { image_object_key: uploadResult.objectKey });
+      let updated = post;
+      if (selectedFile) {
+        const uploadResult = await uploadPostImage(post.pid, selectedFile);
+        updated = await updatePost(post.pid, { image_object_key: uploadResult.objectKey });
+      }
 
       onCreated(normalizeLocalPost(updated));
       reset();
@@ -583,7 +587,7 @@ function CreatePostForm({ onCreated }: { onCreated: (post: BlogFeedPost) => void
 
         <div className={styles.createPostImageRow}>
           <label className={styles.createPostFileLabel}>
-            {selectedFile ? selectedFile.name : "Seleccionar imagen *"}
+            {selectedFile ? selectedFile.name : "Seleccionar imagen"}
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp"
