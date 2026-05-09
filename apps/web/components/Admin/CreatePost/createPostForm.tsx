@@ -57,21 +57,24 @@ export default function CreatePostForm() {
 
     if (!header.trim()) { setErrorMessage("El título es requerido."); return; }
     if (!body.trim()) { setErrorMessage("El contenido es requerido."); return; }
-    if (!selectedFile) { setErrorMessage("La imagen es requerida."); return; }
 
     setIsLoading(true);
 
     try {
-      const freshConfig = await fetchUploadConfig().catch(() => null);
-      if (!isUploadStorageAvailable(freshConfig)) {
-        setErrorMessage(getUploadStorageUnavailableMessage(freshConfig));
-        return;
+      if (selectedFile) {
+        const freshConfig = await fetchUploadConfig().catch(() => null);
+        if (!isUploadStorageAvailable(freshConfig)) {
+          setErrorMessage(getUploadStorageUnavailableMessage(freshConfig));
+          return;
+        }
       }
 
       const post = await createPost({ header: header.trim(), body: body.trim(), is_pinned: isPinned });
 
-      const uploadResult = await uploadPostImage(post.pid, selectedFile);
-      await updatePost(post.pid, { image_object_key: uploadResult.objectKey });
+      if (selectedFile) {
+        const uploadResult = await uploadPostImage(post.pid, selectedFile);
+        await updatePost(post.pid, { image_object_key: uploadResult.objectKey });
+      }
 
       setSuccessMessage("¡Publicación creada exitosamente! Redirigiendo...");
       setTimeout(() => router.push("/admin/posts"), REDIRECT_DELAY_MS);
@@ -96,7 +99,7 @@ export default function CreatePostForm() {
         <form onSubmit={onSubmit}>
           {/* Image */}
           <div className={styles.imagePreviewSection}>
-            <p className={styles.sectionLabel}>Imagen *</p>
+            <p className={styles.sectionLabel}>Imagen</p>
             {previewUrl ? (
               <div style={{ position: "relative", width: 200, height: 200, marginBottom: 12 }}>
                 <Image src={previewUrl} alt="Vista previa" fill style={{ objectFit: "cover", borderRadius: 8 }} />
@@ -181,7 +184,7 @@ export default function CreatePostForm() {
             </Link>
             <button
               type="submit"
-              disabled={isLoading || !isStorageHealthy}
+              disabled={isLoading || (!!selectedFile && !isStorageHealthy)}
               style={{ padding: "10px 24px", background: "var(--color-primary)", color: "#fff", border: "none", borderRadius: 6, fontSize: 14, fontWeight: 600, cursor: isLoading ? "not-allowed" : "pointer", opacity: isLoading ? 0.7 : 1 }}
             >
               {isLoading ? "Creando..." : "Crear Publicación"}
