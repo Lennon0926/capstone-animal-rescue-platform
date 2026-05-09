@@ -1,4 +1,5 @@
 import { GetServerSideProps } from "next";
+import Head from "next/head";
 import AdminHeader from "@/components/Admin/AdminHeader/adminHeader";
 import EditAnimalForm from "@/components/Admin/EditAnimal/editAnimalForm";
 import { useAuthRequired } from "@/lib/useAuthRequired";
@@ -21,6 +22,9 @@ export default function EditAnimalPage({ animal, error }: EditAnimalPageProps) {
 
   return (
     <>
+      <Head>
+        <title>{animal ? `Editar ${animal.name}` : "Editar Animal"} | Huellitas Sin Hogar</title>
+      </Head>
       <AdminHeader />
       {error ? (
         <EditAnimalForm error={error} />
