@@ -1,11 +1,14 @@
 import AdminHeader from "@/components/Admin/AdminHeader/adminHeader";
 import UsersManagement from "@/components/Admin/UsersManagement/usersManagement";
-import { useAuthRequired } from "@/lib/useAuthRequired";
+import { useAuthRequired, useAuthRequiredRol } from "@/lib/useAuthRequired";
 
 export default function CreateUserPage() {
   const { isLoading } = useAuthRequired();
+  const { isLoadingRole, hasRequiredRole } = useAuthRequiredRol("Administrador");
 
   if (isLoading) return <div>Loading...</div>;
+  if (isLoadingRole) return <div>Checking permissions...</div>;
+  if (!hasRequiredRole) return null;
 
   return (
     <>

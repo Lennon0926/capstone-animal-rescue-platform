@@ -1,5 +1,131 @@
 const { getSupabaseClient } = require("../lib/supabase");
 
+function extractRoleName(role) {
+  if (!role || typeof role !== "object") {
+    return null;
+  }
+
+  const id = role.id ?? role.role_id ?? null;
+  const directNameCandidates = [role.name, role.role_name, role.Admin, role.admin];
+  const directName = directNameCandidates.find(
+    (value) => typeof value === "string" && value.trim().length > 0,
+  );
+
+  if (directName) {
+    return directName.trim();
+  }
+
+  const fallbackStringEntry = Object.entries(role).find(([key, value]) => {
+    const normalizedKey = String(key).toLowerCase();
+    return (
+      typeof value === "string" &&
+      value.trim().length > 0 &&
+      !["id", "role_id", "description", "created_at", "updated_at"].includes(normalizedKey)
+    );
+  });
+
+  if (fallbackStringEntry) {
+    return fallbackStringEntry[1].trim();
+  }
+
+  if (typeof id === "number" || typeof id === "string") {
+    return String(id);
+  }
+
+  return null;
+}
+
+function isMissingColumnError(error, columnName) {
+  const message = error?.message;
+  if (typeof message !== "string") {
+    return false;
+  }
+
+  const normalizedMessage = message.toLowerCase();
+  return normalizedMessage.includes("column") && normalizedMessage.includes(columnName.toLowerCase());
+}
+
+async function getUserRoleRowsByColumn({ columnName, userIds }) {
+  const client = getSupabaseClient();
+  const { data, error } = await client
+    .from("user_roles")
+    .select(`${columnName}, role_id`)
+    .in(columnName, userIds);
+
+  return { data: data || [], error, columnName };
+}
+
+async function getUserRoleRowsByUserIds(userIds) {
+  const userIdQueryResult = await getUserRoleRowsByColumn({
+    columnName: "user_id",
+    userIds,
+  });
+
+  if (!userIdQueryResult.error) {
+    return userIdQueryResult;
+  }
+
+  if (!isMissingColumnError(userIdQueryResult.error, "user_id")) {
+    return userIdQueryResult;
+  }
+
+  return getUserRoleRowsByColumn({
+    columnName: "uid",
+    userIds,
+  });
+}
+
+async function getRoleRowsForUser({ columnName, userId }) {
+  const client = getSupabaseClient();
+  const { data, error } = await client
+    .from("user_roles")
+    .select("role_id")
+    .eq(columnName, userId);
+
+  return { data: data || [], error, columnName };
+}
+
+async function getRoleRowsForUserById(userId) {
+  const userIdQueryResult = await getRoleRowsForUser({
+    columnName: "user_id",
+    userId,
+  });
+
+  if (!userIdQueryResult.error) {
+    return userIdQueryResult;
+  }
+
+  if (!isMissingColumnError(userIdQueryResult.error, "user_id")) {
+    return userIdQueryResult;
+  }
+
+  return getRoleRowsForUser({
+    columnName: "uid",
+    userId,
+  });
+}
+
+async function replaceUserRoleRows({ columnName, userId, roleIds }) {
+  const client = getSupabaseClient();
+
+  const deleteResult = await client.from("user_roles").delete().eq(columnName, userId);
+  if (deleteResult.error) {
+    return { error: deleteResult.error, columnName };
+  }
+
+  const roleRows = roleIds.map((roleId) => ({
+    [columnName]: userId,
+    role_id: roleId,
+  }));
+
+  const insertResult = await client.from("user_roles").insert(roleRows);
+  if (insertResult.error) {
+    return { error: insertResult.error, columnName };
+  }
+
+  return { error: null, columnName };
+}
+
 async function getRoles() {
   const client = getSupabaseClient();
   const { data, error } = await client.from("roles").select("*");
@@ -11,10 +137,7 @@ async function getRoles() {
   const normalizedRoles = (data || [])
     .map((role) => {
       const id = role.id ?? role.role_id ?? null;
-      const name =
-        role.name ??
-        role.role_name ??
-        (typeof id === "number" || typeof id === "string" ? String(id) : null);
+      const name = extractRoleName(role);
 
       if (!id || !name) {
         return null;
@@ -82,31 +205,41 @@ async function getRoleNamesById(roleIds) {
     return { data: new Map(), error: null };
   }
 
-  const { data, error } = await client
+  let { data, error } = await client
     .from("roles")
-    .select("id, name")
+    .select("id, name, role_name")
     .in("id", uniqueRoleIds);
+
+  if (
+    error &&
+    (isMissingColumnError(error, "name") || isMissingColumnError(error, "role_name"))
+  ) {
+    const fallbackResult = await client.from("roles").select("*").in("id", uniqueRoleIds);
+    data = fallbackResult.data;
+    error = fallbackResult.error;
+  }
 
   if (error) {
     return { data: null, error: error.message };
   }
 
   return {
-    data: new Map((data || []).map((role) => [role.id, role.name])),
+    data: new Map(
+      (data || []).map((role) => [
+        role.id ?? role.role_id,
+        extractRoleName(role) ?? String(role.id ?? role.role_id),
+      ]),
+    ),
     error: null,
   };
 }
 
 async function getUserRolesByUserId(userIds) {
-  const client = getSupabaseClient();
   if (userIds.length === 0) {
     return { data: new Map(), error: null };
   }
 
-  const { data, error } = await client
-    .from("user_roles")
-    .select("user_id, role_id")
-    .in("user_id", userIds);
+  const { data, error, columnName } = await getUserRoleRowsByUserIds(userIds);
 
   if (error) {
     return { data: null, error: error.message };
@@ -124,33 +257,65 @@ async function getUserRolesByUserId(userIds) {
   }
 
   for (const row of data || []) {
-    const existingRoles = rolesByUserId.get(row.user_id) || [];
+    const mappedUserId = row[columnName];
+    const existingRoles = rolesByUserId.get(mappedUserId) || [];
     existingRoles.push({
       id: row.role_id,
       name: roleNamesByIdResult.data.get(row.role_id) || String(row.role_id),
     });
-    rolesByUserId.set(row.user_id, existingRoles);
+    rolesByUserId.set(mappedUserId, existingRoles);
   }
 
   return { data: rolesByUserId, error: null };
 }
 
-async function replaceUserRoles({ userId, roleIds }) {
-  const client = getSupabaseClient();
+async function getRoleNamesForUser(userId) {
+  const { data, error } = await getRoleRowsForUserById(userId);
 
-  const deleteResult = await client.from("user_roles").delete().eq("user_id", userId);
-  if (deleteResult.error) {
-    return { error: deleteResult.error.message };
+  if (error) {
+    return { data: { roleIds: [], roleNames: [] }, error: error.message };
   }
 
-  const roleRows = roleIds.map((roleId) => ({
-    user_id: userId,
-    role_id: roleId,
-  }));
+  const roleIds = [...new Set((data || []).map((row) => row.role_id).filter(Boolean))];
+  if (roleIds.length === 0) {
+    return { data: { roleIds: [], roleNames: [] }, error: null };
+  }
 
-  const insertResult = await client.from("user_roles").insert(roleRows);
-  if (insertResult.error) {
-    return { error: insertResult.error.message };
+  const roleNamesByIdResult = await getRoleNamesById(roleIds);
+  if (roleNamesByIdResult.error) {
+    return { data: { roleIds: [], roleNames: [] }, error: roleNamesByIdResult.error };
+  }
+
+  const roleNames = roleIds
+    .map((roleId) => roleNamesByIdResult.data.get(roleId) || String(roleId))
+    .filter(Boolean);
+
+  return { data: { roleIds, roleNames }, error: null };
+}
+
+async function replaceUserRoles({ userId, roleIds }) {
+  const userIdReplaceResult = await replaceUserRoleRows({
+    columnName: "user_id",
+    userId,
+    roleIds,
+  });
+
+  if (!userIdReplaceResult.error) {
+    return { error: null };
+  }
+
+  if (!isMissingColumnError(userIdReplaceResult.error, "user_id")) {
+    return { error: userIdReplaceResult.error.message };
+  }
+
+  const uidReplaceResult = await replaceUserRoleRows({
+    columnName: "uid",
+    userId,
+    roleIds,
+  });
+
+  if (uidReplaceResult.error) {
+    return { error: uidReplaceResult.error.message };
   }
 
   return { error: null };
@@ -307,6 +472,7 @@ async function deleteUserById(userId) {
 
 module.exports = {
   getRoles,
+  getRoleNamesForUser,
   createUserWithRoles,
   listUsersWithRoles,
   updateUserWithRoles,

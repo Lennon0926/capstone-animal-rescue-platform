@@ -23,7 +23,11 @@ const mockFrom = jest.fn((table) => {
           return { in: mockRolesIn };
         }
 
-        if (columns === "id, name") {
+        if (
+          columns === "id, name" ||
+          columns === "id, name, role_name" ||
+          columns === "id, name, role_name, Admin, admin"
+        ) {
           return { in: mockRolesIn };
         }
 

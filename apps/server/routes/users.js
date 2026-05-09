@@ -6,6 +6,7 @@ const { requireJson } = require("../middleware/requireJson");
 const {
   createUserWithRoles,
   getRoles,
+  getRoleNamesForUser,
   listUsersWithRoles,
   updateUserWithRoles,
   deleteUserById,
@@ -24,6 +25,45 @@ function parseRoleIds(roleIdsRaw) {
   }
 
   return parsedRoleIds;
+}
+
+function extractRolesFromAuthenticatedUser(user) {
+  const normalizeRoleValue = (value) => {
+    if (typeof value !== "string") {
+      return [];
+    }
+
+    const normalized = value.trim();
+    return normalized ? [normalized] : [];
+  };
+
+  const collectRoles = (container) => {
+    if (!container || typeof container !== "object") {
+      return [];
+    }
+
+    const roles = [];
+    roles.push(...normalizeRoleValue(container.role));
+
+    if (Array.isArray(container.roles)) {
+      for (const roleValue of container.roles) {
+        roles.push(...normalizeRoleValue(roleValue));
+      }
+    } else if (typeof container.roles === "string") {
+      for (const roleValue of container.roles.split(",")) {
+        roles.push(...normalizeRoleValue(roleValue));
+      }
+    }
+
+    return roles;
+  };
+
+  const metadataRoles = [
+    ...collectRoles(user?.app_metadata),
+    ...collectRoles(user?.user_metadata),
+  ];
+
+  return [...new Set(metadataRoles)];
 }
 
 function validateCreateUserPayload(req, res, next) {
@@ -117,6 +157,31 @@ router.get(
     res.json({
       success: true,
       data: result.data,
+    });
+  }),
+);
+
+router.get(
+  "/me/roles",
+  asyncHandler(requireAuth),
+  asyncHandler(async (req, res) => {
+    const result = await getRoleNamesForUser(req.authenticatedUser.id);
+    if (result.error) {
+      throw new ApiError(500, "Failed to fetch current user roles.", result.error);
+    }
+
+    res.json({
+      success: true,
+      data: {
+        user_id: req.authenticatedUser.id,
+        role_ids: result.data.roleIds,
+        role_names: [
+          ...new Set([
+            ...result.data.roleNames,
+            ...extractRolesFromAuthenticatedUser(req.authenticatedUser),
+          ]),
+        ],
+      },
     });
   }),
 );
