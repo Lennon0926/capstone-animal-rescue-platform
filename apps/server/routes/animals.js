@@ -23,7 +23,7 @@ const {
   validateUpdateAnimal,
 } = require("../middleware/validation");
 const { asyncHandler, ApiError } = require("../middleware/errorHandler");
-const { requireAuth } = require("../middleware/auth");
+const { requireAuth, optionalAuth } = require("../middleware/auth");
 const { requireJson } = require("../middleware/requireJson");
 
 /**
@@ -125,7 +125,7 @@ router.get(
  */
 router.get(
   "/:aid",
-  asyncHandler(requireAuth),
+  asyncHandler(optionalAuth),
   validateAnimalId,
   asyncHandler(async (req, res) => {
     const result = await getAnimalById(req.params.aid);
@@ -138,9 +138,14 @@ router.get(
       throw new ApiError(500, "Failed to fetch animal", result.error);
     }
 
+    const data = { ...result.data };
+    if (!req.authenticatedUser) {
+      delete data.medical_records;
+    }
+
     res.json({
       success: true,
-      data: result.data,
+      data,
     });
   }),
 );

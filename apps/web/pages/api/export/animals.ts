@@ -76,7 +76,9 @@ export default async function handler(
   try {
     const [animals, recordsRes] = await Promise.all([
       fetchAllAnimals(base),
-      fetch(`${base}/api/animals/records`),
+      fetch(`${base}/api/animals/records`, {
+        headers: { Authorization: authHeader },
+      }),
     ]);
 
     if (!recordsRes.ok) {

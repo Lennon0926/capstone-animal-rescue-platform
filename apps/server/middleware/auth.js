@@ -34,6 +34,22 @@ async function requireAuth(req, res, next) {
   return next();
 }
 
+async function optionalAuth(req, res, next) {
+  const token = getBearerToken(req.headers.authorization);
+
+  if (!token) return next();
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase.auth.getUser(token);
+
+  if (!error && data?.user) {
+    req.authenticatedUser = data.user;
+  }
+
+  return next();
+}
+
 module.exports = {
   requireAuth,
+  optionalAuth,
 };

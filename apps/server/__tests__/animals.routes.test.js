@@ -264,6 +264,27 @@ describe("GET /api/animals/:aid", () => {
     ]);
   });
 
+  it("returns animal without medical_records when unauthenticated", async () => {
+    mockFrom.mockImplementation((table) => {
+      if (table === "animals") {
+        return buildChainableMock({ data: MOCK_ANIMALS[0], error: null });
+      }
+      if (table === "medical_records") {
+        return buildChainableMock({
+          data: [{ record_id: 77, aid: 1, record_type: "vacunación" }],
+          error: null,
+        });
+      }
+      return buildChainableMock({ data: null, error: { message: "Unknown table" } });
+    });
+
+    const res = await request(getApp()).get("/api/animals/1");
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.name).toBe("Buddy");
+    expect(res.body.data.medical_records).toBeUndefined();
+  });
+
   it("returns 404 when animal is not found", async () => {
     const chain = buildChainableMock({
       data: null,
