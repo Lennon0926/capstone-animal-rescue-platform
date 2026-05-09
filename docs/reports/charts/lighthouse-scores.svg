@@ -4,23 +4,26 @@
   <rect width="760" height="520" fill="#ffffff" rx="8"/>
 
   <!-- Title -->
-  <text x="380" y="28" text-anchor="middle" font-size="15" font-weight="bold" fill="#111827">Lighthouse Audit — Page Performance Scores (After Fixes)</text>
-  <text x="380" y="47" text-anchor="middle" font-size="11" fill="#6b7280">6 public pages · Desktop preset · localhost:3000 · 2026-04-11 · report-analytics-progress-report</text>
+  <text x="380" y="28" text-anchor="middle" font-size="15" font-weight="bold" fill="#111827">Lighthouse Audit — Page Performance Scores</text>
+  <text x="380" y="47" text-anchor="middle" font-size="11" fill="#6b7280">5 public pages · Desktop preset · localhost:3000 · 2026-05-09 · fix/security-medical-records-fb-token</text>
 
   <!--
-    Final Lighthouse v13 scores after all improvements:
-      /home      Perf=100 A11y=98  BP=100 SEO=100  LCP=508ms  CLS=0.012 TTFB=18ms
-      /adopt     Perf=100 A11y=100 BP=100 SEO=100  LCP=485ms  CLS=0.000 TTFB=651ms
-      /adopt/1   Perf=100 A11y=100 BP=100 SEO=100  LCP=491ms  CLS=0.000 TTFB=410ms
-      /about     Perf=100 A11y=98  BP=100 SEO=100  LCP=525ms  CLS=0.000 TTFB=2ms
-      /blog      Perf=100 A11y=98  BP=100 SEO=100  LCP=483ms  CLS=0.000 TTFB=2ms
-      /donation  Perf=100 A11y=98  BP=100 SEO=100  LCP=484ms  CLS=0.000 TTFB=2ms
+    Lighthouse v12.6.1 scores (2026-05-09):
+      /home      Perf=99  A11y=98  BP=100 SEO=100  LCP=850ms
+      /adopt     Perf=100 A11y=100 BP=100 SEO=100  LCP=606ms
+      /adopt/1   Perf=100 A11y=100 BP=100 SEO=100  LCP=611ms
+      /about     Perf=100 A11y=98  BP=100 SEO=100  LCP=628ms
+      /blog      Perf=100 A11y=94  BP=96  SEO=100  LCP=651ms
 
     Plot area: x=60..740 (680px), y=90..380 (290px tall)
-    6 groups × 113px; group i first bar at x = 60 + i×113 + 13
-    Bar width=20px, gap=1px → bar j at group_start + j×21
+    5 groups × 136px: group i starts at x = 60 + i×136
+    Bar width=20px, gap=7px → bar j at group_start + 18 + j×27
     Y scale: height = score/100 × 290; y = 380 − height
-    score 100 → h=290 y=90; score 98 → h=284 y=96
+      100 → h=290 y=90
+       99 → h=287 y=93
+       98 → h=284 y=96
+       96 → h=278 y=102
+       94 → h=273 y=107
   -->
 
   <!-- Legend -->
@@ -55,65 +58,67 @@
   <text x="52" y="384" text-anchor="end" font-size="10" fill="#6b7280">0</text>
 
   <!-- Group separator lines -->
-  <line x1="173" y1="90" x2="173" y2="380" stroke="#f3f4f6" stroke-width="1"/>
-  <line x1="286" y1="90" x2="286" y2="380" stroke="#f3f4f6" stroke-width="1"/>
-  <line x1="399" y1="90" x2="399" y2="380" stroke="#f3f4f6" stroke-width="1"/>
-  <line x1="512" y1="90" x2="512" y2="380" stroke="#f3f4f6" stroke-width="1"/>
-  <line x1="625" y1="90" x2="625" y2="380" stroke="#f3f4f6" stroke-width="1"/>
+  <line x1="196" y1="90" x2="196" y2="380" stroke="#f3f4f6" stroke-width="1"/>
+  <line x1="332" y1="90" x2="332" y2="380" stroke="#f3f4f6" stroke-width="1"/>
+  <line x1="468" y1="90" x2="468" y2="380" stroke="#f3f4f6" stroke-width="1"/>
+  <line x1="604" y1="90" x2="604" y2="380" stroke="#f3f4f6" stroke-width="1"/>
 
-  <!-- ── /home: Perf=100 A11y=98 BP=100 SEO=100 ── -->
-  <rect x="73"  y="90"  width="20" height="290" fill="#4361ee" rx="2"/>
-  <rect x="94"  y="96"  width="20" height="284" fill="#3a9d5c" rx="2"/>
-  <rect x="115" y="90"  width="20" height="290" fill="#f4a261" rx="2"/>
-  <rect x="136" y="90"  width="20" height="290" fill="#9b59b6" rx="2"/>
-  <text x="115" y="398" text-anchor="middle" font-size="11" fill="#374151">/home</text>
+  <!-- ── /home: Perf=99 A11y=98 BP=100 SEO=100 ── -->
+  <!-- group start x=60+0*136=60, bar1 at 60+18=78 -->
+  <rect x="78"  y="93"  width="20" height="287" fill="#4361ee" rx="2"/>
+  <rect x="105" y="96"  width="20" height="284" fill="#3a9d5c" rx="2"/>
+  <rect x="132" y="90"  width="20" height="290" fill="#f4a261" rx="2"/>
+  <rect x="159" y="90"  width="20" height="290" fill="#9b59b6" rx="2"/>
+  <text x="128" y="398" text-anchor="middle" font-size="11" fill="#374151">/home</text>
+  <!-- regression marker for Perf=99 -->
+  <text x="88" y="88" text-anchor="middle" font-size="9" fill="#f59e0b">99▾</text>
 
   <!-- ── /adopt: Perf=100 A11y=100 BP=100 SEO=100 ── -->
-  <rect x="186" y="90"  width="20" height="290" fill="#4361ee" rx="2"/>
-  <rect x="207" y="90"  width="20" height="290" fill="#3a9d5c" rx="2"/>
-  <rect x="228" y="90"  width="20" height="290" fill="#f4a261" rx="2"/>
-  <rect x="249" y="90"  width="20" height="290" fill="#9b59b6" rx="2"/>
-  <text x="228" y="398" text-anchor="middle" font-size="11" fill="#374151">/adopt</text>
+  <!-- group start x=60+1*136=196, bar1 at 196+18=214 -->
+  <rect x="214" y="90"  width="20" height="290" fill="#4361ee" rx="2"/>
+  <rect x="241" y="90"  width="20" height="290" fill="#3a9d5c" rx="2"/>
+  <rect x="268" y="90"  width="20" height="290" fill="#f4a261" rx="2"/>
+  <rect x="295" y="90"  width="20" height="290" fill="#9b59b6" rx="2"/>
+  <text x="264" y="398" text-anchor="middle" font-size="11" fill="#374151">/adopt</text>
 
   <!-- ── /adopt/1: Perf=100 A11y=100 BP=100 SEO=100 ── -->
-  <rect x="299" y="90"  width="20" height="290" fill="#4361ee" rx="2"/>
-  <rect x="320" y="90"  width="20" height="290" fill="#3a9d5c" rx="2"/>
-  <rect x="341" y="90"  width="20" height="290" fill="#f4a261" rx="2"/>
-  <rect x="362" y="90"  width="20" height="290" fill="#9b59b6" rx="2"/>
-  <text x="341" y="398" text-anchor="middle" font-size="11" fill="#374151">/adopt/1</text>
+  <!-- group start x=60+2*136=332, bar1 at 332+18=350 -->
+  <rect x="350" y="90"  width="20" height="290" fill="#4361ee" rx="2"/>
+  <rect x="377" y="90"  width="20" height="290" fill="#3a9d5c" rx="2"/>
+  <rect x="404" y="90"  width="20" height="290" fill="#f4a261" rx="2"/>
+  <rect x="431" y="90"  width="20" height="290" fill="#9b59b6" rx="2"/>
+  <text x="400" y="398" text-anchor="middle" font-size="11" fill="#374151">/adopt/1</text>
 
   <!-- ── /about: Perf=100 A11y=98 BP=100 SEO=100 ── -->
-  <rect x="412" y="90"  width="20" height="290" fill="#4361ee" rx="2"/>
-  <rect x="433" y="96"  width="20" height="284" fill="#3a9d5c" rx="2"/>
-  <rect x="454" y="90"  width="20" height="290" fill="#f4a261" rx="2"/>
-  <rect x="475" y="90"  width="20" height="290" fill="#9b59b6" rx="2"/>
-  <text x="454" y="398" text-anchor="middle" font-size="11" fill="#374151">/about</text>
+  <!-- group start x=60+3*136=468, bar1 at 468+18=486 -->
+  <rect x="486" y="90"  width="20" height="290" fill="#4361ee" rx="2"/>
+  <rect x="513" y="96"  width="20" height="284" fill="#3a9d5c" rx="2"/>
+  <rect x="540" y="90"  width="20" height="290" fill="#f4a261" rx="2"/>
+  <rect x="567" y="90"  width="20" height="290" fill="#9b59b6" rx="2"/>
+  <text x="536" y="398" text-anchor="middle" font-size="11" fill="#374151">/about</text>
 
-  <!-- ── /blog: Perf=100 A11y=98 BP=100 SEO=100 ── -->
-  <rect x="525" y="90"  width="20" height="290" fill="#4361ee" rx="2"/>
-  <rect x="546" y="96"  width="20" height="284" fill="#3a9d5c" rx="2"/>
-  <rect x="567" y="90"  width="20" height="290" fill="#f4a261" rx="2"/>
-  <rect x="588" y="90"  width="20" height="290" fill="#9b59b6" rx="2"/>
-  <text x="567" y="398" text-anchor="middle" font-size="11" fill="#374151">/blog</text>
-
-  <!-- ── /donation: Perf=100 A11y=98 BP=100 SEO=100 ── -->
-  <rect x="638" y="90"  width="20" height="290" fill="#4361ee" rx="2"/>
-  <rect x="659" y="96"  width="20" height="284" fill="#3a9d5c" rx="2"/>
-  <rect x="680" y="90"  width="20" height="290" fill="#f4a261" rx="2"/>
-  <rect x="701" y="90"  width="20" height="290" fill="#9b59b6" rx="2"/>
-  <text x="680" y="398" text-anchor="middle" font-size="11" fill="#374151">/donation</text>
+  <!-- ── /blog: Perf=100 A11y=94 BP=96 SEO=100 ── -->
+  <!-- group start x=60+4*136=604, bar1 at 604+18=622 -->
+  <rect x="622" y="90"  width="20" height="290" fill="#4361ee" rx="2"/>
+  <rect x="649" y="107" width="20" height="273" fill="#3a9d5c" rx="2"/>
+  <rect x="676" y="102" width="20" height="278" fill="#f4a261" rx="2"/>
+  <rect x="703" y="90"  width="20" height="290" fill="#9b59b6" rx="2"/>
+  <text x="672" y="398" text-anchor="middle" font-size="11" fill="#374151">/blog</text>
+  <!-- regression markers -->
+  <text x="659" y="102" text-anchor="middle" font-size="9" fill="#ef4444">94▾</text>
+  <text x="686" y="97"  text-anchor="middle" font-size="9" fill="#f59e0b">96▾</text>
 
   <!-- ── Summary row ── -->
   <rect x="40" y="418" width="680" height="62" fill="#f8fafc" rx="6" stroke="#e2e8f0" stroke-width="1"/>
 
   <text x="113" y="439" text-anchor="middle" font-size="11" fill="#6b7280">Pages Audited</text>
-  <text x="113" y="462" text-anchor="middle" font-size="16" font-weight="bold" fill="#111827">6</text>
+  <text x="113" y="462" text-anchor="middle" font-size="16" font-weight="bold" fill="#111827">5</text>
 
   <text x="262" y="439" text-anchor="middle" font-size="11" fill="#6b7280">Avg Performance</text>
-  <text x="262" y="462" text-anchor="middle" font-size="16" font-weight="bold" fill="#4361ee">100</text>
+  <text x="262" y="462" text-anchor="middle" font-size="16" font-weight="bold" fill="#4361ee">99.8</text>
 
   <text x="400" y="439" text-anchor="middle" font-size="11" fill="#6b7280">Avg Accessibility</text>
-  <text x="400" y="462" text-anchor="middle" font-size="16" font-weight="bold" fill="#3a9d5c">98.7</text>
+  <text x="400" y="462" text-anchor="middle" font-size="16" font-weight="bold" fill="#3a9d5c">98.0</text>
 
   <text x="530" y="439" text-anchor="middle" font-size="11" fill="#6b7280">LCP SMART Obj. 1</text>
   <rect x="594" y="426" width="112" height="40" fill="#d1fae5" rx="4" stroke="#10b981" stroke-width="1"/>
@@ -121,6 +126,6 @@
   <text x="650" y="458" text-anchor="middle" font-size="11" font-weight="bold" fill="#065f46">PASS ✓</text>
 
   <!-- Source note -->
-  <text x="380" y="500" text-anchor="middle" font-size="10" fill="#9ca3af">Source: docs/reports/section-3-1-lighthouse-audit.md · Lighthouse v13 · Desktop · localhost:3000 · 2026-04-11 (after fixes)</text>
+  <text x="380" y="500" text-anchor="middle" font-size="10" fill="#9ca3af">Source: docs/reports/section-3-1-lighthouse-audit.md · Lighthouse v12.6.1 · Desktop · localhost:3000 · 2026-05-09</text>
 
 </svg>
