@@ -186,7 +186,7 @@ describe("GET /api/animals/records", () => {
       });
     });
 
-    const res = await request(getApp()).get("/api/animals/records");
+    const res = await asAuthenticated(request(getApp()).get("/api/animals/records"));
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
@@ -198,6 +198,29 @@ describe("GET /api/animals/records", () => {
         record_type: "vacunación",
       }),
     ]);
+  });
+
+  it("returns 401 when auth token is missing", async () => {
+    const res = await request(getApp()).get("/api/animals/records");
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/authentication required/i);
+  });
+
+  it("returns 401 when auth token is invalid or expired", async () => {
+    mockAuthGetUser.mockResolvedValueOnce({
+      data: { user: null },
+      error: { message: "invalid JWT" },
+    });
+
+    const res = await request(getApp())
+      .get("/api/animals/records")
+      .set("Authorization", "Bearer invalid-token");
+
+    expect(res.status).toBe(401);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/invalid or expired/i);
   });
 
   it("returns 500 when the view query fails", async () => {
@@ -215,7 +238,7 @@ describe("GET /api/animals/records", () => {
       });
     });
 
-    const res = await request(getApp()).get("/api/animals/records");
+    const res = await asAuthenticated(request(getApp()).get("/api/animals/records"));
 
     expect(res.status).toBe(500);
     expect(res.body.success).toBe(false);
@@ -255,6 +278,29 @@ describe("GET /api/animals/:aid", () => {
       });
     });
 
+    const res = await asAuthenticated(request(getApp()).get("/api/animals/1"));
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.name).toBe("Buddy");
+    expect(res.body.data.medical_records).toEqual([
+      expect.objectContaining({ record_id: 77, record_type: "vacunación" }),
+    ]);
+  });
+
+  it("returns animal with medical_records when unauthenticated", async () => {
+    mockFrom.mockImplementation((table) => {
+      if (table === "animals") {
+        return buildChainableMock({ data: MOCK_ANIMALS[0], error: null });
+      }
+      if (table === "medical_records") {
+        return buildChainableMock({
+          data: [{ record_id: 77, aid: 1, record_type: "vacunación" }],
+          error: null,
+        });
+      }
+      return buildChainableMock({ data: null, error: { message: "Unknown table" } });
+    });
+
     const res = await request(getApp()).get("/api/animals/1");
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
@@ -271,20 +317,20 @@ describe("GET /api/animals/:aid", () => {
     });
     mockFrom.mockReturnValue(chain);
 
-    const res = await request(getApp()).get("/api/animals/999");
+    const res = await asAuthenticated(request(getApp()).get("/api/animals/999"));
     expect(res.status).toBe(404);
     expect(res.body.success).toBe(false);
   });
 
   it("returns 400 for an invalid animal ID", async () => {
-    const res = await request(getApp()).get("/api/animals/abc");
+    const res = await asAuthenticated(request(getApp()).get("/api/animals/abc"));
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
     expect(res.body.error.message).toMatch(/invalid animal id/i);
   });
 
   it("returns 400 for negative animal ID", async () => {
-    const res = await request(getApp()).get("/api/animals/-5");
+    const res = await asAuthenticated(request(getApp()).get("/api/animals/-5"));
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
   });

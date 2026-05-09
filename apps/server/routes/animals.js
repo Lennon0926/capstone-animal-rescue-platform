@@ -100,6 +100,7 @@ router.get(
  */
 router.get(
   "/records",
+  asyncHandler(requireAuth),
   asyncHandler(async (req, res) => {
     const result = await getAnimalsRecordView();
 
