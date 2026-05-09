@@ -190,7 +190,7 @@ describe("Smoke: core animal flow", () => {
       });
     });
 
-    const detail = await request(app).get(`/api/animals/${firstAnimalId}`);
+    const detail = await asAuthenticated(request(app).get(`/api/animals/${firstAnimalId}`));
     expect(detail.status).toBe(200);
     expect(detail.body.success).toBe(true);
     expect(detail.body.data.aid).toBe(firstAnimalId);
@@ -201,7 +201,7 @@ describe("Smoke: core animal flow", () => {
   it("animal fetch: invalid ID returns 400", async () => {
     const app = getApp();
 
-    const res = await request(app).get("/api/animals/not-a-number");
+    const res = await asAuthenticated(request(app).get("/api/animals/not-a-number"));
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
   });

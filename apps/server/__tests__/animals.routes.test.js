@@ -186,7 +186,7 @@ describe("GET /api/animals/records", () => {
       });
     });
 
-    const res = await request(getApp()).get("/api/animals/records");
+    const res = await asAuthenticated(request(getApp()).get("/api/animals/records"));
 
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
@@ -215,7 +215,7 @@ describe("GET /api/animals/records", () => {
       });
     });
 
-    const res = await request(getApp()).get("/api/animals/records");
+    const res = await asAuthenticated(request(getApp()).get("/api/animals/records"));
 
     expect(res.status).toBe(500);
     expect(res.body.success).toBe(false);
@@ -255,7 +255,7 @@ describe("GET /api/animals/:aid", () => {
       });
     });
 
-    const res = await request(getApp()).get("/api/animals/1");
+    const res = await asAuthenticated(request(getApp()).get("/api/animals/1"));
     expect(res.status).toBe(200);
     expect(res.body.success).toBe(true);
     expect(res.body.data.name).toBe("Buddy");
@@ -271,20 +271,20 @@ describe("GET /api/animals/:aid", () => {
     });
     mockFrom.mockReturnValue(chain);
 
-    const res = await request(getApp()).get("/api/animals/999");
+    const res = await asAuthenticated(request(getApp()).get("/api/animals/999"));
     expect(res.status).toBe(404);
     expect(res.body.success).toBe(false);
   });
 
   it("returns 400 for an invalid animal ID", async () => {
-    const res = await request(getApp()).get("/api/animals/abc");
+    const res = await asAuthenticated(request(getApp()).get("/api/animals/abc"));
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
     expect(res.body.error.message).toMatch(/invalid animal id/i);
   });
 
   it("returns 400 for negative animal ID", async () => {
-    const res = await request(getApp()).get("/api/animals/-5");
+    const res = await asAuthenticated(request(getApp()).get("/api/animals/-5"));
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
   });
