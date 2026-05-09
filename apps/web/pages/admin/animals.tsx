@@ -24,15 +24,19 @@ type AdminAnimalsPageProps = {
 export default function AdminAnimalsPage({ animals }: AdminAnimalsPageProps) {
   const { isLoading } = useAuthRequired();
 
-  if (isLoading) return <div>Loading...</div>;
-
   return (
     <>
       <Head>
         <title>Administrar Animales | Huellitas Sin Hogar</title>
       </Head>
-      <AdminHeader />
-      <AdminAnimalsList initialAnimals={animals} />
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : (
+        <>
+          <AdminHeader />
+          <AdminAnimalsList initialAnimals={animals} />
+        </>
+      )}
     </>
   );
 }

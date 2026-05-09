@@ -18,20 +18,24 @@ type EditAnimalPageProps = {
 export default function EditAnimalPage({ animal, error }: EditAnimalPageProps) {
   const { isLoading } = useAuthRequired();
 
-  if (isLoading) return <div>Loading...</div>;
-
   return (
     <>
       <Head>
         <title>{animal ? `Editar ${animal.name}` : "Editar Animal"} | Huellitas Sin Hogar</title>
       </Head>
-      <AdminHeader />
-      {error ? (
-        <EditAnimalForm error={error} />
-      ) : animal ? (
-        <EditAnimalForm animal={animal} />
+      {isLoading ? (
+        <div>Loading...</div>
       ) : (
-        <EditAnimalForm notFound />
+        <>
+          <AdminHeader />
+          {error ? (
+            <EditAnimalForm error={error} />
+          ) : animal ? (
+            <EditAnimalForm animal={animal} />
+          ) : (
+            <EditAnimalForm notFound />
+          )}
+        </>
       )}
     </>
   );
