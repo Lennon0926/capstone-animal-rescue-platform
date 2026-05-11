@@ -248,11 +248,6 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
       return;
     }
 
-    if (!selectedFile) {
-      setErrorMessage("La imagen es requerida.");
-      return;
-    }
-
     setIsLoading(true);
 
     try {
@@ -269,15 +264,17 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
         return;
       }
 
-      const { config: latestUploadConfig, error: latestUploadError } =
-        await refreshUploadConfig();
+      if (selectedFile) {
+        const { config: latestUploadConfig, error: latestUploadError } =
+          await refreshUploadConfig();
 
-      if (!isUploadStorageAvailable(latestUploadConfig)) {
-        setErrorMessage(
-          latestUploadError ||
-            getUploadStorageUnavailableMessage(latestUploadConfig)
-        );
-        return;
+        if (!isUploadStorageAvailable(latestUploadConfig)) {
+          setErrorMessage(
+            latestUploadError ||
+              getUploadStorageUnavailableMessage(latestUploadConfig)
+          );
+          return;
+        }
       }
 
       const createResponse = await fetch(
@@ -318,14 +315,17 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
         throw new Error("La respuesta de creación del animal fue inválida.");
       }
 
-      const uploadResult = await uploadAnimalImage(
-        newAnimal.aid.toString(),
-        selectedFile
-      );
-      const finalAnimal = await updateAnimalImageObjectKey(
-        newAnimal.aid,
-        uploadResult.objectKey
-      );
+      let finalAnimal = newAnimal;
+      if (selectedFile) {
+        const uploadResult = await uploadAnimalImage(
+          newAnimal.aid.toString(),
+          selectedFile
+        );
+        finalAnimal = await updateAnimalImageObjectKey(
+          newAnimal.aid,
+          uploadResult.objectKey
+        );
+      }
 
       setSuccessMessage(getCreateAnimalSuccessMessage(createResult));
 
@@ -537,7 +537,6 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
             <div className={styles.formGroup}>
               <label htmlFor="image" className={styles.label}>
                 Selecciona una imagen
-                <span className={styles.required}>*</span>
               </label>
               <p className={styles.helpText}>
                 Formatos permitidos: JPEG, PNG, WEBP. Tamaño máximo: 5 MB.
@@ -548,7 +547,6 @@ export default function CreateAnimalForm({ onSave }: CreateAnimalFormProps) {
                 accept="image/jpeg,image/png,image/webp"
                 onChange={(event) => setSelectedFile(event.target.files?.[0] || null)}
                 className={styles.input}
-                required
               />
             </div>
 

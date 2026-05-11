@@ -11,6 +11,7 @@ export default function HeroSection() {
           loop
           playsInline
           preload="auto"
+          poster="/videos/close-up-dog-poster.jpg"
         >
           <source src="/videos/close-up-dog.mp4" type="video/mp4" />
         </video>

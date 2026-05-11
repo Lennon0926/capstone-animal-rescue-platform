@@ -139,10 +139,10 @@ CREATE POLICY IF NOT EXISTS "Allow service role full access on animals"
     ON public.animals FOR ALL 
     USING (auth.role() = 'service_role');
 
--- Medical Records: Public read, service role full access
-CREATE POLICY IF NOT EXISTS "Allow public read access on medical_records"
+-- Medical Records: Service role only (contains sensitive veterinary data)
+CREATE POLICY IF NOT EXISTS "Allow service role read access on medical_records"
     ON public.medical_records FOR SELECT
-    USING (true);
+    USING (auth.role() = 'service_role');
 
 CREATE POLICY IF NOT EXISTS "Allow service role full access on medical_records"
     ON public.medical_records FOR ALL

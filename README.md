@@ -4,7 +4,6 @@ A full-stack web application for animal rescue coordination, built with Next.js 
 
 ## Project Structure
 
-
 ```
 ├── apps/
 │   ├── server/          # Express API (Node.js)
@@ -112,6 +111,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 # Google Forms Integration
 # URL for the adoption application form
 NEXT_PUBLIC_GOOGLE_FORM_URL=your-google-form-url
+
+# URL for the volunteer intake Google Form
+NEXT_PUBLIC_VOLUNTEER_GOOGLE_FORM_URL=your-volunteer-google-form-url
 ```
 
 > See [docs/guides/SECRETS_MANAGEMENT.md](docs/guides/SECRETS_MANAGEMENT.md) for the full variable reference, optional vars, and secret rotation procedures.
