@@ -15,7 +15,7 @@ jest.mock("next/link", () => ({
     children: React.ReactNode;
     [key: string]: unknown;
   }) => (
-    <a href={typeof href === "string" ? href : href.pathname ?? ""} {...props}>
+    <a href={typeof href === "string" ? href : (href.pathname ?? "")} {...props}>
       {children}
     </a>
   ),
@@ -78,22 +78,17 @@ describe("VolunteerIntakeSection", () => {
       screen.getByRole("heading", {
         name: "Hazte voluntario",
         level: 2,
-      }),
+      })
     ).toBeInTheDocument();
 
     const cta = screen.getByRole("link", {
       name: "Completa el formulario de voluntariado",
     });
 
-    expect(cta).toHaveAttribute(
-      "href",
-      "https://docs.google.com/forms/d/e/example/viewform",
-    );
+    expect(cta).toHaveAttribute("href", "https://docs.google.com/forms/d/e/example/viewform");
     expect(cta).toHaveAttribute("target", "_blank");
     expect(cta).toHaveAttribute("rel", "noopener noreferrer");
-    expect(
-      screen.getByText(/Aunque no puedas ofrecer hogar temporero/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Aunque no puedas ofrecer hogar temporero/i)).toBeInTheDocument();
   });
 
   it("renders the volunteer opportunity options requested for the intake form", () => {
@@ -122,14 +117,12 @@ describe("VolunteerIntakeSection", () => {
     render(<VolunteerIntakeSection />);
 
     expect(
-      screen.getByText(
-        "El formulario de voluntariado no está disponible en este momento.",
-      ),
+      screen.getByText("El formulario de voluntariado no está disponible en este momento.")
     ).toBeInTheDocument();
     expect(
       screen.queryByRole("link", {
         name: "Completa el formulario de voluntariado",
-      }),
+      })
     ).not.toBeInTheDocument();
   });
 
@@ -151,7 +144,7 @@ describe("VolunteerIntakeSection", () => {
     expect(volunteerHeading).toBeInTheDocument();
     expect(
       getInvolvedHeading.compareDocumentPosition(volunteerHeading) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
+        Node.DOCUMENT_POSITION_FOLLOWING
     ).toBeTruthy();
   });
 });

@@ -29,13 +29,11 @@ export default function VolunteerIntakeSection() {
               Hazte voluntario
             </h2>
             <p className={styles.description}>
-              ¿Quieres ayudar a los animales rescatados? Completa nuestro
-              formulario de voluntariado y cuéntanos sobre tus destrezas, tu
-              disponibilidad y cómo te gustaría apoyar al albergue. Puedes
-              ayudar con transportación, recaudación de fondos, cuidado animal,
-              eventos, charlas educativas u otras oportunidades de servicio.
-              Aunque no puedas ofrecer hogar temporero, todavía hay muchas
-              maneras de hacer la diferencia.
+              ¿Quieres ayudar a los animales rescatados? Completa nuestro formulario de voluntariado
+              y cuéntanos sobre tus destrezas, tu disponibilidad y cómo te gustaría apoyar al
+              albergue. Puedes ayudar con transportación, recaudación de fondos, cuidado animal,
+              eventos, charlas educativas u otras oportunidades de servicio. Aunque no puedas
+              ofrecer hogar temporero, todavía hay muchas maneras de hacer la diferencia.
             </p>
           </div>
         </div>
