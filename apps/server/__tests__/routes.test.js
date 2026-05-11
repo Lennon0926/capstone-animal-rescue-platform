@@ -1,5 +1,17 @@
 const request = require("supertest");
 
+const mockAuthGetUser = jest.fn();
+const mockVerifyConnection = jest.fn();
+
+jest.mock("../lib/supabase", () => ({
+  getSupabaseClient: () => ({
+    auth: {
+      getUser: mockAuthGetUser,
+    },
+  }),
+  verifyConnection: (...args) => mockVerifyConnection(...args),
+}));
+
 beforeAll(() => {
   jest.spyOn(console, "error").mockImplementation(() => {});
 });
@@ -13,6 +25,17 @@ afterAll(() => {
 });
 
 const getApp = () => require("../server");
+const asAuthenticated = (req) =>
+  req.set("Authorization", "Bearer test-auth-token");
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  mockAuthGetUser.mockResolvedValue({
+    data: { user: { id: "test-user-id" } },
+    error: null,
+  });
+  mockVerifyConnection.mockResolvedValue({ connected: true });
+});
 
 describe("GET /", () => {
   it("returns the platform welcome message", async () => {
@@ -56,9 +79,21 @@ describe("GET /api/uploads/config", () => {
 });
 
 describe("POST /api/uploads/animals/:animalId/image", () => {
-  it("rejects requests with invalid animalId", async () => {
+  it("rejects requests without authentication", async () => {
     const res = await request(getApp())
-      .post("/api/uploads/animals/!!invalid!!/image")
+      .post("/api/uploads/animals/test-animal-1/image")
+      .attach("image", Buffer.from("fake"), {
+        filename: "test.jpg",
+        contentType: "image/jpeg",
+      });
+    expect(res.status).toBe(401);
+    expect(res.body.error.message).toMatch(/authentication required/i);
+  });
+
+  it("rejects requests with invalid animalId", async () => {
+    const res = await asAuthenticated(
+      request(getApp()).post("/api/uploads/animals/!!invalid!!/image")
+    )
       .attach("image", Buffer.from("fake"), {
         filename: "test.jpg",
         contentType: "image/jpeg",
@@ -68,15 +103,17 @@ describe("POST /api/uploads/animals/:animalId/image", () => {
   });
 
   it("rejects requests with no file attached", async () => {
-    const res = await request(getApp())
-      .post("/api/uploads/animals/test-animal-1/image");
+    const res = await asAuthenticated(
+      request(getApp()).post("/api/uploads/animals/test-animal-1/image")
+    );
     expect(res.status).toBe(400);
     expect(res.body.error.code).toBe("MISSING_IMAGE_FILE");
   });
 
   it("rejects files with unsupported MIME type", async () => {
-    const res = await request(getApp())
-      .post("/api/uploads/animals/test-animal-1/image")
+    const res = await asAuthenticated(
+      request(getApp()).post("/api/uploads/animals/test-animal-1/image")
+    )
       .attach("image", Buffer.from("fake"), {
         filename: "test.gif",
         contentType: "image/gif",

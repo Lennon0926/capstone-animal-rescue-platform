@@ -20,6 +20,7 @@ export interface FacebookPost {
   full_picture?: string;
   created_time: string;
   permalink_url: string;
+  likes?: { summary: { total_count: number } };
   comments?: { data: FacebookComment[] };
   attachments?: { data: FacebookAttachment[] };
 }
@@ -49,18 +50,19 @@ export default async function handler(
   const accessToken = process.env.FB_ACCESS_TOKEN;
 
   if (!pageId || !accessToken) {
-    return res
-      .status(500)
-      .json({ error: "Facebook credentials are not configured" });
+    return res.status(500).json({ error: "Facebook credentials are not configured" });
   }
 
   const limit = Number(req.query.limit ?? 12);
 
   try {
-    const fields = "message,story,full_picture,created_time,permalink_url,comments{message,from{name,id},created_time},attachments{type,media,subattachments{type,media}}";
-    const url = `https://graph.facebook.com/v21.0/${pageId}/posts?fields=${fields}&limit=${limit}&access_token=${accessToken}`;
+    const fields =
+      "message,story,full_picture,created_time,permalink_url,likes.summary(true),comments{message,from{name,id},created_time},attachments{type,media,subattachments{type,media}}";
+    const url = `https://graph.facebook.com/v21.0/${pageId}/posts?fields=${fields}&limit=${limit}`;
 
-    const fbRes = await fetch(url);
+    const fbRes = await fetch(url, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
     const json: FacebookGraphResponse = await fbRes.json();
 
     if (!fbRes.ok || json.error) {
@@ -70,10 +72,7 @@ export default async function handler(
     }
 
     // Cache 10 minutes at the edge, serve stale for 1 minute while revalidating
-    res.setHeader(
-      "Cache-Control",
-      "s-maxage=600, stale-while-revalidate=60"
-    );
+    res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate=60");
 
     return res.status(200).json(json.data);
   } catch {

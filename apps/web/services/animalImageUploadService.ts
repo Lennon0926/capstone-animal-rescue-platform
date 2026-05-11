@@ -1,5 +1,8 @@
 import type { Animal } from "@/types/animal";
 import { getAuthenticatedHeaders } from "@/lib/apiAuth";
+import { compressIfNeeded } from "@/lib/imageCompressor";
+
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -274,8 +277,9 @@ export const uploadAnimalImage = async (
     throw new Error("Animal ID is required.");
   }
 
+  const compressed = await compressIfNeeded(file, MAX_UPLOAD_BYTES);
   const formData = new FormData();
-  formData.append("image", file);
+  formData.append("image", compressed);
 
   const response = await fetch(
     `${getApiBaseUrl()}/api/uploads/animals/${encodeURIComponent(

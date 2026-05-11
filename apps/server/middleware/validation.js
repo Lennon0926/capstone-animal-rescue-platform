@@ -503,6 +503,113 @@ function validateUpdateAnimal(req, res, next) {
   }
 }
 
+function sanitizeLongBlogText(value) {
+  if (typeof value !== "string") return "";
+  return value.replace(/[;'"\\]/g, "").trim().slice(0, 5000);
+}
+
+function validatePostsQuery(req, res, next) {
+  try {
+    req.validatedParams = validatePagination(req.query);
+    next();
+  } catch (err) {
+    next(new ApiError(400, "Invalid query parameters", err.message));
+  }
+}
+
+function validatePostId(req, res, next) {
+  const pid = parseInt(req.params.pid, 10);
+  if (isNaN(pid) || pid < 1) {
+    return next(new ApiError(400, "Invalid post ID. Must be a positive integer."));
+  }
+  req.params.pid = pid;
+  next();
+}
+
+function validateCreatePost(req, res, next) {
+  try {
+    const header = sanitizeString(req.body.header);
+    const body = sanitizeLongBlogText(req.body.body);
+
+    if (!header) throw new ApiError(400, "header is required.");
+    if (header.length > 160) throw new ApiError(400, "header must be 160 characters or fewer.");
+    if (!body) throw new ApiError(400, "body is required.");
+
+    if (req.body.image_url !== undefined) {
+      throw new ApiError(400, "image_url is read-only. Use image_object_key for post images.");
+    }
+
+    const validated = { header, body };
+
+    if (req.body.is_pinned !== undefined) {
+      if (typeof req.body.is_pinned !== "boolean") {
+        throw new ApiError(400, "is_pinned must be a boolean.");
+      }
+      validated.is_pinned = req.body.is_pinned;
+    }
+
+    if (req.body.image_object_key !== undefined) {
+      const key = sanitizeImageObjectKey(req.body.image_object_key);
+      if (!key) throw new ApiError(400, "Invalid image_object_key.");
+      validated.image_object_key = key;
+    }
+
+    req.validatedBody = validated;
+    next();
+  } catch (err) {
+    next(err);
+  }
+}
+
+function validateUpdatePost(req, res, next) {
+  try {
+    const updates = {};
+
+    if (req.body.header !== undefined) {
+      const header = sanitizeString(req.body.header);
+      if (!header) throw new ApiError(400, "Invalid header.");
+      if (header.length > 160) throw new ApiError(400, "header must be 160 characters or fewer.");
+      updates.header = header;
+    }
+
+    if (req.body.body !== undefined) {
+      const body = sanitizeLongBlogText(req.body.body);
+      if (!body) throw new ApiError(400, "Invalid body.");
+      updates.body = body;
+    }
+
+    if (req.body.is_pinned !== undefined) {
+      if (typeof req.body.is_pinned !== "boolean") {
+        throw new ApiError(400, "is_pinned must be a boolean.");
+      }
+      updates.is_pinned = req.body.is_pinned;
+    }
+
+    if (req.body.image_url !== undefined) {
+      throw new ApiError(400, "image_url is read-only. Use image_object_key for post images.");
+    }
+
+    if (req.body.image_object_key !== undefined) {
+      const key = sanitizeImageObjectKey(req.body.image_object_key);
+      if (!key) throw new ApiError(400, "Invalid image_object_key.");
+      updates.image_object_key = key;
+    }
+
+    if (req.body.remove_image === true) {
+      updates.remove_image = true;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      throw new ApiError(400, "No valid fields provided for update.");
+    }
+
+    req.validatedBody = updates;
+    next();
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   sanitizeString,
   sanitizeImageObjectKey,
@@ -512,5 +619,9 @@ module.exports = {
   validateAnimalsQuery,
   validateAnimalId,
   validateCreateAnimal,
-  validateUpdateAnimal
+  validateUpdateAnimal,
+  validatePostsQuery,
+  validatePostId,
+  validateCreatePost,
+  validateUpdatePost,
 };

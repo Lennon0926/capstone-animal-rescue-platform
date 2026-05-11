@@ -91,7 +91,7 @@ describe("DonationModal", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "Ir a PayPal", hidden: true }),
-    ).toHaveAttribute("href", "https://www.paypal.com/donate?token=PWap2_X7g39qEq-0OeWcPX6erlploV4njS3a-pox-ena8sDChwp5TxxV0pBXeCjxAf30QgZ0kenLfrOR");
+    ).toHaveAttribute("href", "https://www.paypal.com/donate");
   });
 
   it("calls onClose from the close button, overlay click, and Escape key", () => {
