@@ -63,7 +63,9 @@ describe("LoginPage", () => {
     await user.type(screen.getByLabelText(/contraseña/i), "password123");
     await user.click(screen.getByRole("button", { name: "Sign In" }));
 
-    expect(await screen.findByText("Invalid email or password. Please try again.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Invalid email or password. Please try again.")
+    ).toBeInTheDocument();
   });
 
   it("normalizes credentials and redirects on successful login", async () => {
@@ -96,7 +98,9 @@ describe("LoginPage", () => {
     await user.click(screen.getByRole("button", { name: "¿Olvidaste tu contraseña?" }));
 
     expect(
-      await screen.findByText("Primero ingresa tu correo para recibir el enlace de restablecimiento."),
+      await screen.findByText(
+        "Primero ingresa tu correo para recibir el enlace de restablecimiento."
+      )
     ).toBeInTheDocument();
   });
 
@@ -113,6 +117,8 @@ describe("LoginPage", () => {
       expect(mockedSupabase.auth.resetPasswordForEmail).toHaveBeenCalled();
     });
 
-    expect(await screen.findByText("Enlace de restablecimiento enviado. Revisa tu correo.")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Enlace de restablecimiento enviado. Revisa tu correo.")
+    ).toBeInTheDocument();
   });
 });

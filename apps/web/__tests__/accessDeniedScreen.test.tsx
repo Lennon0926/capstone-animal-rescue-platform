@@ -8,8 +8,6 @@ describe("AccessDeniedScreen", () => {
     render(<AccessDeniedScreen />);
 
     expect(screen.getByRole("heading", { name: "Acceso Denegado" })).toBeInTheDocument();
-    expect(
-      screen.getByText("No tienes permisos para acceder a esta página."),
-    ).toBeInTheDocument();
+    expect(screen.getByText("No tienes permisos para acceder a esta página.")).toBeInTheDocument();
   });
 });

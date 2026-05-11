@@ -118,7 +118,7 @@ describe("UsersManagement", () => {
     });
 
     const patchCall = (global.fetch as jest.Mock).mock.calls.find(
-      ([, options]) => options?.method === "PATCH",
+      ([, options]) => options?.method === "PATCH"
     );
 
     expect(patchCall).toBeDefined();
@@ -150,7 +150,7 @@ describe("UsersManagement", () => {
     await user.click(screen.getByRole("button", { name: "Delete" }));
 
     const deleteCall = (global.fetch as jest.Mock).mock.calls.find(
-      ([, options]) => options?.method === "DELETE",
+      ([, options]) => options?.method === "DELETE"
     );
 
     expect(deleteCall).toBeUndefined();

@@ -62,7 +62,9 @@ describe("ResetPasswordPage", () => {
     render(<ResetPasswordPage />);
 
     expect(
-      await screen.findByText("Abre esta página desde el enlace del correo para restablecer contraseña."),
+      await screen.findByText(
+        "Abre esta página desde el enlace del correo para restablecer contraseña."
+      )
     ).toBeInTheDocument();
   });
 
@@ -102,7 +104,7 @@ describe("ResetPasswordPage", () => {
     });
 
     expect(
-      await screen.findByText("Contraseña actualizada. Redirigiendo al inicio de sesión..."),
+      await screen.findByText("Contraseña actualizada. Redirigiendo al inicio de sesión...")
     ).toBeInTheDocument();
 
     act(() => {
