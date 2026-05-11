@@ -3,6 +3,7 @@ const request = require("supertest");
 const mockRolesSelect = jest.fn();
 const mockRolesIn = jest.fn();
 const mockUserRolesSelectIn = jest.fn();
+const mockUserRolesSelectEq = jest.fn();
 const mockUserRolesDeleteEq = jest.fn();
 const mockUserRolesInsert = jest.fn();
 const mockAuthGetUser = jest.fn();
@@ -41,6 +42,14 @@ const mockFrom = jest.fn((table) => {
       select: jest.fn((columns) => {
         if (columns === "user_id, role_id") {
           return { in: mockUserRolesSelectIn };
+        }
+
+        if (columns === "uid, role_id") {
+          return { in: mockUserRolesSelectIn };
+        }
+
+        if (columns === "role_id") {
+          return { eq: mockUserRolesSelectEq };
         }
 
         return {};
@@ -142,6 +151,55 @@ describe("GET /api/users", () => {
   });
 });
 
+describe("GET /api/users/me/roles", () => {
+  it("merges role names from DB and auth metadata", async () => {
+    mockAuthGetUser.mockResolvedValue({
+      data: {
+        user: {
+          id: "admin-user-id",
+          app_metadata: { role: "admin", roles: ["manager"] },
+          user_metadata: { roles: "helper, admin" },
+        },
+      },
+      error: null,
+    });
+    mockUserRolesSelectEq.mockResolvedValue({
+      data: [{ role_id: 2 }, { role_id: 3 }],
+      error: null,
+    });
+    mockRolesIn.mockResolvedValue({
+      data: [
+        { id: 2, name: "helper" },
+        { id: 3, role_name: "foster" },
+      ],
+      error: null,
+    });
+
+    const res = await asAuthenticated(request(getApp()).get("/api/users/me/roles"));
+
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data.user_id).toBe("admin-user-id");
+    expect(res.body.data.role_ids).toEqual(expect.arrayContaining([2, 3]));
+    expect(res.body.data.role_names).toEqual(
+      expect.arrayContaining(["helper", "foster", "admin", "manager"]),
+    );
+  });
+
+  it("returns 500 when repository role lookup fails", async () => {
+    mockUserRolesSelectEq.mockResolvedValue({
+      data: null,
+      error: { message: "db down" },
+    });
+
+    const res = await asAuthenticated(request(getApp()).get("/api/users/me/roles"));
+
+    expect(res.status).toBe(500);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toBe("Failed to fetch current user roles.");
+  });
+});
+
 describe("GET /api/users/roles", () => {
   it("returns available roles", async () => {
     mockRolesSelect.mockResolvedValue({
@@ -200,6 +258,35 @@ describe("PATCH /api/users/:userId", () => {
       role_names: ["helper"],
     });
   });
+
+  it("returns 409 when updating email to an existing account", async () => {
+    mockRolesIn.mockResolvedValue({
+      data: [{ id: 2, name: "helper" }],
+      error: null,
+    });
+    mockAuthAdminUpdateUserById.mockResolvedValue({
+      data: { user: null },
+      error: { message: "User already been registered" },
+    });
+
+    const res = await asAuthenticated(
+      request(getApp()).patch("/api/users/user-1").send(VALID_BODY),
+    );
+
+    expect(res.status).toBe(409);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toBe("A user with this email already exists.");
+  });
+
+  it("returns 400 when userId param is blank after trimming", async () => {
+    const res = await asAuthenticated(
+      request(getApp()).patch("/api/users/%20").send(VALID_BODY),
+    );
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toBe("userId is required.");
+  });
 });
 
 describe("DELETE /api/users/:userId", () => {
@@ -212,6 +299,18 @@ describe("DELETE /api/users/:userId", () => {
     expect(res.body.success).toBe(true);
     expect(res.body.data).toEqual({ id: "user-1" });
     expect(mockAuthAdminDeleteUser).toHaveBeenCalledWith("user-1");
+  });
+
+  it("returns 404 when user does not exist", async () => {
+    mockAuthAdminDeleteUser.mockResolvedValue({
+      error: { message: "User not found" },
+    });
+
+    const res = await asAuthenticated(request(getApp()).delete("/api/users/user-404"));
+
+    expect(res.status).toBe(404);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toBe("User not found.");
   });
 });
 
@@ -287,5 +386,16 @@ describe("POST /api/users", () => {
 
     expect(res.status).toBe(409);
     expect(res.body.success).toBe(false);
+  });
+
+  it("returns 400 when role_ids includes non-positive integers", async () => {
+    const res = await asAuthenticated(request(getApp()).post("/api/users")).send({
+      ...VALID_BODY,
+      role_ids: [0],
+    });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/positive integers/i);
   });
 });
