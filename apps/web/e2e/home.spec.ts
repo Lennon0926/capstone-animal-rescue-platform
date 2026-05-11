@@ -36,9 +36,11 @@ test.describe('Home page (/home)', () => {
         const nav = page.locator('header nav');
         await expect(nav.getByRole('link', {name: 'Home', exact: true}))
             .toBeVisible();
+        await expect(nav.getByRole('link', {name: 'Recomendaciones', exact: true}))
+          .toBeVisible();
         await expect(nav.getByRole('link', {name: 'Adoptar', exact: true}))
             .toBeVisible();
-        await expect(nav.getByRole('link', {name: 'About', exact: true}))
+        await expect(nav.getByRole('link', {name: 'Acerca de', exact: true}))
             .toBeVisible();
         await expect(nav.getByRole('link', {name: 'Blog', exact: true}))
             .toBeVisible();
