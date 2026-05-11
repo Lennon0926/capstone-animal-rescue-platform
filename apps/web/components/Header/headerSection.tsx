@@ -15,6 +15,7 @@ export default function Header({ revealOnFirstScroll = false }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
   const navigationLinks = getPublicNavigationLinks();
+  const volunteerFormUrl = process.env.NEXT_PUBLIC_VOLUNTEER_GOOGLE_FORM_URL;
 
   const isRevealed = !revealOnFirstScroll || hasScrolled;
 
@@ -74,6 +75,16 @@ export default function Header({ revealOnFirstScroll = false }: HeaderProps) {
               {link.label}
             </Link>
           ))}
+          {volunteerFormUrl && (
+            <a
+              className={styles.volunteerButton}
+              href={volunteerFormUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Voluntariado
+            </a>
+          )}
           <DonationModalTrigger className={styles.donateButton}>Donar</DonationModalTrigger>
         </nav>
 
@@ -83,7 +94,11 @@ export default function Header({ revealOnFirstScroll = false }: HeaderProps) {
           aria-expanded={isOpen}
           aria-label="Toggle Menu"
         >
-          ☰
+          <span className={styles.menuIcon} aria-hidden="true">
+            <span className={styles.menuIconBar} />
+            <span className={styles.menuIconBar} />
+            <span className={styles.menuIconBar} />
+          </span>
         </button>
       </div>
 
@@ -94,6 +109,17 @@ export default function Header({ revealOnFirstScroll = false }: HeaderProps) {
               {link.label}
             </Link>
           ))}
+          {volunteerFormUrl && (
+            <a
+              className={styles.volunteerButtonMobile}
+              href={volunteerFormUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setIsOpen(false)}
+            >
+              Voluntariado
+            </a>
+          )}
           <DonationModalTrigger
             className={styles.donateButtonMobile}
             onOpen={() => setIsOpen(false)}

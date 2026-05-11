@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import DonationModalTrigger from "@/components/DonationPage/DonationModalTrigger";
+import VolunteerIntakeSection from "@/components/LandingPage/VolunteerIntake/volunteerIntakeSection";
 import { isAdoptCatalogVisible } from "@/lib/publicNavigation";
 import {
   CalendarCheck,
@@ -47,6 +48,10 @@ const careCommitments = [
 
 const helpOptions = [
   {
+    title: "Voluntariado",
+    text: "Completar el formulario de voluntariado nos ayuda a conocer tus destrezas, disponibilidad y la mejor forma de integrarte al trabajo de rescate.",
+  },
+  {
     title: "Hogar temporero",
     text: "Abrir tu casa de forma temporal ayuda a que un animal rescatado tenga un ambiente seguro mientras se recupera y se prepara para adopción.",
   },
@@ -66,6 +71,7 @@ const helpOptions = [
 
 export default function RecommendationsPage() {
   const showAdoptCatalog = isAdoptCatalogVisible();
+  const volunteerFormUrl = process.env.NEXT_PUBLIC_VOLUNTEER_GOOGLE_FORM_URL;
 
   return (
     <main className={styles.page}>
@@ -96,6 +102,16 @@ export default function RecommendationsPage() {
             <a href="#help" className={styles.secondaryAction}>
               Cómo ayudar
             </a>
+            {volunteerFormUrl && (
+              <a
+                href={volunteerFormUrl}
+                className={styles.volunteerAction}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Formulario de voluntariado
+              </a>
+            )}
           </div>
         </div>
       </section>
@@ -164,6 +180,8 @@ export default function RecommendationsPage() {
         </div>
       </section>
 
+      <VolunteerIntakeSection />
+
       <section className={`${styles.section} ${styles.calloutSection}`}>
         <div className={styles.calloutGrid}>
           <article className={styles.calloutCard}>
@@ -207,6 +225,16 @@ export default function RecommendationsPage() {
               </Link>
             )}
             <DonationModalTrigger className={styles.finalSecondary}>Donar</DonationModalTrigger>
+            {volunteerFormUrl && (
+              <a
+                href={volunteerFormUrl}
+                className={styles.finalSecondary}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Ser voluntario
+              </a>
+            )}
             <Link href="/about" className={styles.finalSecondary}>
               Conocer CPAAA
             </Link>

@@ -6,6 +6,7 @@ import { getFooterQuickLinks } from "@/lib/publicNavigation";
 
 export default function Footer() {
   const quickLinks = getFooterQuickLinks();
+  const volunteerFormUrl = process.env.NEXT_PUBLIC_VOLUNTEER_GOOGLE_FORM_URL;
 
   return (
     <footer className={styles.footer}>
@@ -38,8 +39,18 @@ export default function Footer() {
                 Donar
               </DonationModalTrigger>
             </li>
-            {/* <li><Link href="/volunteer">Ser Voluntario</Link></li>
-            <li><Link href="/foster">Programa de Hogar Temporal</Link></li> */}
+            {volunteerFormUrl && (
+              <li>
+                <a
+                  className={styles.footerVolunteerButton}
+                  href={volunteerFormUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Ser voluntario
+                </a>
+              </li>
+            )}
           </ul>
         </div>
 
