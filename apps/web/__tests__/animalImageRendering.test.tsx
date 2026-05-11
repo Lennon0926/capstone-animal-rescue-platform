@@ -13,15 +13,8 @@ jest.mock("next/image", () => ({
     src: string | { src: string };
     alt: string;
     [key: string]: unknown;
-  }) => (
-    <img
-      src={typeof src === "string" ? src : src.src}
-      alt={alt}
-      {...props}
-    />
-  ),
+  }) => <img src={typeof src === "string" ? src : src.src} alt={alt} {...props} />,
 }));
-
 
 jest.mock("next/link", () => ({
   __esModule: true,
@@ -34,14 +27,13 @@ jest.mock("next/link", () => ({
     children: React.ReactNode;
     [key: string]: unknown;
   }) => (
-    <a href={typeof href === "string" ? href : href.pathname ?? ""} {...props}>
+    <a href={typeof href === "string" ? href : (href.pathname ?? "")} {...props}>
       {children}
     </a>
   ),
 }));
 
-const R2_PUBLIC_BASE_URL =
-  "https://pub-9bda3c8e4200423ca4ec2b9ee4d6d5d3.r2.dev";
+const R2_PUBLIC_BASE_URL = "https://pub-9bda3c8e4200423ca4ec2b9ee4d6d5d3.r2.dev";
 
 const animalWithObjectKey: Animal = {
   aid: 42,
@@ -93,24 +85,22 @@ describe("animal image rendering", () => {
   });
 
   it("renders the landing-page animal card image from image_object_key", async () => {
-    const { default: AnimalsSection } = await import(
-      "@/components/LandingPage/Animals/animalsSection"
-    );
+    const { default: AnimalsSection } =
+      await import("@/components/LandingPage/Animals/animalsSection");
 
     render(<AnimalsSection animals={[animalWithObjectKey]} />);
 
     expect(screen.getByRole("img", { name: animalWithObjectKey.name })).toHaveAttribute(
       "src",
-      `${R2_PUBLIC_BASE_URL}/animals/42/luna%20photo.jpg`,
+      `${R2_PUBLIC_BASE_URL}/animals/42/luna%20photo.jpg`
     );
   });
 
   it("hides the landing-page animals section when adopt catalog is disabled", async () => {
     process.env.NEXT_PUBLIC_SHOW_ADOPT_PAGE = "false";
 
-    const { default: AnimalsSection } = await import(
-      "@/components/LandingPage/Animals/animalsSection"
-    );
+    const { default: AnimalsSection } =
+      await import("@/components/LandingPage/Animals/animalsSection");
 
     render(<AnimalsSection animals={[animalWithObjectKey]} />);
 
@@ -121,22 +111,18 @@ describe("animal image rendering", () => {
   });
 
   it("renders the animal detail image from image_object_key", async () => {
-    const { default: AnimalInfo } = await import(
-      "@/components/Animal/AnimalInfoPage/animalInfo"
-    );
+    const { default: AnimalInfo } = await import("@/components/Animal/AnimalInfoPage/animalInfo");
 
     render(<AnimalInfo animal={animalWithObjectKey} />);
 
     expect(screen.getByRole("img", { name: animalWithObjectKey.name })).toHaveAttribute(
       "src",
-      `${R2_PUBLIC_BASE_URL}/animals/42/luna%20photo.jpg`,
+      `${R2_PUBLIC_BASE_URL}/animals/42/luna%20photo.jpg`
     );
   });
 
   it("renders medical records on the animal detail page", async () => {
-    const { default: AnimalInfo } = await import(
-      "@/components/Animal/AnimalInfoPage/animalInfo"
-    );
+    const { default: AnimalInfo } = await import("@/components/Animal/AnimalInfoPage/animalInfo");
 
     render(<AnimalInfo animal={animalWithMedicalRecords} />);
 
