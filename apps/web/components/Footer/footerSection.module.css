@@ -57,7 +57,8 @@
   transition: var(--transition-fast);
 }
 
-.footerDonateButton {
+.footerDonateButton,
+.footerVolunteerButton {
   color: var(--text-muted);
   transition: var(--transition-fast);
 }
@@ -66,7 +67,8 @@
   color: var(--color-primary);
 }
 
-.footerDonateButton:hover {
+.footerDonateButton:hover,
+.footerVolunteerButton:hover {
   color: var(--color-primary);
 }
 
