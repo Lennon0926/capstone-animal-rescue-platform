@@ -4,8 +4,8 @@ import { useAuthRequired } from "@/lib/useAuthRequired";
 
 export default function AdminAccessDeniedPage() {
   const { isLoading } = useAuthRequired();
-  
-  if (isLoading) return <div>Loading...</div>;
+
+  if (isLoading) return <div>Cargando...</div>;
 
   return (
     <>
