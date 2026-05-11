@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import DonationModalTrigger from "../DonationPage/DonationModalTrigger";
+import DonationModal from "../DonationPage/DonationModal";
+import { DEFAULT_MODAL_AMOUNT } from "../DonationPage/donationOptions";
 import { getPublicNavigationLinks } from "@/lib/publicNavigation";
 import styles from "./headerSection.module.css";
 
@@ -13,6 +14,7 @@ type HeaderProps = {
 
 export default function Header({ revealOnFirstScroll = false }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isDonationOpen, setIsDonationOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
   const navigationLinks = getPublicNavigationLinks();
   const volunteerFormUrl = process.env.NEXT_PUBLIC_VOLUNTEER_GOOGLE_FORM_URL;
@@ -85,7 +87,13 @@ export default function Header({ revealOnFirstScroll = false }: HeaderProps) {
               Voluntariado
             </a>
           )}
-          <DonationModalTrigger className={styles.donateButton}>Donar</DonationModalTrigger>
+          <button
+            type="button"
+            className={styles.donateButton}
+            onClick={() => setIsDonationOpen(true)}
+          >
+            Donar
+          </button>
         </nav>
 
         <button
@@ -120,14 +128,24 @@ export default function Header({ revealOnFirstScroll = false }: HeaderProps) {
               Voluntariado
             </a>
           )}
-          <DonationModalTrigger
+          <button
+            type="button"
             className={styles.donateButtonMobile}
-            onOpen={() => setIsOpen(false)}
+            onClick={() => {
+              setIsOpen(false);
+              setIsDonationOpen(true);
+            }}
           >
             Donar
-          </DonationModalTrigger>
+          </button>
         </nav>
       )}
+
+      <DonationModal
+        isOpen={isDonationOpen}
+        onClose={() => setIsDonationOpen(false)}
+        selectedAmount={DEFAULT_MODAL_AMOUNT}
+      />
     </header>
   );
 }
