@@ -10,7 +10,7 @@ const publicNavigationLinks: PublicNavigationLink[] = [
   { href: "/", label: "Home" },
   { href: "/recommendations", label: "Recomendaciones" },
   { href: "/adopt", label: "Adoptar", requiresAdoptCatalog: true },
-  { href: "/about", label: "About" },
+  { href: "/about", label: "Acerca de" },
   { href: "/blog", label: "Blog" },
 ];
 

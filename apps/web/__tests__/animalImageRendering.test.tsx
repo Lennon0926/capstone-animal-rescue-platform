@@ -74,13 +74,22 @@ const animalWithMedicalRecords: Animal = {
 };
 
 describe("animal image rendering", () => {
+  const originalShowAdoptPage = process.env.NEXT_PUBLIC_SHOW_ADOPT_PAGE;
+
   beforeEach(() => {
     jest.resetModules();
     process.env.NEXT_PUBLIC_R2_PUBLIC_BASE_URL = R2_PUBLIC_BASE_URL;
+    process.env.NEXT_PUBLIC_SHOW_ADOPT_PAGE = "true";
   });
 
   afterAll(() => {
     delete process.env.NEXT_PUBLIC_R2_PUBLIC_BASE_URL;
+
+    if (originalShowAdoptPage === undefined) {
+      delete process.env.NEXT_PUBLIC_SHOW_ADOPT_PAGE;
+    } else {
+      process.env.NEXT_PUBLIC_SHOW_ADOPT_PAGE = originalShowAdoptPage;
+    }
   });
 
   it("renders the landing-page animal card image from image_object_key", async () => {
@@ -94,6 +103,21 @@ describe("animal image rendering", () => {
       "src",
       `${R2_PUBLIC_BASE_URL}/animals/42/luna%20photo.jpg`,
     );
+  });
+
+  it("hides the landing-page animals section when adopt catalog is disabled", async () => {
+    process.env.NEXT_PUBLIC_SHOW_ADOPT_PAGE = "false";
+
+    const { default: AnimalsSection } = await import(
+      "@/components/LandingPage/Animals/animalsSection"
+    );
+
+    render(<AnimalsSection animals={[animalWithObjectKey]} />);
+
+    expect(
+      screen.queryByRole("heading", { name: /Conoce a Nuestros Animales/i })
+    ).not.toBeInTheDocument();
+    expect(screen.queryByRole("img", { name: animalWithObjectKey.name })).not.toBeInTheDocument();
   });
 
   it("renders the animal detail image from image_object_key", async () => {
