@@ -10,7 +10,6 @@ module.exports = {
         'http://localhost:3000/adopt/1',
         'http://localhost:3000/about',
         'http://localhost:3000/blog',
-        'http://localhost:3000/donation',
       ],
       numberOfRuns: 1,
       settings: { preset: 'desktop' },

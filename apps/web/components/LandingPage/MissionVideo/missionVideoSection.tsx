@@ -57,6 +57,7 @@ export default function MissionVideoSection() {
         loop
         playsInline
         preload="auto"
+        poster="/videos/playa-poster.jpg"
         aria-hidden="true"
       >
         <source src="/videos/Playa.mp4" type="video/mp4" />

@@ -4,8 +4,8 @@
   <rect width="720" height="380" fill="#ffffff" rx="8"/>
 
   <!-- Title -->
-  <text x="360" y="30" text-anchor="middle" font-size="15" font-weight="bold" fill="#111827">Performance Optimization — Baseline vs Final (#113)</text>
-  <text x="360" y="50" text-anchor="middle" font-size="11" fill="#6b7280">4 optimization rounds applied · 2026-04-05 → 2026-04-11</text>
+  <text x="360" y="30" text-anchor="middle" font-size="15" font-weight="bold" fill="#111827">Performance Optimization — Baseline vs Final (April Sprint)</text>
+  <text x="360" y="50" text-anchor="middle" font-size="11" fill="#6b7280">4 optimization rounds applied · 2026-04-05 → 2026-04-11 (historical; May run affected by rate limiter)</text>
 
   <!--
     Metrics to compare (ms):
@@ -124,6 +124,6 @@
   <text x="360" y="362" text-anchor="middle" font-size="11" fill="#065f46">2,417 ms → 9 ms  (−99.6%)  — 4 parallel queries replaced by single RPC + 30 s cache</text>
 
   <!-- Source note -->
-  <text x="360" y="378" text-anchor="middle" font-size="10" fill="#9ca3af">Source: docs/reports/section-3-2-load-test-results.md</text>
+  <text x="360" y="378" text-anchor="middle" font-size="10" fill="#9ca3af">Source: docs/reports/section-3-2-load-test-results.md · April optimization history · 2026-05-09 run data in load-test-p95.svg</text>
 
 </svg>

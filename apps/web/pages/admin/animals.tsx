@@ -1,4 +1,5 @@
 import { GetServerSideProps } from "next";
+import Head from "next/head";
 import AdminHeader from "@/components/Admin/AdminHeader/adminHeader";
 import AdminAnimalsList from "@/components/Admin/AdminAnimalsList/adminAnimalsList";
 import { useAuthRequired } from "@/lib/useAuthRequired";
@@ -27,6 +28,9 @@ export default function AdminAnimalsPage({ animals }: AdminAnimalsPageProps) {
 
   return (
     <>
+      <Head>
+        <title>Administrar Animales | Huellitas Sin Hogar</title>
+      </Head>
       <AdminHeader />
       <AdminAnimalsList initialAnimals={animals} />
     </>
@@ -35,9 +39,7 @@ export default function AdminAnimalsPage({ animals }: AdminAnimalsPageProps) {
 
 export const getServerSideProps: GetServerSideProps = async () => {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals?limit=1000`,
-    );
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals?limit=1000`);
 
     if (!res.ok) {
       return { props: { animals: [], fetchError: true } };

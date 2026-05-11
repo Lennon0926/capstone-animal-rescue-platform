@@ -1,8 +1,7 @@
 # Section 3.1 — Page Performance Results (Lighthouse)
 
-All Lighthouse audits were executed locally on 2026-04-11 against the `report-analytics-progress-report` branch
-(Node.js v24.13.1, Lighthouse v13.1.0 via `@lhci/cli` v0.15.1, Next.js v16.2.3 production build).
-Results below reflect scores **after** all performance improvements were applied in this branch.
+All Lighthouse audits were executed locally on 2026-05-09 against the `fix/security-medical-records-fb-token` branch
+(Node.js v24.13.1, Lighthouse v12.6.1 via `@lhci/cli` v0.15.1, Next.js v16.2.4 production build).
 
 ---
 
@@ -10,14 +9,14 @@ Results below reflect scores **after** all performance improvements were applied
 
 | Parameter | Value |
 |-----------|-------|
-| Tool | Lighthouse v13.1.0 via `@lhci/cli` v0.15.1 |
+| Tool | Lighthouse v12.6.1 via `@lhci/cli` v0.15.1 |
 | Target | `http://localhost:3000` (Next.js production build, `npm run start`) |
 | API Backend | `https://animal-rescue-server.vercel.app` (`NEXT_PUBLIC_API_BASE_URL`) |
 | Preset | Desktop (1350 × 940, no CPU/network throttling) |
 | Runs per URL | 1 |
 | Config file | `apps/web/lighthouserc.js` |
-| Branch | `report-analytics-progress-report` |
-| Run date | 2026-04-11 |
+| Branch | `fix/security-medical-records-fb-token` |
+| Run date | 2026-05-09 |
 
 **Pages audited:**
 
@@ -28,8 +27,8 @@ Results below reflect scores **after** all performance improvements were applied
 | 3 | Animal Detail | `/adopt/1` |
 | 4 | About | `/about` |
 | 5 | Blog | `/blog` |
-| 6 | Donation | `/donation` |
 
+> **`/donation` removed:** The donation page was removed from the application in a subsequent sprint. The URL now returns 404 and has been removed from the audit config.
 > **Admin pages excluded:** `/admin/*` routes require authenticated state and are not public-facing pages.
 
 ---
@@ -44,13 +43,12 @@ Results below reflect scores **after** all performance improvements were applied
 
 | Page | Performance | Accessibility | Best Practices | SEO |
 |------|:-----------:|:-------------:|:--------------:|:---:|
-| `/home` | **100** | **98** | **100** | **100** |
+| `/home` | **99** | **98** | **100** | **100** |
 | `/adopt` | **100** | **100** | **100** | **100** |
 | `/adopt/1` | **100** | **100** | **100** | **100** |
 | `/about` | **100** | **98** | **100** | **100** |
-| `/blog` | **100** | **98** | **100** | **100** |
-| `/donation` | **100** | **98** | **100** | **100** |
-| **Average** | **100.0** | **98.7** | **100.0** | **100.0** |
+| `/blog` | **100** | **94** | **96** | **100** |
+| **Average** | **99.8** | **98.0** | **99.2** | **100.0** |
 
 Score scale: 0–49 Poor · 50–89 Needs Improvement · 90–100 Good.
 
@@ -58,17 +56,17 @@ Score scale: 0–49 Poor · 50–89 Needs Improvement · 90–100 Good.
 
 ## Core Web Vitals
 
-| Page | LCP | CLS | TTFB | FCP | Speed Index |
-|------|-----|-----|------|-----|-------------|
-| `/home` | 508 ms | 0.012 | 18 ms | — | — |
-| `/adopt` | 485 ms | 0.000 | 651 ms | — | — |
-| `/adopt/1` | 491 ms | 0.000 | 410 ms | — | — |
-| `/about` | 525 ms | 0.000 | 2 ms | — | — |
-| `/blog` | 483 ms | 0.000 | 2 ms | — | — |
-| `/donation` | 484 ms | 0.000 | 2 ms | — | — |
+| Page | FCP | LCP | TBT | CLS |
+|------|-----|-----|-----|-----|
+| `/home` | 247 ms | 850 ms ¹ | 0 ms | 0.039 |
+| `/adopt` | 244 ms | 606 ms | 0 ms | 0.000 |
+| `/adopt/1` | 247 ms | 611 ms | 0 ms | 0.000 |
+| `/about` | 245 ms | 628 ms | 0 ms | 0.000 |
+| `/blog` | 244 ms | 651 ms | 0 ms | 0.000 |
 
-> **LCP** = Largest Contentful Paint · **CLS** = Cumulative Layout Shift · **TTFB** = Time to First Byte
+> **FCP** = First Contentful Paint · **LCP** = Largest Contentful Paint · **TBT** = Total Blocking Time · **CLS** = Cumulative Layout Shift
 > Total Blocking Time = **0 ms** on all pages.
+> ¹ `/home` LCP candidate is now the hero video poster image (`close-up-dog-poster.jpg`, 58 KB). Higher than other pages because the poster is served after the initial HTML parse. Score is 99 (Good range).
 
 ---
 
@@ -78,22 +76,35 @@ Score scale: 0–49 Poor · 50–89 Needs Improvement · 90–100 Good.
 
 | Page | LCP | ≤ 3,000 ms? |
 |------|-----|:-----------:|
-| `/home` | 508 ms | **PASS** |
-| `/adopt` | 485 ms | **PASS** |
-| `/adopt/1` | 491 ms | **PASS** |
-| `/about` | 525 ms | **PASS** |
-| `/blog` | 483 ms | **PASS** |
-| `/donation` | 484 ms | **PASS** |
+| `/home` | 850 ms | **PASS** |
+| `/adopt` | 606 ms | **PASS** |
+| `/adopt/1` | 611 ms | **PASS** |
+| `/about` | 628 ms | **PASS** |
+| `/blog` | 651 ms | **PASS** |
 
 **Result: PASS**
 
-All six public pages have an LCP well under 3,000 ms. Worst-case LCP is 525 ms on `/about` — 82% below the limit. Total Blocking Time is 0 ms on every page.
+All five pages have LCP well under 3,000 ms. Worst-case is 850 ms on `/home` — 72% below the limit. Total Blocking Time is 0 ms on every page.
 
 ---
 
-## Issues Found and Resolved
+## Regressions vs. 2026-04-11 Audit
 
-Three issues were identified in the initial audit run and resolved before the final scores above were recorded.
+| Page | Category | 2026-04-11 | 2026-05-09 | Delta | Root Cause |
+|------|----------|-----------|-----------|-------|------------|
+| `/blog` | Accessibility | 98 | **94** | −4 | `color-contrast` (13 elements) + `heading-order` (1 element) |
+| `/blog` | Best Practices | 100 | **96** | −4 | Console errors + unused JS from blog redesign |
+| `/home` | Performance | 100 | **99** | −1 | LCP is now poster image (850 ms) vs. video first-frame (previously unmeasurable) |
+
+**`/blog` color-contrast:** 13 text elements on the new blog redesign have insufficient contrast ratio. Predominantly affects secondary text and metadata labels introduced in the blog redesign (`blog-redesign` branch). Recommended fix: audit text color tokens against the WCAG AA 4.5:1 minimum.
+
+**`heading-order` (all pages):** Heading levels skip from `<h1>` directly to `<h3>` or similar in at least one component on `/home`, `/about`, and `/blog`. This is a structural HTML issue in shared layout components, not page-specific.
+
+---
+
+## Issues Found and Resolved (2026-04-11 run)
+
+Three issues were identified in the initial audit run and resolved before the April scores were recorded.
 
 ### Issue 1 — `/home` TTFB of 2,520 ms (resolved → 18 ms)
 
@@ -147,8 +158,9 @@ Three issues were identified in the initial audit run and resolved before the fi
 
 - **Single run per page.** `numberOfRuns: 1` was used to keep audit time manageable. Real-world variance in cold-start timing means individual run results may differ by ±10–15% from a multi-run median.
 - **Desktop preset only.** No CPU or network throttling applied. Mobile scores would be lower for pages that fetch data from the production API. A mobile audit is recommended before production release.
-- **Local server, not production Vercel deployment.** TTFB values for `/about`, `/blog`, and `/donation` (2 ms) reflect the local in-process server. Production values will include Vercel Function overhead on cold starts but benefit from edge caching on warm requests.
+- **Local server, not production Vercel deployment.** TTFB values for `/about` and `/blog` (2 ms) reflect the local in-process server. Production values will include Vercel Function overhead on cold starts but benefit from edge caching on warm requests.
 - **Mobile Safari not tested.** WebKit is not installed in this development environment. Accessibility and performance results reflect Desktop Chrome exclusively.
+- **`/home` Performance 99 (not 100).** The hero video poster (`close-up-dog-poster.jpg`, 58 KB) is now the LCP element at 850 ms. To reach 100, the poster image would need to be smaller or served with higher priority. Acceptable for current scope.
 
 ---
 

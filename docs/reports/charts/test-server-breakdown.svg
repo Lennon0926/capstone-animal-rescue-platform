@@ -1,116 +1,121 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="380" viewBox="0 0 720 380" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="13">
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="500" viewBox="0 0 720 500" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="13">
 
   <!-- Background -->
-  <rect width="720" height="380" fill="#ffffff" rx="8"/>
+  <rect width="720" height="500" fill="#ffffff" rx="8"/>
 
   <!-- Title -->
-  <text x="360" y="28" text-anchor="middle" font-size="15" font-weight="bold" fill="#111827">Server Jest — Tests per File (#115)</text>
-  <text x="360" y="46" text-anchor="middle" font-size="11" fill="#6b7280">apps/server · 8 suites · 97 tests · 100% pass rate</text>
+  <text x="360" y="28" text-anchor="middle" font-size="15" font-weight="bold" fill="#111827">Server Jest — Tests per File</text>
+  <text x="360" y="46" text-anchor="middle" font-size="11" fill="#6b7280">apps/server · 12 suites · 161 tests · 100% pass rate · 2026-05-09</text>
 
   <!--
-    Test files and counts:
-      animals.routes.test.js   34
-      validation.test.js       18
-      errorHandler.test.js     13
-      smoke.test.js            10
-      animalsRepository.test.js 6
-      r2Service.test.js         5
-      routes.test.js            7
-      migrateImageUrls.test.js  4
+    Test files and counts (sorted descending):
+      animals.routes.test.js    52
+      validation.test.js        30
+      posts.routes.test.js      24
+      errorHandler.test.js      11
+      routes.test.js             8
+      smoke.test.js              8
+      requireJson.test.js        7
+      animalsRepository.test.js  5
+      cors.test.js               5
+      r2Service.test.js          4
+      migrateImageUrls.test.js   4
+      rateLimiting.test.js       3
 
-    Sort descending: 34, 18, 13, 10, 7, 6, 5, 4
-
-    Horizontal bar chart
-    Chart area: x=230..680, y=60..330  (width=450, height=270)
-    Scale: 450/36 = 12.5px per test
-    Row height: 270/8 = 33.75 → use 30px bar, 4px gap
-    Row centers: 60+15, +34, +34...
-    Bar colors: gradient of indigo shades, all pass so same color family
+    Chart area: x=230..680, y=58..428  (width=450, height=370)
+    Scale: 450/55 = 8.18px per test
+    12 rows: row height=30px, bar height=22px
+    Row centres: 73, 103, 133, 163, 193, 223, 253, 283, 313, 343, 373, 403
   -->
 
   <!-- Y axis -->
-  <line x1="230" y1="58" x2="230" y2="330" stroke="#9ca3af" stroke-width="1.5"/>
-  <line x1="230" y1="330" x2="680" y2="330" stroke="#9ca3af" stroke-width="1.5"/>
+  <line x1="230" y1="58" x2="230" y2="428" stroke="#9ca3af" stroke-width="1.5"/>
+  <line x1="230" y1="428" x2="680" y2="428" stroke="#9ca3af" stroke-width="1.5"/>
 
-  <!-- X-axis grid lines at 5, 10, 15, 20, 25, 30, 35 -->
-  <!-- scale: x = 230 + (n/36)*450 -->
-  <!-- 5→292, 10→355, 15→417, 20→480, 25→542, 30→605, 35→667 -->
-  <line x1="292" y1="58" x2="292" y2="330" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="292" y="343" text-anchor="middle" font-size="10" fill="#6b7280">5</text>
-  <line x1="355" y1="58" x2="355" y2="330" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="355" y="343" text-anchor="middle" font-size="10" fill="#6b7280">10</text>
-  <line x1="417" y1="58" x2="417" y2="330" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="417" y="343" text-anchor="middle" font-size="10" fill="#6b7280">15</text>
-  <line x1="480" y1="58" x2="480" y2="330" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="480" y="343" text-anchor="middle" font-size="10" fill="#6b7280">20</text>
-  <line x1="542" y1="58" x2="542" y2="330" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="542" y="343" text-anchor="middle" font-size="10" fill="#6b7280">25</text>
-  <line x1="605" y1="58" x2="605" y2="330" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="605" y="343" text-anchor="middle" font-size="10" fill="#6b7280">30</text>
-  <line x1="667" y1="58" x2="667" y2="330" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="667" y="343" text-anchor="middle" font-size="10" fill="#6b7280">35</text>
-  <text x="230" y="343" text-anchor="middle" font-size="10" fill="#6b7280">0</text>
-  <text x="455" y="358" text-anchor="middle" font-size="10" fill="#6b7280">Number of Tests</text>
+  <!-- X-axis grid lines at 10, 20, 30, 40, 50 -->
+  <!-- x = 230 + n*8.18: 10→312, 20→394, 30→475, 40→557, 50→639 -->
+  <line x1="312" y1="58" x2="312" y2="428" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="312" y="441" text-anchor="middle" font-size="10" fill="#6b7280">10</text>
+  <line x1="394" y1="58" x2="394" y2="428" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="394" y="441" text-anchor="middle" font-size="10" fill="#6b7280">20</text>
+  <line x1="475" y1="58" x2="475" y2="428" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="475" y="441" text-anchor="middle" font-size="10" fill="#6b7280">30</text>
+  <line x1="557" y1="58" x2="557" y2="428" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="557" y="441" text-anchor="middle" font-size="10" fill="#6b7280">40</text>
+  <line x1="639" y1="58" x2="639" y2="428" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="639" y="441" text-anchor="middle" font-size="10" fill="#6b7280">50</text>
+  <text x="230" y="441" text-anchor="middle" font-size="10" fill="#6b7280">0</text>
+  <text x="455" y="456" text-anchor="middle" font-size="10" fill="#6b7280">Number of Tests</text>
 
-  <!--
-    Rows (y centers, bar height=26px):
-    Row 1: y=74   animals.routes.test.js    34  → 34/36*450=425px
-    Row 2: y=107  validation.test.js        18  → 225px
-    Row 3: y=140  errorHandler.test.js      13  → 162.5px
-    Row 4: y=173  smoke.test.js             10  → 125px
-    Row 5: y=206  routes.test.js             7  → 87.5px
-    Row 6: y=239  animalsRepository.test.js  6  → 75px
-    Row 7: y=272  r2Service.test.js           5  → 62.5px
-    Row 8: y=305  migrateImageUrls.test.js   4  → 50px
+  <!-- Row 1: animals.routes.test.js — 52 tests (52*8.18=425px) -->
+  <text x="225" y="80" text-anchor="end" font-size="10" fill="#374151">animals.routes.test.js</text>
+  <rect x="231" y="62" width="425" height="22" fill="#4f46e5" rx="3"/>
+  <text x="648" y="78" text-anchor="end" font-size="11" font-weight="bold" fill="#ffffff">52</text>
 
-    Colors: alternating shades of indigo/blue
-  -->
+  <!-- Row 2: validation.test.js — 30 tests (30*8.18=245px) -->
+  <text x="225" y="110" text-anchor="end" font-size="10" fill="#374151">validation.test.js</text>
+  <rect x="231" y="92" width="245" height="22" fill="#6366f1" rx="3"/>
+  <text x="468" y="108" text-anchor="end" font-size="11" font-weight="bold" fill="#ffffff">30</text>
 
-  <!-- Row 1: animals.routes.test.js — 34 tests (NEW mutations coverage badge) -->
-  <text x="225" y="82" text-anchor="end" font-size="10" fill="#374151">animals.routes.test.js</text>
-  <rect x="231" y="62" width="425" height="24" fill="#4f46e5" rx="3"/>
-  <text x="648" y="79" text-anchor="end" font-size="11" font-weight="bold" fill="#ffffff">34</text>
-  <!-- NEW badge -->
-  <rect x="658" y="63" width="30" height="22" fill="#fef3c7" rx="3"/>
-  <text x="673" y="78" text-anchor="middle" font-size="9" font-weight="bold" fill="#92400e">+25</text>
+  <!-- Row 3: posts.routes.test.js — 24 tests (24*8.18=196px) — NEW -->
+  <text x="225" y="140" text-anchor="end" font-size="10" fill="#374151">posts.routes.test.js</text>
+  <rect x="231" y="122" width="196" height="22" fill="#6366f1" rx="3"/>
+  <text x="419" y="138" text-anchor="end" font-size="11" font-weight="bold" fill="#ffffff">24</text>
+  <rect x="432" y="122" width="34" height="22" fill="#fef3c7" rx="3"/>
+  <text x="449" y="138" text-anchor="middle" font-size="9" font-weight="bold" fill="#92400e">NEW</text>
 
-  <!-- Row 2: validation.test.js — 18 tests -->
-  <text x="225" y="115" text-anchor="end" font-size="10" fill="#374151">validation.test.js</text>
-  <rect x="231" y="95" width="225" height="24" fill="#6366f1" rx="3"/>
-  <text x="448" y="112" text-anchor="end" font-size="11" font-weight="bold" fill="#ffffff">18</text>
+  <!-- Row 4: errorHandler.test.js — 11 tests (11*8.18=90px) -->
+  <text x="225" y="170" text-anchor="end" font-size="10" fill="#374151">errorHandler.test.js</text>
+  <rect x="231" y="152" width="90" height="22" fill="#818cf8" rx="3"/>
+  <text x="313" y="168" text-anchor="end" font-size="11" font-weight="bold" fill="#ffffff">11</text>
 
-  <!-- Row 3: errorHandler.test.js — 13 tests -->
-  <text x="225" y="148" text-anchor="end" font-size="10" fill="#374151">errorHandler.test.js</text>
-  <rect x="231" y="128" width="163" height="24" fill="#818cf8" rx="3"/>
-  <text x="386" y="145" text-anchor="end" font-size="11" font-weight="bold" fill="#ffffff">13</text>
+  <!-- Row 5: routes.test.js — 8 tests (8*8.18=65px) -->
+  <text x="225" y="200" text-anchor="end" font-size="10" fill="#374151">routes.test.js</text>
+  <rect x="231" y="182" width="65" height="22" fill="#818cf8" rx="3"/>
+  <text x="288" y="198" text-anchor="end" font-size="11" font-weight="bold" fill="#ffffff">8</text>
 
-  <!-- Row 4: smoke.test.js — 10 tests -->
-  <text x="225" y="181" text-anchor="end" font-size="10" fill="#374151">smoke.test.js</text>
-  <rect x="231" y="161" width="125" height="24" fill="#818cf8" rx="3"/>
-  <text x="348" y="178" text-anchor="end" font-size="11" font-weight="bold" fill="#ffffff">10</text>
+  <!-- Row 6: smoke.test.js — 8 tests (8*8.18=65px) -->
+  <text x="225" y="230" text-anchor="end" font-size="10" fill="#374151">smoke.test.js</text>
+  <rect x="231" y="212" width="65" height="22" fill="#818cf8" rx="3"/>
+  <text x="288" y="228" text-anchor="end" font-size="11" font-weight="bold" fill="#ffffff">8</text>
 
-  <!-- Row 5: routes.test.js — 7 tests -->
-  <text x="225" y="214" text-anchor="end" font-size="10" fill="#374151">routes.test.js</text>
-  <rect x="231" y="194" width="88" height="24" fill="#a5b4fc" rx="3"/>
-  <text x="311" y="211" text-anchor="end" font-size="11" font-weight="bold" fill="#3730a3">7</text>
+  <!-- Row 7: requireJson.test.js — 7 tests (7*8.18=57px) — NEW -->
+  <text x="225" y="260" text-anchor="end" font-size="10" fill="#374151">requireJson.test.js</text>
+  <rect x="231" y="242" width="57" height="22" fill="#a5b4fc" rx="3"/>
+  <text x="280" y="258" text-anchor="end" font-size="11" font-weight="bold" fill="#3730a3">7</text>
+  <rect x="292" y="242" width="34" height="22" fill="#fef3c7" rx="3"/>
+  <text x="309" y="258" text-anchor="middle" font-size="9" font-weight="bold" fill="#92400e">NEW</text>
 
-  <!-- Row 6: animalsRepository.test.js — 6 tests -->
-  <text x="225" y="247" text-anchor="end" font-size="10" fill="#374151">animalsRepository.test.js</text>
-  <rect x="231" y="227" width="75" height="24" fill="#a5b4fc" rx="3"/>
-  <text x="298" y="244" text-anchor="end" font-size="11" font-weight="bold" fill="#3730a3">6</text>
+  <!-- Row 8: animalsRepository.test.js — 5 tests (5*8.18=41px) -->
+  <text x="225" y="290" text-anchor="end" font-size="10" fill="#374151">animalsRepository.test.js</text>
+  <rect x="231" y="272" width="41" height="22" fill="#a5b4fc" rx="3"/>
+  <text x="264" y="288" text-anchor="end" font-size="11" font-weight="bold" fill="#3730a3">5</text>
 
-  <!-- Row 7: r2Service.test.js — 5 tests -->
-  <text x="225" y="280" text-anchor="end" font-size="10" fill="#374151">r2Service.test.js</text>
-  <rect x="231" y="260" width="63" height="24" fill="#c7d2fe" rx="3"/>
-  <text x="286" y="277" text-anchor="end" font-size="11" font-weight="bold" fill="#3730a3">5</text>
+  <!-- Row 9: cors.test.js — 5 tests (5*8.18=41px) — NEW -->
+  <text x="225" y="320" text-anchor="end" font-size="10" fill="#374151">cors.test.js</text>
+  <rect x="231" y="302" width="41" height="22" fill="#a5b4fc" rx="3"/>
+  <text x="264" y="318" text-anchor="end" font-size="11" font-weight="bold" fill="#3730a3">5</text>
+  <rect x="276" y="302" width="34" height="22" fill="#fef3c7" rx="3"/>
+  <text x="293" y="318" text-anchor="middle" font-size="9" font-weight="bold" fill="#92400e">NEW</text>
 
-  <!-- Row 8: migrateImageUrls.test.js — 4 tests -->
-  <text x="225" y="313" text-anchor="end" font-size="10" fill="#374151">migrateImageUrls.test.js</text>
-  <rect x="231" y="293" width="50" height="24" fill="#c7d2fe" rx="3"/>
-  <text x="273" y="310" text-anchor="end" font-size="11" font-weight="bold" fill="#3730a3">4</text>
+  <!-- Row 10: r2Service.test.js — 4 tests (4*8.18=33px) -->
+  <text x="225" y="350" text-anchor="end" font-size="10" fill="#374151">r2Service.test.js</text>
+  <rect x="231" y="332" width="33" height="22" fill="#c7d2fe" rx="3"/>
+  <text x="256" y="348" text-anchor="end" font-size="11" font-weight="bold" fill="#3730a3">4</text>
 
-  <!-- Legend note for +25 badge -->
-  <text x="670" y="62" text-anchor="middle" font-size="9" fill="#92400e">new</text>
-  <text x="360" y="370" text-anchor="middle" font-size="10" fill="#9ca3af">+25 = new tests added in this branch (POST, PATCH, DELETE mutations coverage)</text>
+  <!-- Row 11: migrateImageUrls.test.js — 4 tests (4*8.18=33px) -->
+  <text x="225" y="380" text-anchor="end" font-size="10" fill="#374151">migrateImageUrls.test.js</text>
+  <rect x="231" y="362" width="33" height="22" fill="#c7d2fe" rx="3"/>
+  <text x="256" y="378" text-anchor="end" font-size="11" font-weight="bold" fill="#3730a3">4</text>
+
+  <!-- Row 12: rateLimiting.test.js — 3 tests (3*8.18=25px) — NEW -->
+  <text x="225" y="410" text-anchor="end" font-size="10" fill="#374151">rateLimiting.test.js</text>
+  <rect x="231" y="392" width="25" height="22" fill="#c7d2fe" rx="3"/>
+  <text x="248" y="408" text-anchor="end" font-size="11" font-weight="bold" fill="#3730a3">3</text>
+  <rect x="260" y="392" width="34" height="22" fill="#fef3c7" rx="3"/>
+  <text x="277" y="408" text-anchor="middle" font-size="9" font-weight="bold" fill="#92400e">NEW</text>
+
+  <!-- Source note -->
+  <text x="360" y="488" text-anchor="middle" font-size="10" fill="#9ca3af">NEW = test file added since 2026-04-11 · apps/server · all 161 tests pass · 100% pass rate</text>
 
 </svg>

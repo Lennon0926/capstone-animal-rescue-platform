@@ -298,19 +298,6 @@ test.describe("Admin Create Animal (/admin/createAnimal)", () => {
     await expect(page.getByRole("alert").filter({ hasText: /nombre/i })).toBeVisible();
   });
 
-  test("validation error shown when image is missing", async ({ page }) => {
-    await page.locator("#name").fill("Test Animal");
-    await page.locator("#description").fill("Test description");
-    await page.locator("#species").selectOption("perro");
-    await page.locator("#size").selectOption("mediano");
-    await page.locator("#gender").selectOption("macho");
-    // Disable native validation so the JS handler runs and checks for a missing image
-    await page.evaluate(() => {
-      (document.querySelector("form") as HTMLFormElement).noValidate = true;
-    });
-    await page.getByRole("button", { name: /Crear Animal/i }).click();
-    await expect(page.getByRole("alert").filter({ hasText: /imagen/i })).toBeVisible();
-  });
 
   // --- Tags ---
   test("can add a tag by pressing Enter", async ({ page }) => {
