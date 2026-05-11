@@ -76,13 +76,13 @@ describe("VolunteerIntakeSection", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: "Become a Volunteer",
+        name: "Hazte voluntario",
         level: 2,
       }),
     ).toBeInTheDocument();
 
     const cta = screen.getByRole("link", {
-      name: "Fill Out Volunteer Form",
+      name: "Completa el formulario de voluntariado",
     });
 
     expect(cta).toHaveAttribute(
@@ -92,7 +92,7 @@ describe("VolunteerIntakeSection", () => {
     expect(cta).toHaveAttribute("target", "_blank");
     expect(cta).toHaveAttribute("rel", "noopener noreferrer");
     expect(
-      screen.getByText(/Even if you cannot foster animals/i),
+      screen.getByText(/Aunque no puedas ofrecer hogar temporero/i),
     ).toBeInTheDocument();
   });
 
@@ -104,12 +104,12 @@ describe("VolunteerIntakeSection", () => {
 
     [
       "Transportación",
-      "Fundraising",
+      "Recaudación de fondos",
       "Cuidado animal",
       "Hogar temporero",
       "Eventos",
       "Charlas educativas",
-      "Transporto sin foster",
+      "Puedo transportar, pero no ofrecer hogar temporero",
       "Todo lo anterior",
     ].forEach((option) => {
       expect(screen.getByText(option)).toBeInTheDocument();
@@ -127,7 +127,9 @@ describe("VolunteerIntakeSection", () => {
       ),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("link", { name: "Fill Out Volunteer Form" }),
+      screen.queryByRole("link", {
+        name: "Completa el formulario de voluntariado",
+      }),
     ).not.toBeInTheDocument();
   });
 
@@ -142,7 +144,7 @@ describe("VolunteerIntakeSection", () => {
       level: 2,
     });
     const volunteerHeading = screen.getByRole("heading", {
-      name: "Become a Volunteer",
+      name: "Hazte voluntario",
       level: 2,
     });
 
