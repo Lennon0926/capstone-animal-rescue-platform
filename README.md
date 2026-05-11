@@ -2,7 +2,6 @@
 
 A full-stack web application for animal rescue coordination, built with Next.js and Express.
 
-
 ## Project Structure
 
 ```
@@ -112,6 +111,9 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 # Google Forms Integration
 # URL for the adoption application form
 NEXT_PUBLIC_GOOGLE_FORM_URL=your-google-form-url
+
+# URL for the volunteer intake Google Form
+NEXT_PUBLIC_VOLUNTEER_GOOGLE_FORM_URL=your-volunteer-google-form-url
 ```
 
 > See [docs/guides/SECRETS_MANAGEMENT.md](docs/guides/SECRETS_MANAGEMENT.md) for the full variable reference, optional vars, and secret rotation procedures.
@@ -256,6 +258,7 @@ CI runs lint, build, unit tests, and E2E tests for every push and pull request t
 | [docs/guides/ROLLBACK.md](docs/guides/ROLLBACK.md) | Rollback procedures for Vercel deployments |
 | [docs/api/endpoints.md](docs/api/endpoints.md) | API endpoint reference (request/response examples) |
 | [docs/api/contract-v1.md](docs/api/contract-v1.md) | Planned v1 API contract |
+| [docs/reports/figure-1-system-architecture.md](docs/reports/figure-1-system-architecture.md) | Report-ready Figure 1 architecture description and caption |
 | [docs/reports/section-3-4-test-results.md](docs/reports/section-3-4-test-results.md) | Unit, integration, and E2E test results (Section 3.4) |
 
 ## ngrok Tunnel

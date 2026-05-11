@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import type { Animal } from "@/types/animal";
@@ -7,14 +8,10 @@ jest.mock("next/image", () => ({
   default: ({
     src,
     alt,
-    fill: _fill,
-    priority: _priority,
     ...props
   }: {
     src: string | { src: string };
     alt: string;
-    fill?: boolean;
-    priority?: boolean;
     [key: string]: unknown;
   }) => (
     <img
@@ -24,6 +21,7 @@ jest.mock("next/image", () => ({
     />
   ),
 }));
+
 
 jest.mock("next/link", () => ({
   __esModule: true,
@@ -60,6 +58,21 @@ const animalWithObjectKey: Animal = {
   record_id: null,
 };
 
+const animalWithMedicalRecords: Animal = {
+  ...animalWithObjectKey,
+  medical_records: [
+    {
+      record_id: 5,
+      aid: 42,
+      record_type: "vacunación",
+      date_given: "2026-04-14T10:00:00.000Z",
+      vet_name: "Dr. Rivera",
+      notes: "Vacuna al día.",
+      created_at: "2026-04-14T10:00:00.000Z",
+    },
+  ],
+};
+
 describe("animal image rendering", () => {
   beforeEach(() => {
     jest.resetModules();
@@ -94,5 +107,20 @@ describe("animal image rendering", () => {
       "src",
       `${R2_PUBLIC_BASE_URL}/animals/42/luna%20photo.jpg`,
     );
+  });
+
+  it("renders medical records on the animal detail page", async () => {
+    const { default: AnimalInfo } = await import(
+      "@/components/Animal/AnimalInfoPage/animalInfo"
+    );
+
+    render(<AnimalInfo animal={animalWithMedicalRecords} />);
+
+    expect(screen.getByRole("heading", { name: /Registros médicos/i })).toBeInTheDocument();
+    expect(screen.getByText("Vacunación")).toBeInTheDocument();
+    expect(screen.getByText(/Veterinario: Dr\. Rivera/i)).toBeInTheDocument();
+    const description = screen.getByText("Vacuna al día.");
+    expect(description).toBeInTheDocument();
+    expect(description.closest("p")).toHaveTextContent(/Descripción:\s*Vacuna al día\./i);
   });
 });

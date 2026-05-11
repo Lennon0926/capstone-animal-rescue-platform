@@ -2,6 +2,7 @@ const path = require("path");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const express = require("express");
+const { rateLimit } = require("express-rate-limit");
 
 dotenv.config({
   path: path.resolve(__dirname, ".env.local"),
@@ -13,18 +14,57 @@ validateEnv();
 
 const healthRouter = require("./routes/health");
 const animalsRouter = require("./routes/animals");
+const postsRouter = require("./routes/posts");
 const uploadsRouter = require("./routes/uploads");
+const settingsRouter = require("./routes/settings");
 const { errorHandler, notFoundHandler } = require("./middleware/errorHandler");
 
 const app = express();
 const port = Number(process.env.PORT) || 4000;
 
+const rateLimitHandler = (req, res) =>
+  res.status(429).json({
+    error: {
+      code: "TOO_MANY_REQUESTS",
+      message: "Too many requests, please try again later.",
+    },
+  });
+
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 100,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  handler: rateLimitHandler,
+});
+
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  handler: rateLimitHandler,
+});
+
+app.set("trust proxy", 1);
+
 // Middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.ALLOWED_ORIGINS?.split(",").map((o) => o.trim()).filter(Boolean) ?? [],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+app.use(globalLimiter);
 app.use(express.json());
 
 // Routes
 app.use("/api/animals", animalsRouter);
+app.use("/api/posts", postsRouter);
+app.use("/api/settings", settingsRouter);
+app.post("/api/uploads/animals/:animalId/image", uploadLimiter);
+app.post("/api/uploads/posts/:postId/image", uploadLimiter);
 app.use("/api/uploads", uploadsRouter);
 app.use("/", healthRouter);
 

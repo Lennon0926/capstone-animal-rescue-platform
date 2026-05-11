@@ -1,8 +1,8 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import HeaderSection from "@/components/Header/headerSection";
-import FooterSection from "@/components/Footer/footerSection";
+import AdminHeader from "@/components/Admin/AdminHeader/adminHeader";
 import AdminAnimalsList from "@/components/Admin/AdminAnimalsList/adminAnimalsList";
+import { useAuthRequired } from "@/lib/useAuthRequired";
 import type { Animal } from "@/types/animal";
 
 type ApiResponse = {
@@ -22,54 +22,38 @@ type AdminAnimalsPageProps = {
 };
 
 export default function AdminAnimalsPage({ animals }: AdminAnimalsPageProps) {
+  const { isLoading } = useAuthRequired();
+
+  if (isLoading) return <div>Loading...</div>;
+
   return (
     <>
       <Head>
         <title>Administrar Animales | Huellitas Sin Hogar</title>
       </Head>
-      <HeaderSection />
+      <AdminHeader />
       <AdminAnimalsList initialAnimals={animals} />
-      <FooterSection />
     </>
   );
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals?limit=100`
-    );
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals?limit=1000`);
 
     if (!res.ok) {
-      return {
-        props: {
-          animals: [],
-        },
-      };
+      return { props: { animals: [], fetchError: true } };
     }
 
     const result: ApiResponse = await res.json();
 
-    if (!result.success || !result.data) {
-      return {
-        props: {
-          animals: [],
-        },
-      };
-    }
-
     return {
       props: {
-        animals: result.data,
+        animals: result.success && result.data ? result.data : [],
       },
     };
   } catch (err) {
     console.error("[admin/animals] getServerSideProps failed:", err);
-    return {
-      props: {
-        animals: [],
-        fetchError: true,
-      },
-    };
+    return { props: { animals: [], fetchError: true } };
   }
 };

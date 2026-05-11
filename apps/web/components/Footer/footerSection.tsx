@@ -1,12 +1,16 @@
 import styles from "./footerSection.module.css";
 import { Mail, Phone, MapPin } from "lucide-react";
 import Link from "next/link";
+import DonationModalTrigger from "../DonationPage/DonationModalTrigger";
+import { getFooterQuickLinks } from "@/lib/publicNavigation";
 
 export default function Footer() {
+  const quickLinks = getFooterQuickLinks();
+  const volunteerFormUrl = process.env.NEXT_PUBLIC_VOLUNTEER_GOOGLE_FORM_URL;
+
   return (
     <footer className={styles.footer}>
       <div className={styles.inner}>
-
         <div className={styles.brand}>
           <div className={styles.logo}>
             <span>Ciudadanos Pro Albergue de Animales de Aguadilla</span>
@@ -19,18 +23,34 @@ export default function Footer() {
         <div className={styles.column}>
           <h4 className={styles.heading}>Enlaces Rápidos</h4>
           <ul>
-            <li><Link href="/about">Sobre Nosotros</Link></li>
-            <li><Link href="/adopt">Animales Disponibles</Link></li>
-            <li><Link href="/#adoption_process">Proceso de Adopción</Link></li>
+            {quickLinks.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href}>{link.label}</Link>
+              </li>
+            ))}
           </ul>
         </div>
 
         <div className={styles.column}>
           <h4 className={styles.heading}>Apoyo</h4>
           <ul>
-            <li><Link href="/donation">Donar</Link></li>
-            {/* <li><Link href="/volunteer">Ser Voluntario</Link></li>
-            <li><Link href="/foster">Programa de Hogar Temporal</Link></li> */}
+            <li>
+              <DonationModalTrigger className={styles.footerDonateButton}>
+                Donar
+              </DonationModalTrigger>
+            </li>
+            {volunteerFormUrl && (
+              <li>
+                <a
+                  className={styles.footerVolunteerButton}
+                  href={volunteerFormUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Ser voluntario
+                </a>
+              </li>
+            )}
           </ul>
         </div>
 
@@ -50,13 +70,11 @@ export default function Footer() {
           <div className={styles.contactItem}>
             <MapPin className={styles.mapIcon} />
             <span>
-              Ciudadanos Pro Albergue de Animales de Aguadilla, Inc.
-              Box 4152
-              Aguadilla, Puerto Rico 00605
+              Ciudadanos Pro Albergue de Animales de Aguadilla, Inc. Box 4152 Aguadilla, Puerto Rico
+              00605
             </span>
           </div>
         </div>
-
       </div>
     </footer>
   );

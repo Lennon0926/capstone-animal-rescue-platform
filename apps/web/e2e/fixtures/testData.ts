@@ -29,3 +29,52 @@ export const MOCK_ANIMALS = Array.from({ length: 13 }, (_, i) => ({
   created_at: "2024-01-01T00:00:00Z",
   record_id: null as number | null,
 }));
+
+/**
+ * Fixture posts served by the mock API server (globalSetup.ts).
+ * First post is pinned (featured); second is a regular card.
+ */
+export const MOCK_POSTS = [
+  {
+    pid: 1,
+    header: "Publicación Destacada de Prueba",
+    body: "Este es el cuerpo de la publicación destacada.",
+    is_pinned: true,
+    image_url: null,
+    image_object_key: null,
+    created_at: "2026-01-01T00:00:00Z",
+    updated_at: "2026-01-01T00:00:00Z",
+  },
+  {
+    pid: 2,
+    header: "Segunda Publicación de Prueba",
+    body: "Este es el cuerpo de la segunda publicación.",
+    is_pinned: false,
+    image_url: null,
+    image_object_key: null,
+    created_at: "2026-01-02T00:00:00Z",
+    updated_at: "2026-01-02T00:00:00Z",
+  },
+];
+
+export const MOCK_MEDICAL_RECORDS_BY_AID: Record<number, Array<{
+  record_id: number;
+  aid: number;
+  record_type: string;
+  date_given?: string;
+  vet_name?: string;
+  notes?: string;
+  created_at: string;
+}>> = {
+  1: [
+    {
+      record_id: 101,
+      aid: 1,
+      record_type: "vacunación",
+      date_given: "2026-04-14T10:00:00.000Z",
+      vet_name: "Dr. Rivera",
+      notes: "Primary vaccine",
+      created_at: "2026-04-14T10:00:00.000Z",
+    },
+  ],
+};

@@ -1,8 +1,8 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import HeaderSection from "@/components/Header/headerSection";
-import FooterSection from "@/components/Footer/footerSection";
+import AdminHeader from "@/components/Admin/AdminHeader/adminHeader";
 import EditAnimalForm from "@/components/Admin/EditAnimal/editAnimalForm";
+import { useAuthRequired } from "@/lib/useAuthRequired";
 import type { Animal } from "@/types/animal";
 
 type ApiResponse = {
@@ -16,27 +16,34 @@ type EditAnimalPageProps = {
 };
 
 export default function EditAnimalPage({ animal, error }: EditAnimalPageProps) {
+  const { isLoading } = useAuthRequired();
+
   return (
     <>
       <Head>
-        <title>{`${animal ? `Editar ${animal.name}` : "Editar Animal"} | Huellitas Sin Hogar`}</title>
+        <title>{animal ? `Editar ${animal.name}` : "Editar Animal"} | Huellitas Sin Hogar</title>
       </Head>
-      <HeaderSection />
-      {error ? (
-        <EditAnimalForm error={error} />
-      ) : animal ? (
-        <EditAnimalForm animal={animal} />
+      {isLoading ? (
+        <div>Loading...</div>
       ) : (
-        <EditAnimalForm notFound />
+        <>
+          <AdminHeader />
+          {error ? (
+            <EditAnimalForm error={error} />
+          ) : animal ? (
+            <EditAnimalForm animal={animal} />
+          ) : (
+            <EditAnimalForm notFound />
+          )}
+        </>
       )}
-      <FooterSection />
     </>
   );
 }
 
-export const getServerSideProps: GetServerSideProps<EditAnimalPageProps> = async (
-  context
-) => {
+export const getServerSideProps: GetServerSideProps<
+  EditAnimalPageProps
+> = async (context) => {
   const { id } = context.query;
 
   if (!id) {
@@ -49,7 +56,7 @@ export const getServerSideProps: GetServerSideProps<EditAnimalPageProps> = async
 
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals/${id}`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals/${id}`,
     );
 
     if (!res.ok) {

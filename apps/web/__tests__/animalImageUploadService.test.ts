@@ -174,7 +174,7 @@ describe("updateAnimalImageObjectKey", () => {
       `${MOCK_API_BASE}/api/animals/1`,
       {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "content-type": "application/json" },
         body: JSON.stringify({ image_object_key: "animals/1/1-photo.jpg" }),
       }
     );

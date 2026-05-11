@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
 import Home from "@/pages/home";
@@ -8,14 +9,10 @@ jest.mock("next/image", () => ({
   default: ({
     src,
     alt,
-    fill: _fill,
-    priority: _priority,
     ...props
   }: {
     src: string | { src: string };
     alt: string;
-    fill?: boolean;
-    priority?: boolean;
     [key: string]: unknown;
   }) => (
     <img

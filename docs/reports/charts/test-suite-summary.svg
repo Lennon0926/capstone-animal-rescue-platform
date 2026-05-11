@@ -4,19 +4,19 @@
   <rect width="720" height="380" fill="#ffffff" rx="8"/>
 
   <!-- Title -->
-  <text x="360" y="30" text-anchor="middle" font-size="15" font-weight="bold" fill="#111827">Test Suite Results — Section 3.4 (#115)</text>
-  <text x="360" y="50" text-anchor="middle" font-size="11" fill="#6b7280">Node.js v24.13.1 · 2026-04-11 · docs/115-test-results-documentation</text>
+  <text x="360" y="30" text-anchor="middle" font-size="15" font-weight="bold" fill="#111827">Test Suite Results — Section 3.4</text>
+  <text x="360" y="50" text-anchor="middle" font-size="11" fill="#6b7280">Node.js v24.13.1 · 2026-05-09 · fix/security-medical-records-fb-token</text>
 
   <!--
     3 suites (excl. Mobile Safari):
-      Server Jest:   97 pass, 0 fail, 0 skip  → total 97
-      Web Jest:      21 pass, 0 fail, 0 skip  → total 21
-      E2E Chrome:   127 pass, 1 fail, 1 skip  → total 129
+      Server Jest:   161 pass, 0 fail, 0 skip  → total 161
+      Web Jest:       60 pass, 0 fail, 0 skip  → total 60
+      E2E Chrome:    153 pass, 2 fail, 1 skip  → total 156
 
     Stacked horizontal bar chart
-    Bar length proportional to 129 (max)
     Chart area: x=190..680, y=70..260  (width=490)
-    Scale: 490/130 = 3.77px per test
+    Max scale: 165 (padded past 161)
+    Scale: 490/165 = 2.97px per test
 
     Row height = 50px, centers at y=100, 160, 220
     Bar height = 28px
@@ -33,71 +33,67 @@
   <!-- Y axis -->
   <line x1="190" y1="65" x2="190" y2="245" stroke="#9ca3af" stroke-width="1.5"/>
 
-  <!-- X axis grid lines at 25, 50, 75, 100, 125 tests -->
-  <!-- scale: x = 190 + (n/130)*490 -->
-  <!-- 25 → 284, 50→378, 75→471, 100→567, 125→661 -->
+  <!-- X axis grid lines at 50, 100, 150 tests -->
+  <!-- scale: x = 190 + (n/165)*490 -->
+  <!-- 50 → 339, 100 → 487, 150 → 636 -->
   <line x1="190" y1="245" x2="680" y2="245" stroke="#9ca3af" stroke-width="1.5"/>
-  <line x1="284" y1="65" x2="284" y2="245" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="284" y="258" text-anchor="middle" font-size="10" fill="#6b7280">25</text>
-  <line x1="378" y1="65" x2="378" y2="245" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="378" y="258" text-anchor="middle" font-size="10" fill="#6b7280">50</text>
-  <line x1="471" y1="65" x2="471" y2="245" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="471" y="258" text-anchor="middle" font-size="10" fill="#6b7280">75</text>
-  <line x1="567" y1="65" x2="567" y2="245" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="567" y="258" text-anchor="middle" font-size="10" fill="#6b7280">100</text>
-  <line x1="661" y1="65" x2="661" y2="245" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="661" y="258" text-anchor="middle" font-size="10" fill="#6b7280">125</text>
+  <line x1="339" y1="65" x2="339" y2="245" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="339" y="258" text-anchor="middle" font-size="10" fill="#6b7280">50</text>
+  <line x1="487" y1="65" x2="487" y2="245" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="487" y="258" text-anchor="middle" font-size="10" fill="#6b7280">100</text>
+  <line x1="636" y1="65" x2="636" y2="245" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="636" y="258" text-anchor="middle" font-size="10" fill="#6b7280">150</text>
   <text x="190" y="258" text-anchor="middle" font-size="10" fill="#6b7280">0</text>
   <text x="435" y="272" text-anchor="middle" font-size="10" fill="#6b7280">Number of Tests</text>
 
-  <!-- ── Row 1: Server Jest (97 pass) ── -->
+  <!-- ── Row 1: Server Jest (161 pass) ── -->
   <text x="185" y="103" text-anchor="end" font-size="11" fill="#374151">Server Jest</text>
-  <!-- 97 pass: 97/130*490 = 365.5px -->
-  <rect x="191" y="89" width="366" height="28" fill="#10b981" rx="3"/>
-  <text x="374" y="108" text-anchor="end" font-size="11" font-weight="bold" fill="#ffffff">97 pass</text>
+  <!-- 161 pass: 161/165*490 = 478px -->
+  <rect x="191" y="89" width="478" height="28" fill="#10b981" rx="3"/>
+  <text x="461" y="108" text-anchor="end" font-size="11" font-weight="bold" fill="#ffffff">161 pass</text>
   <!-- pass rate badge -->
-  <rect x="560" y="89" width="90" height="28" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
-  <text x="605" y="108" text-anchor="middle" font-size="12" font-weight="bold" fill="#065f46">100%</text>
+  <rect x="585" y="89" width="90" height="28" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
+  <text x="630" y="108" text-anchor="middle" font-size="12" font-weight="bold" fill="#065f46">100%</text>
 
-  <!-- ── Row 2: Web Jest (21 pass) ── -->
+  <!-- ── Row 2: Web Jest (60 pass) ── -->
   <text x="185" y="163" text-anchor="end" font-size="11" fill="#374151">Web Jest</text>
-  <!-- 21 pass: 21/130*490 = 79.2px -->
-  <rect x="191" y="149" width="79" height="28" fill="#10b981" rx="3"/>
-  <text x="267" y="168" text-anchor="end" font-size="11" font-weight="bold" fill="#ffffff">21</text>
-  <rect x="560" y="149" width="90" height="28" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
-  <text x="605" y="168" text-anchor="middle" font-size="12" font-weight="bold" fill="#065f46">100%</text>
+  <!-- 60 pass: 60/165*490 = 178px -->
+  <rect x="191" y="149" width="178" height="28" fill="#10b981" rx="3"/>
+  <text x="361" y="168" text-anchor="end" font-size="11" font-weight="bold" fill="#ffffff">60 pass</text>
+  <rect x="585" y="149" width="90" height="28" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
+  <text x="630" y="168" text-anchor="middle" font-size="12" font-weight="bold" fill="#065f46">100%</text>
 
-  <!-- ── Row 3: E2E Chrome (127 pass, 1 fail, 1 skip) ── -->
+  <!-- ── Row 3: E2E Chrome (153 pass, 2 fail, 1 skip) ── -->
   <text x="185" y="223" text-anchor="end" font-size="11" fill="#374151">E2E Chrome</text>
-  <!-- 127 pass: 127/130*490 = 478.7px -->
-  <rect x="191" y="209" width="479" height="28" fill="#10b981" rx="3"/>
-  <!-- 1 fail: 1/130*490 = 3.77px -->
-  <rect x="670" y="209" width="4" height="28" fill="#ef4444" rx="1"/>
-  <!-- 1 skip: 1/130*490 = 3.77px -->
-  <rect x="674" y="209" width="4" height="28" fill="#f59e0b" rx="1"/>
-  <text x="467" y="228" text-anchor="end" font-size="11" font-weight="bold" fill="#ffffff">127 pass</text>
-  <rect x="560" y="209" width="90" height="28" fill="#fef3c7" rx="3" stroke="#f59e0b" stroke-width="1"/>
-  <text x="605" y="228" text-anchor="middle" font-size="12" font-weight="bold" fill="#92400e">98.4%</text>
+  <!-- 153 pass: 153/165*490 = 455px -->
+  <rect x="191" y="209" width="455" height="28" fill="#10b981" rx="3"/>
+  <!-- 2 fail: 2/165*490 = 6px -->
+  <rect x="646" y="209" width="6" height="28" fill="#ef4444" rx="1"/>
+  <!-- 1 skip: 1/165*490 = 3px -->
+  <rect x="652" y="209" width="3" height="28" fill="#f59e0b" rx="1"/>
+  <text x="438" y="228" text-anchor="end" font-size="11" font-weight="bold" fill="#ffffff">153 pass</text>
+  <rect x="585" y="209" width="90" height="28" fill="#fef3c7" rx="3" stroke="#f59e0b" stroke-width="1"/>
+  <text x="630" y="228" text-anchor="middle" font-size="12" font-weight="bold" fill="#92400e">98.7%</text>
 
   <!-- ── Totals summary row ── -->
   <rect x="70" y="285" width="580" height="50" fill="#f8fafc" rx="6" stroke="#e2e8f0" stroke-width="1"/>
 
-  <!-- Total: 247 tests, 245 pass, 1 fail, 1 skip — 99.6% -->
+  <!-- Total: 377 tests, 374 pass, 2 fail, 1 skip — 99.5% -->
   <text x="155" y="305" text-anchor="middle" font-size="11" fill="#6b7280">Total Tests</text>
-  <text x="155" y="323" text-anchor="middle" font-size="14" font-weight="bold" fill="#111827">247</text>
+  <text x="155" y="323" text-anchor="middle" font-size="14" font-weight="bold" fill="#111827">377</text>
 
   <text x="285" y="305" text-anchor="middle" font-size="11" fill="#10b981">Passed</text>
-  <text x="285" y="323" text-anchor="middle" font-size="14" font-weight="bold" fill="#10b981">245</text>
+  <text x="285" y="323" text-anchor="middle" font-size="14" font-weight="bold" fill="#10b981">374</text>
 
   <text x="415" y="305" text-anchor="middle" font-size="11" fill="#ef4444">Failed</text>
-  <text x="415" y="323" text-anchor="middle" font-size="14" font-weight="bold" fill="#ef4444">1</text>
+  <text x="415" y="323" text-anchor="middle" font-size="14" font-weight="bold" fill="#ef4444">2</text>
 
   <text x="525" y="305" text-anchor="middle" font-size="11" fill="#f59e0b">Skipped</text>
   <text x="525" y="323" text-anchor="middle" font-size="14" font-weight="bold" fill="#f59e0b">1</text>
 
   <rect x="585" y="288" width="58" height="44" fill="#dbeafe" rx="4"/>
   <text x="614" y="308" text-anchor="middle" font-size="11" fill="#1e40af">Pass Rate</text>
-  <text x="614" y="325" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e40af">99.6%</text>
+  <text x="614" y="325" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e40af">99.5%</text>
 
   <!-- Source note -->
   <text x="360" y="372" text-anchor="middle" font-size="10" fill="#9ca3af">Source: docs/reports/section-3-4-test-results.md · excl. Mobile Safari (WebKit not installed locally)</text>

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import DonationModalTrigger from "../../DonationPage/DonationModalTrigger";
 import styles from "./donationSection.module.css";
 
 export default function DonationSection() {
@@ -19,9 +19,9 @@ export default function DonationSection() {
             necesitan.
           </p>
 
-          <Link href="/donation" className={styles.donateButton}>
+          <DonationModalTrigger className={styles.donateButton}>
             Dona Ahora
-          </Link>
+          </DonationModalTrigger>
         </div>
 
         <div className={styles.imageWrapper}>

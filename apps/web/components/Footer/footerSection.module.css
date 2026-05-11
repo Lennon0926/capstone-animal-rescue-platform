@@ -57,7 +57,18 @@
   transition: var(--transition-fast);
 }
 
+.footerDonateButton,
+.footerVolunteerButton {
+  color: var(--text-muted);
+  transition: var(--transition-fast);
+}
+
 .column a:hover {
+  color: var(--color-primary);
+}
+
+.footerDonateButton:hover,
+.footerVolunteerButton:hover {
   color: var(--color-primary);
 }
 

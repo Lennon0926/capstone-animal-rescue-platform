@@ -6,16 +6,25 @@
 const express = require("express");
 const router = express.Router();
 
+
 const {
   getAnimals,
   getAnimalById,
   getFilterOptions,
-  createAnimal,
+  getAnimalsRecordView,
+  createAnimalWithInitialMedicalRecords,
   deleteAnimal,
-  updateAnimalById
+  updateAnimalWithMedicalRecordsById,
 } = require("../repositories/animalsRepository");
-const { validateAnimalsQuery, validateAnimalId, validateCreateAnimal, validateUpdateAnimal } = require("../middleware/validation");
+const {
+  validateAnimalsQuery,
+  validateAnimalId,
+  validateCreateAnimal,
+  validateUpdateAnimal,
+} = require("../middleware/validation");
 const { asyncHandler, ApiError } = require("../middleware/errorHandler");
+const { requireAuth } = require("../middleware/auth");
+const { requireJson } = require("../middleware/requireJson");
 
 /**
  * GET /api/animals
@@ -62,7 +71,7 @@ router.get(
         hasMore: offset + result.data.length < result.count,
       },
     });
-  })
+  }),
 );
 
 /**
@@ -82,7 +91,32 @@ router.get(
       success: true,
       data,
     });
-  })
+  }),
+);
+
+/**
+ * GET /api/animals/records
+ * Returns all rows from the animalsrecord view.
+ */
+router.get(
+  "/records",
+  asyncHandler(requireAuth),
+  asyncHandler(async (req, res) => {
+    const result = await getAnimalsRecordView();
+
+    if (result.error) {
+      throw new ApiError(
+        500,
+        "Failed to fetch animal medical records",
+        result.error,
+      );
+    }
+
+    res.json({
+      success: true,
+      data: result.data,
+    });
+  }),
 );
 
 /**
@@ -107,7 +141,7 @@ router.get(
       success: true,
       data: result.data,
     });
-  })
+  }),
 );
 
 /**
@@ -116,19 +150,33 @@ router.get(
  */
 router.post(
   "/",
+  requireJson,
+  asyncHandler(requireAuth),
   validateCreateAnimal,
   asyncHandler(async (req, res) => {
-    const result = await createAnimal(req.validatedBody);
+    const result = await createAnimalWithInitialMedicalRecords(
+      req.validatedBody,
+    );
 
     if (result.error) {
       throw new ApiError(500, "Failed to create animal", result.error);
     }
 
-    res.status(201).json({
+    const response = {
       success: true,
       data: result.data,
-    });
-  })
+      medicalRecordsAttempted: result.medicalRecordsAttempted,
+      medicalRecordsRequested: result.medicalRecordsRequested,
+      medicalRecordsCreatedCount: result.medicalRecordsCreatedCount,
+      medicalRecordCreated: result.medicalRecordCreated,
+    };
+
+    if (result.warnings.length > 0) {
+      response.warnings = result.warnings;
+    }
+
+    res.status(201).json(response);
+  }),
 );
 
 /**
@@ -137,6 +185,7 @@ router.post(
  */
 router.delete(
   "/:aid",
+  asyncHandler(requireAuth),
   validateAnimalId,
   asyncHandler(async (req, res) => {
     const result = await deleteAnimal(req.params.aid);
@@ -153,7 +202,7 @@ router.delete(
       success: true,
       data: result.data,
     });
-  })
+  }),
 );
 
 /**
@@ -162,10 +211,15 @@ router.delete(
  */
 router.patch(
   "/:aid",
+  requireJson,
+  asyncHandler(requireAuth),
   validateAnimalId,
   validateUpdateAnimal,
   asyncHandler(async (req, res) => {
-    const result = await updateAnimalById(req.params.aid, req.validatedBody);
+    const result = await updateAnimalWithMedicalRecordsById(
+      req.params.aid,
+      req.validatedBody,
+    );
 
     if (result.error === "Animal not found") {
       throw new ApiError(404, `Animal with ID ${req.params.aid} not found`);
@@ -179,7 +233,7 @@ router.patch(
       success: true,
       data: result.data,
     });
-  })
+  }),
 );
 
 module.exports = router;
