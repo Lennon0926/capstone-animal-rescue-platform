@@ -19,7 +19,9 @@ test.describe("Animal detail page (/adopt/[id])", () => {
 
   // --- Animal identity ---
   test("animal name is shown as h1", async ({ page }) => {
-    await expect(page.getByRole("heading", { name: fluffy.name, level: 1, exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: fluffy.name, level: 1, exact: true })
+    ).toBeVisible();
   });
 
   test("status badge shows Disponible", async ({ page }) => {
@@ -52,9 +54,7 @@ test.describe("Animal detail page (/adopt/[id])", () => {
   });
 
   test("medical records are displayed when available", async ({ page }) => {
-    await expect(
-      page.getByRole("heading", { name: /Registros médicos/i })
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Registros médicos/i })).toBeVisible();
     await expect(page.getByText("Vacunación", { exact: true })).toBeVisible();
     await expect(page.getByText(/Veterinario: Dr\. Rivera/i)).toBeVisible();
     await expect(page.getByText(/Descripción:\s*Primary vaccine/i)).toBeVisible();
@@ -79,9 +79,7 @@ test.describe("Animal detail page (/adopt/[id])", () => {
     const adoptionButton = page.getByRole("link", {
       name: /Iniciar Proceso de Adopción/i,
     });
-    const unavailableMessage = page.getByText(
-      /El formulario de adopción no está disponible/i
-    );
+    const unavailableMessage = page.getByText(/El formulario de adopción no está disponible/i);
 
     // Playwright test process env and Next web-server env can differ.
     // Validate whichever state is actually rendered in the UI.
