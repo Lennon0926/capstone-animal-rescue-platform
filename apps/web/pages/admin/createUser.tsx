@@ -7,7 +7,7 @@ export default function CreateUserPage() {
   const { isLoadingRole, hasRequiredRole } = useAuthRequiredRol("Administrador");
 
   if (isLoading) return <div>Loading...</div>;
-  if (isLoadingRole) return <div>Checking permissions...</div>;
+  if (isLoadingRole) return <div></div>;
   if (!hasRequiredRole) return null;
 
   return (
