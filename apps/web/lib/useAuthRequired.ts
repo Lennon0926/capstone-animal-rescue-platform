@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import type { User } from '@supabase/supabase-js';
+import { getAuthenticatedHeaders } from '@/lib/apiAuth';
 import { supabase } from './supabase';
 
 interface AuthState {
@@ -19,18 +20,8 @@ type CurrentUserRolesResponse = {
   data: {
     user_id: string;
     role_ids?: number[];
-    role_names: string[];
+    role_names?: string[];
   };
-};
-
-type UsersResponse = {
-  success: boolean;
-  data: Array<{
-    id: string;
-    email?: string;
-    role_ids?: number[];
-    role_names: string[];
-  }>;
 };
 
 function getApiBaseUrl(): string {
@@ -110,10 +101,9 @@ function userHasRequiredRole(
 ): boolean {
   const normalizedRequiredRole = requiredRole.trim().toLowerCase();
   const adminRoleNames = new Set(['admin', 'administrador']);
-  const requiredRoleId = adminRoleNames.has(normalizedRequiredRole) ? 1 : null;
-
-  if (requiredRoleId !== null && userRoleIds.includes(requiredRoleId)) {
-    return true;
+  if (adminRoleNames.has(normalizedRequiredRole)) {
+    const uniqueRoleIds = [...new Set(userRoleIds)];
+    return uniqueRoleIds.length === 1 && uniqueRoleIds[0] === 1;
   }
 
   return userRoleNames.some((roleName) => {
@@ -160,18 +150,10 @@ export function useAuthRequiredRol(requiredRole: string): RoleState {
           return;
         }
 
-        let roleResponse: Response | null = null;
+        let headers: Record<string, string>;
         try {
-          roleResponse = await fetch(buildApiUrl('/api/users/me/roles'), {
-            headers: {
-              Authorization: `Bearer ${session.access_token}`,
-            },
-          });
+          headers = await getAuthenticatedHeaders();
         } catch {
-          roleResponse = null;
-        }
-
-        if (roleResponse?.status === 401) {
           if (isMounted) {
             setUser(null);
             setHasRequiredRole(false);
@@ -181,88 +163,12 @@ export function useAuthRequiredRol(requiredRole: string): RoleState {
           return;
         }
 
-        let roleNames: string[] = [];
-        let roleIds: number[] = [];
-
-        if (roleResponse?.ok) {
-          const roleBody: CurrentUserRolesResponse = await roleResponse.json();
-          if (roleBody.success) {
-            roleNames = roleBody.data.role_names || [];
-            roleIds = roleBody.data.role_ids || [];
-          }
-        }
-
-        if (roleNames.length === 0) {
-          let usersResponse: Response;
-          try {
-            usersResponse = await fetch(buildApiUrl('/api/users'), {
-              headers: {
-                Authorization: `Bearer ${session.access_token}`,
-              },
-            });
-          } catch {
-            if (isMounted) {
-              setUser(session.user);
-              setHasRequiredRole(false);
-              setIsLoadingRole(false);
-            }
-            router.push('/admin/accessDenied');
-            return;
-          }
-
-          if (usersResponse.status === 401) {
-            if (isMounted) {
-              setUser(null);
-              setHasRequiredRole(false);
-              setIsLoadingRole(false);
-            }
-            router.push('/admin/login');
-            return;
-          }
-
-          if (!usersResponse.ok) {
-            if (isMounted) {
-              setUser(session.user);
-              setHasRequiredRole(false);
-              setIsLoadingRole(false);
-            }
-            router.push('/admin/accessDenied');
-            return;
-          }
-
-          const usersBody: UsersResponse = await usersResponse.json();
-          if (!usersBody.success) {
-            if (isMounted) {
-              setUser(session.user);
-              setHasRequiredRole(false);
-              setIsLoadingRole(false);
-            }
-            router.push('/admin/accessDenied');
-            return;
-          }
-
-          const normalizedSessionEmail = session.user.email?.trim().toLowerCase();
-          const currentUser = usersBody.data.find((listedUser) => {
-            if (listedUser.id === session.user.id) {
-              return true;
-            }
-
-            if (!normalizedSessionEmail) {
-              return false;
-            }
-
-            const listedUserEmail =
-              typeof listedUser.email === 'string'
-                ? listedUser.email.trim().toLowerCase()
-                : null;
-
-            return listedUserEmail === normalizedSessionEmail;
+        let currentUserRolesResponse: Response;
+        try {
+          currentUserRolesResponse = await fetch(buildApiUrl('/api/users/me/roles'), {
+            headers,
           });
-          roleNames = currentUser?.role_names || [];
-          roleIds = currentUser?.role_ids || [];
-        }
-
-        if ((!roleResponse || !roleResponse.ok) && roleNames.length === 0) {
+        } catch {
           if (isMounted) {
             setUser(session.user);
             setHasRequiredRole(false);
@@ -272,6 +178,53 @@ export function useAuthRequiredRol(requiredRole: string): RoleState {
           return;
         }
 
+        if (currentUserRolesResponse.status === 401) {
+          if (isMounted) {
+            setUser(null);
+            setHasRequiredRole(false);
+            setIsLoadingRole(false);
+          }
+          router.push('/admin/login');
+          return;
+        }
+
+        if (!currentUserRolesResponse.ok) {
+          if (isMounted) {
+            setUser(session.user);
+            setHasRequiredRole(false);
+            setIsLoadingRole(false);
+          }
+          router.push('/admin/accessDenied');
+          return;
+        }
+
+        const currentUserRolesBody: CurrentUserRolesResponse =
+          await currentUserRolesResponse.json();
+        if (!currentUserRolesBody.success) {
+          if (isMounted) {
+            setUser(session.user);
+            setHasRequiredRole(false);
+            setIsLoadingRole(false);
+          }
+          router.push('/admin/accessDenied');
+          return;
+        }
+
+        const responseUserId = currentUserRolesBody.data.user_id;
+        if (responseUserId !== session.user.id) {
+          if (isMounted) {
+            setUser(session.user);
+            setHasRequiredRole(false);
+            setIsLoadingRole(false);
+          }
+          router.push('/admin/accessDenied');
+          return;
+        }
+
+        const roleNames = currentUserRolesBody.data.role_names || [];
+        const roleIds = (currentUserRolesBody.data.role_ids || [])
+          .map((roleId) => Number.parseInt(String(roleId), 10))
+          .filter((roleId) => Number.isInteger(roleId) && roleId > 0);
         const hasRole = userHasRequiredRole(roleNames, roleIds, requiredRole);
 
         if (isMounted) {
