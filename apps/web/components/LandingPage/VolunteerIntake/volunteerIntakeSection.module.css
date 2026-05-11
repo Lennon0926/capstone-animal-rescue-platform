@@ -14,8 +14,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background:
-    linear-gradient(135deg, rgba(31, 60, 79, 0.06), rgba(42, 157, 143, 0.08)),
-    var(--color-surface);
+    linear-gradient(135deg, rgba(31, 60, 79, 0.06), rgba(42, 157, 143, 0.08)), var(--color-surface);
   box-shadow: var(--shadow-sm);
 }
 
