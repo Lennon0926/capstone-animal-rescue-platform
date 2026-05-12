@@ -43,7 +43,10 @@ export default function AdminHeader() {
             Dashboard
           </Link>
           <Link href="/admin/animals" className={styles.navLink}>
-            Animals
+            Animales
+          </Link>
+          <Link href="/admin/createUser" className={styles.navLink}>
+            Usuarios
           </Link>
           <Link href="/admin/posts" className={styles.navLink}>
             Posts
@@ -68,7 +71,10 @@ export default function AdminHeader() {
             Dashboard
           </Link>
           <Link href="/admin/animals" className={styles.navLinkMobile}>
-            Animals
+            Animales
+          </Link>
+          <Link href="/admin/createUser" className={styles.navLinkMobile}>
+            Usuarios
           </Link>
           <Link href="/admin/posts" className={styles.navLinkMobile}>
             Posts

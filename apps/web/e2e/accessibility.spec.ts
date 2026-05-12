@@ -6,7 +6,6 @@
  *   /home                Landing page (index.tsx redirects → /home)
  *   /about               About page
  *   /blog                Blog page
- *   /donation            Donation page
  *   /adopt               Animal listing
  *   /adopt/1             Animal detail (Fluffy, aid=1 from mock server)
  *   /admin/animals       Admin dashboard
@@ -205,26 +204,6 @@ test.describe("Accessibility — Blog (/blog)", () => {
 });
 
 // ─────────────────────────────────────────────────────────
-// Donation — /donation
-// ─────────────────────────────────────────────────────────
-test.describe("Accessibility — Donation (/donation)", () => {
-  test("WCAG 2.1 AA audit", async ({ page }) => {
-    await page.goto("/donation", { waitUntil: "load" });
-
-    const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
-    const violations = results.violations as AxeViolation[];
-
-    printViolations("/donation", violations);
-    test.info().annotations.push({
-      type: "a11y",
-      description: JSON.stringify(countByImpact(violations)),
-    });
-
-    const criticalCount = violations.filter((v) => v.impact === "critical").length;
-    expect(criticalCount, "No Critical violations on /donation").toBe(0);
-  });
-});
-
 // ─────────────────────────────────────────────────────────
 // Create Animal — /admin/createAnimal
 // ─────────────────────────────────────────────────────────

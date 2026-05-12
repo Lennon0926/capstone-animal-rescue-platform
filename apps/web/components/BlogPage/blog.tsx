@@ -58,7 +58,8 @@ type BlogFeedPost = {
 function getFbPostType(post: FacebookPost): "reel" | "shared" | "normal" {
   const attachType = post.attachments?.data[0]?.type ?? "";
   if (post.story || attachType === "share") return "shared";
-  if (attachType === "video_inline" || attachType === "video" || attachType === "reel") return "reel";
+  if (attachType === "video_inline" || attachType === "video" || attachType === "reel")
+    return "reel";
   return "normal";
 }
 
@@ -137,7 +138,14 @@ function ImageGrid({ images, unoptimized = false }: { images: string[]; unoptimi
   if (images.length === 1) {
     return (
       <div className={styles.postImage}>
-        <Image src={images[0]} alt="Publicación" fill style={{ objectFit: "cover" }} sizes="(max-width: 720px) 100vw, 720px" unoptimized={unoptimized} />
+        <Image
+          src={images[0]}
+          alt="Publicación"
+          fill
+          style={{ objectFit: "cover" }}
+          sizes="(max-width: 720px) 100vw, 720px"
+          unoptimized={unoptimized}
+        />
       </div>
     );
   }
@@ -146,12 +154,26 @@ function ImageGrid({ images, unoptimized = false }: { images: string[]; unoptimi
     return (
       <div className={styles.postImageGrid3}>
         <div className={styles.postImageGrid3Left}>
-          <Image src={images[0]} alt="Foto 1" fill style={{ objectFit: "cover" }} sizes="480px" unoptimized={unoptimized} />
+          <Image
+            src={images[0]}
+            alt="Foto 1"
+            fill
+            style={{ objectFit: "cover" }}
+            sizes="480px"
+            unoptimized={unoptimized}
+          />
         </div>
         <div className={styles.postImageGrid3Right}>
           {images.slice(1).map((src, i) => (
             <div key={i} className={styles.postImageGrid3Small}>
-              <Image src={src} alt={`Foto ${i + 2}`} fill style={{ objectFit: "cover" }} sizes="240px" unoptimized={unoptimized} />
+              <Image
+                src={src}
+                alt={`Foto ${i + 2}`}
+                fill
+                style={{ objectFit: "cover" }}
+                sizes="240px"
+                unoptimized={unoptimized}
+              />
             </div>
           ))}
         </div>
@@ -165,8 +187,17 @@ function ImageGrid({ images, unoptimized = false }: { images: string[]; unoptimi
     <div className={`${styles.postImageGrid} ${gridClass}`}>
       {images.slice(0, 4).map((src, i) => (
         <div key={i} className={styles.postImageGridTile}>
-          {i === 3 && images.length > 4 && <div className={styles.postImageGridMore}>+{images.length - 4}</div>}
-          <Image src={src} alt={`Foto ${i + 1}`} fill style={{ objectFit: "cover" }} sizes="360px" unoptimized={unoptimized} />
+          {i === 3 && images.length > 4 && (
+            <div className={styles.postImageGridMore}>+{images.length - 4}</div>
+          )}
+          <Image
+            src={src}
+            alt={`Foto ${i + 1}`}
+            fill
+            style={{ objectFit: "cover" }}
+            sizes="360px"
+            unoptimized={unoptimized}
+          />
         </div>
       ))}
     </div>
@@ -195,11 +226,29 @@ function Comment({ comment }: { comment: FacebookComment }) {
 function SourceBadge({ post }: { post: BlogFeedPost }) {
   if (post.source === "facebook") {
     const type = post.metadata?.facebookType;
-    if (type === "reel") return <span className={`${styles.badge} ${styles.badgeReel}`}><Clapperboard size={11} /> Reel</span>;
-    if (type === "shared") return <span className={`${styles.badge} ${styles.badgeShared}`}><Share2 size={11} /> Compartido</span>;
-    return <span className={`${styles.badge} ${styles.badgeFacebook}`}><Facebook size={11} /> Facebook</span>;
+    if (type === "reel")
+      return (
+        <span className={`${styles.badge} ${styles.badgeReel}`}>
+          <Clapperboard size={11} /> Reel
+        </span>
+      );
+    if (type === "shared")
+      return (
+        <span className={`${styles.badge} ${styles.badgeShared}`}>
+          <Share2 size={11} /> Compartido
+        </span>
+      );
+    return (
+      <span className={`${styles.badge} ${styles.badgeFacebook}`}>
+        <Facebook size={11} /> Facebook
+      </span>
+    );
   }
-  return <span className={`${styles.badge} ${styles.badgeWeb}`}><Globe size={11} /> Web</span>;
+  return (
+    <span className={`${styles.badge} ${styles.badgeWeb}`}>
+      <Globe size={11} /> Web
+    </span>
+  );
 }
 
 // ── Post Card ─────────────────────────────────────────────────────────────────
@@ -223,7 +272,8 @@ function PostCard({
 
   const comments = post.metadata?.rawComments ?? [];
   const isLong = post.body.length > BODY_LIMIT;
-  const visibleBody = isLong && !expanded ? post.body.slice(0, BODY_LIMIT).trimEnd() + "…" : post.body;
+  const visibleBody =
+    isLong && !expanded ? post.body.slice(0, BODY_LIMIT).trimEnd() + "…" : post.body;
   const likeCount = post.metadata?.likes ?? 0;
 
   const handlePin = async () => {
@@ -255,10 +305,18 @@ function PostCard({
             </button>
             {post.source === "local" && (
               <>
-                <button className={styles.editBtn} onClick={() => onEdit?.(post)} title="Editar publicación">
+                <button
+                  className={styles.editBtn}
+                  onClick={() => onEdit?.(post)}
+                  title="Editar publicación"
+                >
                   <Pencil size={14} />
                 </button>
-                <button className={styles.deleteBtn} onClick={() => onDelete?.(post)} title="Eliminar publicación">
+                <button
+                  className={styles.deleteBtn}
+                  onClick={() => onDelete?.(post)}
+                  title="Eliminar publicación"
+                >
                   <Trash2 size={14} />
                 </button>
               </>
@@ -284,27 +342,46 @@ function PostCard({
       <footer className={styles.postFooter}>
         {post.source === "facebook" && (
           <div className={styles.postActions}>
-            <span className={styles.action}><Heart size={13} />{likeCount}</span>
+            <span className={styles.action}>
+              <Heart size={13} />
+              {likeCount}
+            </span>
             {comments.length > 0 ? (
-              <button className={styles.action} onClick={() => setShowComments((s) => !s)} aria-expanded={showComments}>
-                <MessageCircle size={13} />{comments.length}
+              <button
+                className={styles.action}
+                onClick={() => setShowComments((s) => !s)}
+                aria-expanded={showComments}
+              >
+                <MessageCircle size={13} />
+                {comments.length}
                 {showComments ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
               </button>
             ) : (
-              <span className={styles.action}><MessageCircle size={13} />0</span>
+              <span className={styles.action}>
+                <MessageCircle size={13} />0
+              </span>
             )}
           </div>
         )}
         {post.externalUrl && (
-          <a href={post.externalUrl} target="_blank" rel="noopener noreferrer" className={styles.postSource}>
-            <Facebook size={12} />Ver en Facebook<ExternalLink size={10} />
+          <a
+            href={post.externalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.postSource}
+          >
+            <Facebook size={12} />
+            Ver en Facebook
+            <ExternalLink size={10} />
           </a>
         )}
       </footer>
 
       {showComments && comments.length > 0 && (
         <div className={styles.comments}>
-          {comments.map((c) => <Comment key={c.id} comment={c} />)}
+          {comments.map((c) => (
+            <Comment key={c.id} comment={c} />
+          ))}
         </div>
       )}
     </article>
@@ -330,7 +407,8 @@ function FeaturedPost({
   const [pinning, setPinning] = useState(false);
 
   const isLong = post.body.length > BODY_LIMIT;
-  const visibleBody = isLong && !expanded ? post.body.slice(0, BODY_LIMIT).trimEnd() + "…" : post.body;
+  const visibleBody =
+    isLong && !expanded ? post.body.slice(0, BODY_LIMIT).trimEnd() + "…" : post.body;
 
   const handlePin = async () => {
     if (pinning) return;
@@ -362,10 +440,18 @@ function FeaturedPost({
             </button>
             {post.source === "local" && (
               <>
-                <button className={styles.editBtn} onClick={() => onEdit?.(post)} title="Editar publicación">
+                <button
+                  className={styles.editBtn}
+                  onClick={() => onEdit?.(post)}
+                  title="Editar publicación"
+                >
                   <Pencil size={14} />
                 </button>
-                <button className={styles.deleteBtn} onClick={() => onDelete?.(post)} title="Eliminar publicación">
+                <button
+                  className={styles.deleteBtn}
+                  onClick={() => onDelete?.(post)}
+                  title="Eliminar publicación"
+                >
                   <Trash2 size={14} />
                 </button>
               </>
@@ -377,7 +463,15 @@ function FeaturedPost({
         {post.imageUrls[0] && (
           <div className={styles.featuredMedia}>
             <div className={styles.featuredImage}>
-              <Image src={post.imageUrls[0]} alt="Publicación destacada" fill priority style={{ objectFit: "cover" }} sizes="(max-width: 640px) 100vw, 400px" unoptimized={post.source === "facebook"} />
+              <Image
+                src={post.imageUrls[0]}
+                alt="Publicación destacada"
+                fill
+                priority
+                style={{ objectFit: "cover" }}
+                sizes="(max-width: 640px) 100vw, 400px"
+                unoptimized={post.source === "facebook"}
+              />
             </div>
           </div>
         )}
@@ -398,8 +492,14 @@ function FeaturedPost({
             <span>{getRelativeTime(post.createdAt)}</span>
           </div>
           {post.externalUrl && (
-            <a href={post.externalUrl} target="_blank" rel="noopener noreferrer" className={styles.featuredLink}>
-              Leer publicación<ExternalLink size={13} />
+            <a
+              href={post.externalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.featuredLink}
+            >
+              Leer publicación
+              <ExternalLink size={13} />
             </a>
           )}
         </div>
@@ -427,9 +527,11 @@ function LoginModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: ()
         password,
       });
       if (signInError) {
-        setError(signInError.message === "Invalid login credentials"
-          ? "Correo o contraseña incorrectos."
-          : signInError.message);
+        setError(
+          signInError.message === "Invalid login credentials"
+            ? "Correo o contraseña incorrectos."
+            : signInError.message
+        );
         return;
       }
       if (!data?.session) {
@@ -477,7 +579,11 @@ function LoginModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: ()
               required
               disabled={loading}
             />
-            <button type="button" className={styles.loginModalEyeBtn} onClick={() => setShowPassword((v) => !v)}>
+            <button
+              type="button"
+              className={styles.loginModalEyeBtn}
+              onClick={() => setShowPassword((v) => !v)}
+            >
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
@@ -503,15 +609,22 @@ function CreatePostForm({ onCreated }: { onCreated: (post: BlogFeedPost) => void
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!selectedFile) { setPreviewUrl(null); return; }
+    if (!selectedFile) {
+      setPreviewUrl(null);
+      return;
+    }
     const url = URL.createObjectURL(selectedFile);
     setPreviewUrl(url);
     return () => URL.revokeObjectURL(url);
   }, [selectedFile]);
 
   const reset = () => {
-    setHeader(""); setBody(""); setIsPinned(false);
-    setSelectedFile(null); setPreviewUrl(null); setError("");
+    setHeader("");
+    setBody("");
+    setIsPinned(false);
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setError("");
     setOpen(false);
   };
 
@@ -519,21 +632,35 @@ function CreatePostForm({ onCreated }: { onCreated: (post: BlogFeedPost) => void
     e.preventDefault();
     setError("");
 
-    if (!header.trim()) { setError("El título es requerido."); return; }
-    if (!body.trim()) { setError("El contenido es requerido."); return; }
-    if (!selectedFile) { setError("La imagen es requerida."); return; }
+    if (!header.trim()) {
+      setError("El título es requerido.");
+      return;
+    }
+    if (!body.trim()) {
+      setError("El contenido es requerido.");
+      return;
+    }
 
     setLoading(true);
     try {
-      const config = await fetchUploadConfig().catch(() => null);
-      if (!isUploadStorageAvailable(config)) {
-        setError("El almacenamiento de imágenes no está disponible.");
-        return;
+      if (selectedFile) {
+        const config = await fetchUploadConfig().catch(() => null);
+        if (!isUploadStorageAvailable(config)) {
+          setError("El almacenamiento de imágenes no está disponible.");
+          return;
+        }
       }
 
-      const post = await createPost({ header: header.trim(), body: body.trim(), is_pinned: isPinned });
-      const uploadResult = await uploadPostImage(post.pid, selectedFile);
-      const updated = await updatePost(post.pid, { image_object_key: uploadResult.objectKey });
+      const post = await createPost({
+        header: header.trim(),
+        body: body.trim(),
+        is_pinned: isPinned,
+      });
+      let updated = post;
+      if (selectedFile) {
+        const uploadResult = await uploadPostImage(post.pid, selectedFile);
+        updated = await updatePost(post.pid, { image_object_key: uploadResult.objectKey });
+      }
 
       onCreated(normalizeLocalPost(updated));
       reset();
@@ -583,7 +710,7 @@ function CreatePostForm({ onCreated }: { onCreated: (post: BlogFeedPost) => void
 
         <div className={styles.createPostImageRow}>
           <label className={styles.createPostFileLabel}>
-            {selectedFile ? selectedFile.name : "Seleccionar imagen *"}
+            {selectedFile ? selectedFile.name : "Seleccionar imagen"}
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp"
@@ -594,7 +721,12 @@ function CreatePostForm({ onCreated }: { onCreated: (post: BlogFeedPost) => void
           </label>
           {previewUrl && (
             <div style={{ position: "relative", width: 60, height: 60, flexShrink: 0 }}>
-              <Image src={previewUrl} alt="Vista previa" fill style={{ objectFit: "cover", borderRadius: 6 }} />
+              <Image
+                src={previewUrl}
+                alt="Vista previa"
+                fill
+                style={{ objectFit: "cover", borderRadius: 6 }}
+              />
             </div>
           )}
         </div>
@@ -612,7 +744,12 @@ function CreatePostForm({ onCreated }: { onCreated: (post: BlogFeedPost) => void
         {error && <p className={styles.createPostError}>{error}</p>}
 
         <div className={styles.createPostActions}>
-          <button type="button" className={styles.createPostCancel} onClick={reset} disabled={loading}>
+          <button
+            type="button"
+            className={styles.createPostCancel}
+            onClick={reset}
+            disabled={loading}
+          >
             Cancelar
           </button>
           <button type="submit" className={styles.createPostSubmit} disabled={loading}>
@@ -648,7 +785,10 @@ function EditPostModal({
   const hasCurrentImage = post.imageUrls[0] && !removeImage;
 
   useEffect(() => {
-    if (!selectedFile) { setPreviewUrl(null); return; }
+    if (!selectedFile) {
+      setPreviewUrl(null);
+      return;
+    }
     const url = URL.createObjectURL(selectedFile);
     setPreviewUrl(url);
     return () => URL.revokeObjectURL(url);
@@ -667,8 +807,14 @@ function EditPostModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (!header.trim()) { setError("El título es requerido."); return; }
-    if (!body.trim()) { setError("El contenido es requerido."); return; }
+    if (!header.trim()) {
+      setError("El título es requerido.");
+      return;
+    }
+    if (!body.trim()) {
+      setError("El contenido es requerido.");
+      return;
+    }
     setLoading(true);
     try {
       let extra: Record<string, unknown> = {};
@@ -678,7 +824,11 @@ function EditPostModal({
       } else if (removeImage) {
         extra = { remove_image: true };
       }
-      const updated = await updatePost(post.pid!, { header: header.trim(), body: body.trim(), ...extra });
+      const updated = await updatePost(post.pid!, {
+        header: header.trim(),
+        body: body.trim(),
+        ...extra,
+      });
       onSave(normalizeLocalPost(updated));
       onClose();
     } catch (err) {
@@ -693,7 +843,9 @@ function EditPostModal({
       <div className={styles.editPostModal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.loginModalHeader}>
           <h2 className={styles.loginModalTitle}>Editar publicación</h2>
-          <button className={styles.loginModalClose} onClick={onClose} aria-label="Cerrar"><X size={18} /></button>
+          <button className={styles.loginModalClose} onClick={onClose} aria-label="Cerrar">
+            <X size={18} />
+          </button>
         </div>
         {error && <p className={styles.createPostError}>{error}</p>}
         <form onSubmit={handleSubmit}>
@@ -717,9 +869,20 @@ function EditPostModal({
             {hasCurrentImage && (
               <>
                 <div style={{ position: "relative", width: 60, height: 60, flexShrink: 0 }}>
-                  <Image src={post.imageUrls[0]} alt="Imagen actual" fill sizes="60px" style={{ objectFit: "cover", borderRadius: 6 }} />
+                  <Image
+                    src={post.imageUrls[0]}
+                    alt="Imagen actual"
+                    fill
+                    sizes="60px"
+                    style={{ objectFit: "cover", borderRadius: 6 }}
+                  />
                 </div>
-                <button type="button" className={styles.removeImageBtn} onClick={handleRemoveImage} disabled={loading}>
+                <button
+                  type="button"
+                  className={styles.removeImageBtn}
+                  onClick={handleRemoveImage}
+                  disabled={loading}
+                >
                   <Trash2 size={13} /> Quitar imagen
                 </button>
               </>
@@ -729,19 +892,43 @@ function EditPostModal({
             )}
             {!removeImage && (
               <label className={styles.createPostFileLabel}>
-                {selectedFile ? selectedFile.name : hasCurrentImage ? "Cambiar imagen" : "Agregar imagen (opcional)"}
-                <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleFileChange} disabled={loading} hidden />
+                {selectedFile
+                  ? selectedFile.name
+                  : hasCurrentImage
+                    ? "Cambiar imagen"
+                    : "Agregar imagen (opcional)"}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handleFileChange}
+                  disabled={loading}
+                  hidden
+                />
               </label>
             )}
             {previewUrl && (
               <div style={{ position: "relative", width: 60, height: 60, flexShrink: 0 }}>
-                <Image src={previewUrl} alt="Vista previa" fill style={{ objectFit: "cover", borderRadius: 6 }} />
+                <Image
+                  src={previewUrl}
+                  alt="Vista previa"
+                  fill
+                  style={{ objectFit: "cover", borderRadius: 6 }}
+                />
               </div>
             )}
           </div>
           <div className={styles.createPostActions}>
-            <button type="button" className={styles.createPostCancel} onClick={onClose} disabled={loading}>Cancelar</button>
-            <button type="submit" className={styles.createPostSubmit} disabled={loading}>{loading ? "Guardando..." : "Guardar"}</button>
+            <button
+              type="button"
+              className={styles.createPostCancel}
+              onClick={onClose}
+              disabled={loading}
+            >
+              Cancelar
+            </button>
+            <button type="submit" className={styles.createPostSubmit} disabled={loading}>
+              {loading ? "Guardando..." : "Guardar"}
+            </button>
           </div>
         </form>
       </div>
@@ -779,7 +966,9 @@ function DeleteConfirmModal({
       <div className={styles.deleteModal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.loginModalHeader}>
           <h2 className={styles.loginModalTitle}>Eliminar publicación</h2>
-          <button className={styles.loginModalClose} onClick={onClose} aria-label="Cerrar"><X size={18} /></button>
+          <button className={styles.loginModalClose} onClick={onClose} aria-label="Cerrar">
+            <X size={18} />
+          </button>
         </div>
         <p className={styles.deleteModalText}>
           ¿Estás seguro que deseas eliminar esta publicación? Esta acción no se puede deshacer.
@@ -787,7 +976,9 @@ function DeleteConfirmModal({
         {post.header && <p className={styles.deleteModalPostTitle}>&ldquo;{post.header}&rdquo;</p>}
         {error && <p className={styles.createPostError}>{error}</p>}
         <div className={styles.createPostActions}>
-          <button className={styles.createPostCancel} onClick={onClose} disabled={loading}>Cancelar</button>
+          <button className={styles.createPostCancel} onClick={onClose} disabled={loading}>
+            Cancelar
+          </button>
           <button className={styles.deleteConfirmBtn} onClick={handleDelete} disabled={loading}>
             {loading ? "Eliminando..." : "Eliminar"}
           </button>
@@ -818,7 +1009,10 @@ function useScrollReveal(dep: unknown) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const observer = new IntersectionObserver(
-      (entries) => entries.forEach((e) => { if (e.isIntersecting) e.target.classList.add(styles.visible); }),
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) e.target.classList.add(styles.visible);
+        }),
       { threshold: 0.05, rootMargin: "0px 0px -20px 0px" }
     );
     ref.current?.querySelectorAll(`.${styles.fadeInUp}`).forEach((el) => observer.observe(el));
@@ -838,14 +1032,18 @@ export default function Blog() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [editingPost, setEditingPost] = useState<BlogFeedPost | null>(null);
   const [deletingPost, setDeletingPost] = useState<BlogFeedPost | null>(null);
-  const feedRef = useScrollReveal(`${allPosts.length}:${allPosts.find((p) => p.isPinned)?.id ?? ""}`);
+  const feedRef = useScrollReveal(
+    `${allPosts.length}:${allPosts.find((p) => p.isPinned)?.id ?? ""}`
+  );
 
   // Track auth state
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsAdmin(!!session);
     });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAdmin(!!session);
     });
     return () => subscription.unsubscribe();
@@ -883,12 +1081,20 @@ export default function Blog() {
             }
             return normalized;
           })
-        : (setFbError(fbResult.reason instanceof Error ? fbResult.reason.message : "Error de Facebook"), []);
+        : (setFbError(
+            fbResult.reason instanceof Error ? fbResult.reason.message : "Error de Facebook"
+          ),
+          []);
 
     const localPosts: BlogFeedPost[] =
       localResult.status === "fulfilled"
         ? localResult.value.map(normalizeLocalPost)
-        : (setLocalError(localResult.reason instanceof Error ? localResult.reason.message : "Error al cargar publicaciones"), []);
+        : (setLocalError(
+            localResult.reason instanceof Error
+              ? localResult.reason.message
+              : "Error al cargar publicaciones"
+          ),
+          []);
 
     const merged = [...localPosts, ...fbPosts].sort(
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -898,8 +1104,10 @@ export default function Blog() {
     setLoading(false);
   }
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { loadPosts(); }, []);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadPosts();
+  }, []);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -908,9 +1116,7 @@ export default function Blog() {
 
   const handlePostCreated = (newPost: BlogFeedPost) => {
     setAllPosts((prev) => {
-      const list = newPost.isPinned
-        ? prev.map((p) => ({ ...p, isPinned: false }))
-        : prev;
+      const list = newPost.isPinned ? prev.map((p) => ({ ...p, isPinned: false })) : prev;
       return [newPost, ...list].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
@@ -938,7 +1144,8 @@ export default function Blog() {
       } else {
         const fbId = postId.replace("fb-", "");
         if (nowPinned) {
-          if (pinnedLocalPre?.pid) updatePost(pinnedLocalPre.pid, { is_pinned: false }).catch(() => {});
+          if (pinnedLocalPre?.pid)
+            updatePost(pinnedLocalPre.pid, { is_pinned: false }).catch(() => {});
           await setPinnedFbPostId(fbId);
         } else {
           await setPinnedFbPostId(null);
@@ -1025,7 +1232,9 @@ export default function Blog() {
 
         {loading && (
           <div className={styles.feedList}>
-            {Array.from({ length: 5 }).map((_, i) => <SkeletonCard key={i} />)}
+            {Array.from({ length: 5 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
           </div>
         )}
 
@@ -1039,18 +1248,27 @@ export default function Blog() {
         )}
 
         {!loading && !bothFailed && fbError && (
-          <p className={styles.sourceWarning}>Las publicaciones de Facebook no están disponibles en este momento.</p>
+          <p className={styles.sourceWarning}>
+            Las publicaciones de Facebook no están disponibles en este momento.
+          </p>
         )}
 
         {!loading && !bothFailed && localError && (
-          <p className={styles.sourceWarning}>Las publicaciones del sitio web no están disponibles en este momento.</p>
+          <p className={styles.sourceWarning}>
+            Las publicaciones del sitio web no están disponibles en este momento.
+          </p>
         )}
 
         {!loading && !bothFailed && !hasPosts && (
           <div className={styles.emptyState}>
             <Facebook size={40} color="#ccc" />
             <p>No hay publicaciones disponibles en este momento.</p>
-            <a href={FB_PAGE_URL} target="_blank" rel="noopener noreferrer" className={styles.postSource}>
+            <a
+              href={FB_PAGE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.postSource}
+            >
               Ver en Facebook
             </a>
           </div>

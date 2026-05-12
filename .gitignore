@@ -45,3 +45,7 @@ apps/server/.env.*
 # Supabase local CLI/runtime artifacts
 supabase/.temp/
 supabase/.env
+
+# Playwright local run artifacts
+**/test-results/
+.vercel

@@ -6,6 +6,7 @@ import MissionVideoSection from "@/components/LandingPage/MissionVideo/missionVi
 import TimelineSection from "@/components/LandingPage/Timeline/timelineSection";
 import StoriesSection from "@/components/LandingPage/Stories/storiesSection";
 import GetInvolvedSection from "@/components/LandingPage/GetInvolved/getInvolvedSection";
+import VolunteerIntakeSection from "@/components/LandingPage/VolunteerIntake/volunteerIntakeSection";
 import AnimalsSection from "@/components/LandingPage/Animals/animalsSection";
 import DonationBanner from "@/components/LandingPage/Donate/donationBanner";
 import ContactSection from "@/components/LandingPage/Contact/contactSection";
@@ -36,6 +37,7 @@ function Home({ animals, fetchError }: HomeProps) {
       <TimelineSection />
       <StoriesSection />
       <GetInvolvedSection />
+      <VolunteerIntakeSection />
       <AnimalsSection animals={animals} fetchError={fetchError} />
       <DonationBanner />
       <ContactSection />
