@@ -10,29 +10,35 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [sendingReset, setSendingReset] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email || !password) {
+      setResetMessage(null);
       setError('Please enter both email and password');
       return;
     }
 
     if (email.length < 5) {
+      setResetMessage(null);
       setError('Please enter a valid email address');
       return;
     }
 
     if (password.length < 6) {
+      setResetMessage(null);
       setError('Password must be at least 6 characters');
       return;
     }
 
     setLoading(true);
     setError(null);
+    setResetMessage(null);
 
     try {
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
@@ -69,6 +75,44 @@ export default function LoginPage() {
     }
   };
 
+  const handleForgotPassword = async () => {
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail) {
+      setResetMessage(null);
+      setError('Primero ingresa tu correo para recibir el enlace de restablecimiento.');
+      return;
+    }
+
+    if (normalizedEmail.length < 5) {
+      setResetMessage(null);
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    setSendingReset(true);
+    setError(null);
+    setResetMessage(null);
+
+    const redirectTo =
+      typeof window !== 'undefined' ? `${window.location.origin}/admin/reset-password` : undefined;
+
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+      ...(redirectTo ? { redirectTo } : {}),
+    });
+
+    if (resetError) {
+      setResetMessage(null);
+      setError(resetError.message || 'No se pudo enviar el correo de restablecimiento. Inténtalo de nuevo.');
+      setSendingReset(false);
+      return;
+    }
+
+    setSendingReset(false);
+    setError(null);
+    setResetMessage('Enlace de restablecimiento enviado. Revisa tu correo.');
+  };
+
 
 
   return (
@@ -85,6 +129,7 @@ export default function LoginPage() {
         </div>
 
         {error && <div className={styles.errorMessage}>{error}</div>}
+        {resetMessage && <div className={styles.successMessage}>{resetMessage}</div>}
 
         <form onSubmit={handleEmailLogin} className={styles.form}>
           <div className={styles.formGroup}>
@@ -132,6 +177,14 @@ export default function LoginPage() {
                 )}
               </button>
             </div>
+            <button
+              type="button"
+              className={styles.forgotPasswordButton}
+              onClick={handleForgotPassword}
+              disabled={loading || sendingReset}
+            >
+              {sendingReset ? 'Enviando enlace...' : '¿Olvidaste tu contraseña?'}
+            </button>
           </div>
 
           <button

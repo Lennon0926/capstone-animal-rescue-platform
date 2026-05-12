@@ -16,6 +16,7 @@ const healthRouter = require("./routes/health");
 const animalsRouter = require("./routes/animals");
 const postsRouter = require("./routes/posts");
 const uploadsRouter = require("./routes/uploads");
+const usersRouter = require("./routes/users");
 const settingsRouter = require("./routes/settings");
 const { errorHandler, notFoundHandler } = require("./middleware/errorHandler");
 
@@ -61,6 +62,7 @@ app.use(express.json());
 
 // Routes
 app.use("/api/animals", animalsRouter);
+app.use("/api/users", usersRouter);
 app.use("/api/posts", postsRouter);
 app.use("/api/settings", settingsRouter);
 app.post("/api/uploads/animals/:animalId/image", uploadLimiter);
