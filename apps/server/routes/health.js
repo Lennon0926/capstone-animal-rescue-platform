@@ -3,6 +3,7 @@
  * Provides health checks, readiness probes, and API info endpoints.
  */
 
+
 const express = require("express");
 const router = express.Router();
 
@@ -22,6 +23,7 @@ router.get("/", (req, res) => {
     version: "1.0.0",
     endpoints: {
       animals: "/api/animals",
+      users: "/api/users",
       health: "/api/health",
     },
   });

@@ -12,6 +12,11 @@ interface AnimalsSectionProps {
 
 export default function AnimalsSection({ animals, fetchError = false }: AnimalsSectionProps) {
   const showAdoptCatalog = isAdoptCatalogVisible();
+
+  if (!showAdoptCatalog) {
+    return null;
+  }
+
   const statusMessage = fetchError
     ? "No se pudieron cargar los animales."
     : animals.length === 0
