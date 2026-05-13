@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { Eye, EyeOff } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import styles from './login.module.css';
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { Eye, EyeOff } from "lucide-react";
+import { supabase } from "@/lib/supabase";
+import styles from "./login.module.css";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [sendingReset, setSendingReset] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -17,22 +17,22 @@ export default function LoginPage() {
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email || !password) {
       setResetMessage(null);
-      setError('Please enter both email and password');
+      setError("Please enter both email and password");
       return;
     }
 
     if (email.length < 5) {
       setResetMessage(null);
-      setError('Please enter a valid email address');
+      setError("Please enter a valid email address");
       return;
     }
 
     if (password.length < 6) {
       setResetMessage(null);
-      setError('Password must be at least 6 characters');
+      setError("Password must be at least 6 characters");
       return;
     }
 
@@ -48,28 +48,29 @@ export default function LoginPage() {
 
       // Handle Supabase errors - don't throw, just set error state
       if (signInError) {
-        console.error('Sign in error:', signInError.message);
-        
-        if (signInError.message === 'Invalid login credentials') {
-          setError('Invalid email or password. Please try again.');
+        console.error("Sign in error:", signInError.message);
+
+        if (signInError.message === "Invalid login credentials") {
+          setError("Invalid email or password. Please try again.");
         } else {
-          setError(signInError.message || 'Failed to sign in. Please try again.');
+          setError(signInError.message || "Failed to sign in. Please try again.");
         }
-        
+
         setLoading(false);
         return;
       }
 
       if (!data?.session) {
-        setError('Login successful but session could not be created. Please try again.');
+        setError("Login successful but session could not be created. Please try again.");
         setLoading(false);
         return;
       }
 
-      await router.push('/admin/home');
+      await router.push("/admin/home");
     } catch (err) {
       // Catch any unexpected errors
-      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred. Please try again.';
+      const errorMessage =
+        err instanceof Error ? err.message : "An unexpected error occurred. Please try again.";
       setError(errorMessage);
       setLoading(false);
     }
@@ -80,13 +81,13 @@ export default function LoginPage() {
 
     if (!normalizedEmail) {
       setResetMessage(null);
-      setError('Primero ingresa tu correo para recibir el enlace de restablecimiento.');
+      setError("Primero ingresa tu correo para recibir el enlace de restablecimiento.");
       return;
     }
 
     if (normalizedEmail.length < 5) {
       setResetMessage(null);
-      setError('Please enter a valid email address.');
+      setError("Please enter a valid email address.");
       return;
     }
 
@@ -94,8 +95,11 @@ export default function LoginPage() {
     setError(null);
     setResetMessage(null);
 
-    const redirectTo =
-      typeof window !== 'undefined' ? `${window.location.origin}/admin/reset-password` : undefined;
+    const envAppUrl = process.env.NEXT_PUBLIC_APP_URL || undefined;
+
+    const origin = typeof window !== "undefined" ? window.location.origin : envAppUrl;
+
+    const redirectTo = origin ? `${origin.replace(/\/$/, "")}/admin/reset-password` : undefined;
 
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
       ...(redirectTo ? { redirectTo } : {}),
@@ -103,17 +107,17 @@ export default function LoginPage() {
 
     if (resetError) {
       setResetMessage(null);
-      setError(resetError.message || 'No se pudo enviar el correo de restablecimiento. Inténtalo de nuevo.');
+      setError(
+        resetError.message || "No se pudo enviar el correo de restablecimiento. Inténtalo de nuevo."
+      );
       setSendingReset(false);
       return;
     }
 
     setSendingReset(false);
     setError(null);
-    setResetMessage('Enlace de restablecimiento enviado. Revisa tu correo.');
+    setResetMessage("Enlace de restablecimiento enviado. Revisa tu correo.");
   };
-
-
 
   return (
     <div className={styles.container}>
@@ -124,7 +128,8 @@ export default function LoginPage() {
         <div className={styles.header}>
           <h1 className={styles.title}>Admin Login</h1>
           <p className={styles.subtitle}>
-            Sign para acceder al panel de administración. Asegúrate de usar tus credenciales de administrador para iniciar sesión.
+            Sign para acceder al panel de administración. Asegúrate de usar tus credenciales de
+            administrador para iniciar sesión.
           </p>
         </div>
 
@@ -155,7 +160,7 @@ export default function LoginPage() {
             <div className={styles.passwordWrapper}>
               <input
                 id="password"
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
@@ -168,13 +173,9 @@ export default function LoginPage() {
                 className={styles.togglePassword}
                 onClick={() => setShowPassword(!showPassword)}
                 disabled={loading}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? (
-                  <EyeOff size={20} />
-                ) : (
-                  <Eye size={20} />
-                )}
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
             <button
@@ -183,20 +184,14 @@ export default function LoginPage() {
               onClick={handleForgotPassword}
               disabled={loading || sendingReset}
             >
-              {sendingReset ? 'Enviando enlace...' : '¿Olvidaste tu contraseña?'}
+              {sendingReset ? "Enviando enlace..." : "¿Olvidaste tu contraseña?"}
             </button>
           </div>
 
-          <button
-            type="submit"
-            className={styles.submitButton}
-            disabled={loading}
-          >
-            {loading ? 'Signing in...' : 'Sign In'}
+          <button type="submit" className={styles.submitButton} disabled={loading}>
+            {loading ? "Signing in..." : "Sign In"}
           </button>
         </form>
-
-
       </div>
     </div>
   );
