@@ -503,6 +503,41 @@ function validateUpdateAnimal(req, res, next) {
   }
 }
 
+/**
+ * Middleware to validate AI Pet Match request body.
+ * Accepts a single natural-language prompt and an optional limit.
+ */
+function validateAiMatchBody(req, res, next) {
+  try {
+    const rawPrompt = req.body?.prompt;
+    if (typeof rawPrompt !== "string") {
+      throw new ApiError(400, "prompt is required and must be a string.");
+    }
+
+    const prompt = rawPrompt.trim();
+    if (prompt.length < 3) {
+      throw new ApiError(400, "prompt must be at least 3 characters.");
+    }
+    if (prompt.length > 500) {
+      throw new ApiError(400, "prompt must be 500 characters or fewer.");
+    }
+
+    let limit = 5;
+    if (req.body?.limit !== undefined) {
+      const parsedLimit = Number.parseInt(req.body.limit, 10);
+      if (!Number.isInteger(parsedLimit) || parsedLimit < 1 || parsedLimit > 20) {
+        throw new ApiError(400, "limit must be an integer between 1 and 20.");
+      }
+      limit = parsedLimit;
+    }
+
+    req.validatedBody = { prompt, limit };
+    next();
+  } catch (err) {
+    next(err);
+  }
+}
+
 function sanitizeLongBlogText(value) {
   if (typeof value !== "string") return "";
   return value.replace(/[;'"\\]/g, "").trim().slice(0, 5000);
@@ -620,6 +655,7 @@ module.exports = {
   validateAnimalId,
   validateCreateAnimal,
   validateUpdateAnimal,
+  validateAiMatchBody,
   validatePostsQuery,
   validatePostId,
   validateCreatePost,
