@@ -5,6 +5,16 @@ import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import styles from "./login.module.css";
 
+const PASSWORD_RESET_PATH = "/admin/reset-password";
+
+function buildPasswordResetRedirectUrl() {
+  const configuredAppUrl = process.env.NEXT_PUBLIC_APP_URL?.trim();
+
+  return configuredAppUrl
+    ? `${configuredAppUrl.replace(/\/+$/, "")}${PASSWORD_RESET_PATH}`
+    : undefined;
+}
+
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -95,11 +105,13 @@ export default function LoginPage() {
     setError(null);
     setResetMessage(null);
 
-    const envAppUrl = process.env.NEXT_PUBLIC_APP_URL || undefined;
+    const redirectTo = buildPasswordResetRedirectUrl();
 
-    const origin = typeof window !== "undefined" ? window.location.origin : envAppUrl;
-
-    const redirectTo = origin ? `${origin.replace(/\/$/, "")}/admin/reset-password` : undefined;
+    if (!redirectTo) {
+      setError("Falta configurar NEXT_PUBLIC_APP_URL para enviar el enlace de restablecimiento.");
+      setSendingReset(false);
+      return;
+    }
 
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
       ...(redirectTo ? { redirectTo } : {}),
