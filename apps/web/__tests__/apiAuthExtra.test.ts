@@ -67,16 +67,23 @@ describe("getAuthenticatedHeaders", () => {
       return {
         getAuthenticatedHeaders: async (headers: HeadersInit = {}) => {
           const normalized = new Headers(headers);
-          const { data: { session }, error } = await supabaseModule.supabase.auth.getSession();
+          const {
+            data: { session },
+            error,
+          } = await supabaseModule.supabase.auth.getSession();
           if (error) throw new Error("No se pudo validar la sesión actual.");
-          if (!session?.access_token) throw new Error("Debes iniciar sesión para realizar esta acción.");
+          if (!session?.access_token)
+            throw new Error("Debes iniciar sesión para realizar esta acción.");
           normalized.set("Authorization", `Bearer ${session.access_token}`);
           return Object.fromEntries(normalized.entries());
         },
       };
     });
 
-    mockGetSession.mockResolvedValue({ data: { session: null }, error: new Error("Session error") });
+    mockGetSession.mockResolvedValue({
+      data: { session: null },
+      error: new Error("Session error"),
+    });
     const { getAuthenticatedHeaders: getHeadersFresh } = require("@/lib/apiAuth");
     await expect(getHeadersFresh()).rejects.toThrow(/sesión/i);
   });
@@ -93,9 +100,13 @@ describe("getAuthenticatedHeaders", () => {
       return {
         getAuthenticatedHeaders: async (headers: HeadersInit = {}) => {
           const normalized = new Headers(headers);
-          const { data: { session }, error } = await supabaseModule.supabase.auth.getSession();
+          const {
+            data: { session },
+            error,
+          } = await supabaseModule.supabase.auth.getSession();
           if (error) throw new Error("No se pudo validar la sesión actual.");
-          if (!session?.access_token) throw new Error("Debes iniciar sesión para realizar esta acción.");
+          if (!session?.access_token)
+            throw new Error("Debes iniciar sesión para realizar esta acción.");
           normalized.set("Authorization", `Bearer ${session.access_token}`);
           return Object.fromEntries(normalized.entries());
         },

@@ -24,7 +24,9 @@ class MockImage {
   private _src = "";
   onload: (() => void) | null = null;
   onerror: (() => void) | null = null;
-  get src(): string { return this._src; }
+  get src(): string {
+    return this._src;
+  }
   set src(value: string) {
     this._src = value;
     Promise.resolve().then(() => this.onload?.());
@@ -68,9 +70,7 @@ describe("compressIfNeeded", () => {
   it("calls URL.createObjectURL for large files", async () => {
     const smallBlob = new Blob([new Uint8Array(100)], { type: "image/jpeg" });
     // toBlob resolves with a small blob on first binary-search step
-    mockToBlob.mockImplementation(
-      (callback: (b: Blob | null) => void) => callback(smallBlob)
-    );
+    mockToBlob.mockImplementation((callback: (b: Blob | null) => void) => callback(smallBlob));
 
     const largeFile = makeFile(2000);
     await compressIfNeeded(largeFile, 1000);
@@ -80,9 +80,7 @@ describe("compressIfNeeded", () => {
 
   it("returns a compressed File when toBlob succeeds under maxBytes", async () => {
     const smallBlob = new Blob([new Uint8Array(200)], { type: "image/jpeg" });
-    mockToBlob.mockImplementation(
-      (callback: (b: Blob | null) => void) => callback(smallBlob)
-    );
+    mockToBlob.mockImplementation((callback: (b: Blob | null) => void) => callback(smallBlob));
 
     const largeFile = makeFile(2000, "big.jpg");
     const result = await compressIfNeeded(largeFile, 1000);
@@ -94,9 +92,7 @@ describe("compressIfNeeded", () => {
   it("throws when compressed blob still exceeds maxBytes", async () => {
     // Always return a blob larger than maxBytes
     const tooBigBlob = new Blob([new Uint8Array(5000)], { type: "image/jpeg" });
-    mockToBlob.mockImplementation(
-      (callback: (b: Blob | null) => void) => callback(tooBigBlob)
-    );
+    mockToBlob.mockImplementation((callback: (b: Blob | null) => void) => callback(tooBigBlob));
 
     const file = makeFile(6000);
     await expect(compressIfNeeded(file, 100)).rejects.toThrow(/comprimirse|límite/i);

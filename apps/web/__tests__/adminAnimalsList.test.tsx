@@ -7,7 +7,9 @@ import type { Animal } from "@/types/animal";
 jest.mock("next/link", () => ({
   __esModule: true,
   default: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => (
-    <a href={href} {...rest}>{children}</a>
+    <a href={href} {...rest}>
+      {children}
+    </a>
   ),
 }));
 
@@ -130,10 +132,7 @@ describe("search", () => {
 
 describe("sorting", () => {
   it("toggles sort direction when clicking the same column twice", async () => {
-    const animals = [
-      makeAnimal({ aid: 1, name: "Zorro" }),
-      makeAnimal({ aid: 2, name: "Alpha" }),
-    ];
+    const animals = [makeAnimal({ aid: 1, name: "Zorro" }), makeAnimal({ aid: 2, name: "Alpha" })];
     render(<AdminAnimalsList initialAnimals={animals} />);
     const nameHeader = screen.getByRole("columnheader", { name: /nombre/i });
     // First click: ascending → Alpha (A) first
@@ -161,7 +160,9 @@ describe("pagination", () => {
     fireEvent.click(screen.getByTitle("Página siguiente"));
     // Page info text is split across <strong> elements — match against container
     expect(
-      screen.getByText((_, el) => el?.tagName === "SPAN" && /Página\s+2\s+de\s+2/i.test(el.textContent ?? ""))
+      screen.getByText(
+        (_, el) => el?.tagName === "SPAN" && /Página\s+2\s+de\s+2/i.test(el.textContent ?? "")
+      )
     ).toBeInTheDocument();
   });
 
@@ -176,7 +177,9 @@ describe("pagination", () => {
     fireEvent.click(screen.getByTitle("Página siguiente"));
     fireEvent.click(screen.getByTitle("Página anterior"));
     expect(
-      screen.getByText((_, el) => el?.tagName === "SPAN" && /Página\s+1\s+de\s+2/i.test(el.textContent ?? ""))
+      screen.getByText(
+        (_, el) => el?.tagName === "SPAN" && /Página\s+1\s+de\s+2/i.test(el.textContent ?? "")
+      )
     ).toBeInTheDocument();
   });
 });
@@ -195,7 +198,9 @@ describe("delete modal", () => {
     render(<AdminAnimalsList initialAnimals={[makeAnimal({ name: "Rex" })]} />);
     fireEvent.click(screen.getByRole("button", { name: /eliminar/i }));
     fireEvent.click(screen.getByRole("button", { name: /cancelar/i }));
-    expect(screen.queryByRole("heading", { name: /confirmar eliminación/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: /confirmar eliminación/i })
+    ).not.toBeInTheDocument();
     expect(screen.getByText("Rex")).toBeInTheDocument();
   });
 
@@ -209,9 +214,7 @@ describe("delete modal", () => {
     // Click confirm inside modal (last "Eliminar" button)
     const allDeleteBtns = screen.getAllByRole("button", { name: /eliminar/i });
     fireEvent.click(allDeleteBtns[allDeleteBtns.length - 1]);
-    await waitFor(() =>
-      expect(screen.queryByText("Rex")).not.toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.queryByText("Rex")).not.toBeInTheDocument());
   });
 
   it("shows error when delete fails", async () => {
@@ -224,20 +227,14 @@ describe("delete modal", () => {
     await screen.findByRole("heading", { name: /confirmar eliminación/i });
     const allDeleteBtns = screen.getAllByRole("button", { name: /eliminar/i });
     fireEvent.click(allDeleteBtns[allDeleteBtns.length - 1]);
-    await waitFor(() =>
-      expect(screen.getByRole("alert")).toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.getByRole("alert")).toBeInTheDocument());
   });
 });
 
 // ── Status badge styles ───────────────────────────────────────────────────────
 
 describe("status badge", () => {
-  it.each([
-    ["disponible"],
-    ["adoptado"],
-    ["pendiente"],
-  ])("renders %s status", (status) => {
+  it.each([["disponible"], ["adoptado"], ["pendiente"]])("renders %s status", (status) => {
     render(<AdminAnimalsList initialAnimals={[makeAnimal({ status })]} />);
     const badge = screen.getByText(status.charAt(0).toUpperCase() + status.slice(1));
     expect(badge).toBeInTheDocument();

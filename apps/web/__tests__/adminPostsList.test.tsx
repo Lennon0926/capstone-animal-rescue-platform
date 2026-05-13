@@ -7,7 +7,9 @@ import type { Post } from "@/types/post";
 jest.mock("next/link", () => ({
   __esModule: true,
   default: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => (
-    <a href={href} {...rest}>{children}</a>
+    <a href={href} {...rest}>
+      {children}
+    </a>
   ),
 }));
 
@@ -38,9 +40,7 @@ function makePost(overrides: Partial<Post> = {}): Post {
 }
 
 function makePosts(count: number): Post[] {
-  return Array.from({ length: count }, (_, i) =>
-    makePost({ pid: i + 1, header: `Post ${i + 1}` })
-  );
+  return Array.from({ length: count }, (_, i) => makePost({ pid: i + 1, header: `Post ${i + 1}` }));
 }
 
 beforeEach(() => {
@@ -61,7 +61,10 @@ describe("empty state", () => {
 
 describe("list render", () => {
   it("renders post headers in the table", () => {
-    const posts = [makePost({ header: "Noticia importante" }), makePost({ pid: 2, header: "Evento especial" })];
+    const posts = [
+      makePost({ header: "Noticia importante" }),
+      makePost({ pid: 2, header: "Evento especial" }),
+    ];
     render(<AdminPostsList initialPosts={posts} />);
     expect(screen.getByText("Noticia importante")).toBeInTheDocument();
     expect(screen.getByText("Evento especial")).toBeInTheDocument();
@@ -89,7 +92,13 @@ describe("list render", () => {
   });
 
   it("renders image thumbnail when post has image", () => {
-    render(<AdminPostsList initialPosts={[makePost({ image_url: "https://example.com/img.jpg", header: "With Image" })]} />);
+    render(
+      <AdminPostsList
+        initialPosts={[
+          makePost({ image_url: "https://example.com/img.jpg", header: "With Image" }),
+        ]}
+      />
+    );
     expect(screen.getByRole("img", { name: "With Image" })).toBeInTheDocument();
   });
 });
@@ -98,7 +107,10 @@ describe("list render", () => {
 
 describe("search", () => {
   it("filters posts by header", async () => {
-    const posts = [makePost({ header: "Adopción exitosa" }), makePost({ pid: 2, header: "Evento fin de año" })];
+    const posts = [
+      makePost({ header: "Adopción exitosa" }),
+      makePost({ pid: 2, header: "Evento fin de año" }),
+    ];
     render(<AdminPostsList initialPosts={posts} />);
     const input = screen.getByPlaceholderText(/buscar/i);
     await userEvent.type(input, "Adopción");
@@ -160,11 +172,15 @@ describe("pagination", () => {
     render(<AdminPostsList initialPosts={makePosts(12)} />);
     fireEvent.click(screen.getByRole("button", { name: /siguiente/i }));
     expect(
-      screen.getByText((_, el) => el?.tagName === "SPAN" && /Página\s+2\s+de\s+2/i.test(el.textContent ?? ""))
+      screen.getByText(
+        (_, el) => el?.tagName === "SPAN" && /Página\s+2\s+de\s+2/i.test(el.textContent ?? "")
+      )
     ).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /anterior/i }));
     expect(
-      screen.getByText((_, el) => el?.tagName === "SPAN" && /Página\s+1\s+de\s+2/i.test(el.textContent ?? ""))
+      screen.getByText(
+        (_, el) => el?.tagName === "SPAN" && /Página\s+1\s+de\s+2/i.test(el.textContent ?? "")
+      )
     ).toBeInTheDocument();
   });
 });
@@ -183,7 +199,9 @@ describe("delete modal", () => {
     render(<AdminPostsList initialPosts={[makePost({ header: "Mi post" })]} />);
     fireEvent.click(screen.getByRole("button", { name: /eliminar/i }));
     fireEvent.click(screen.getByRole("button", { name: /cancelar/i }));
-    expect(screen.queryByRole("heading", { name: /confirmar eliminación/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: /confirmar eliminación/i })
+    ).not.toBeInTheDocument();
     expect(screen.getByText("Mi post")).toBeInTheDocument();
   });
 
@@ -196,9 +214,7 @@ describe("delete modal", () => {
     );
     const allDeleteBtns = screen.getAllByRole("button", { name: /eliminar/i });
     fireEvent.click(allDeleteBtns[allDeleteBtns.length - 1]);
-    await waitFor(() =>
-      expect(screen.queryByText("Mi post")).not.toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.queryByText("Mi post")).not.toBeInTheDocument());
   });
 
   it("shows error message when delete fails", async () => {
@@ -210,8 +226,6 @@ describe("delete modal", () => {
     );
     const allDeleteBtns = screen.getAllByRole("button", { name: /eliminar/i });
     fireEvent.click(allDeleteBtns[allDeleteBtns.length - 1]);
-    await waitFor(() =>
-      expect(screen.getByRole("alert")).toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.getByRole("alert")).toBeInTheDocument());
   });
 });

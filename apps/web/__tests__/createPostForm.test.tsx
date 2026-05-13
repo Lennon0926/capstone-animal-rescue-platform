@@ -36,7 +36,8 @@ jest.mock("@/services/postService", () => ({
 jest.mock("@/services/animalImageUploadService", () => ({
   fetchUploadConfig: (...args: unknown[]) => mockFetchUploadConfig(...args),
   isUploadStorageAvailable: (...args: unknown[]) => mockIsUploadStorageAvailable(...args),
-  getUploadStorageUnavailableMessage: (...args: unknown[]) => mockGetUploadStorageUnavailableMessage(...args),
+  getUploadStorageUnavailableMessage: (...args: unknown[]) =>
+    mockGetUploadStorageUnavailableMessage(...args),
 }));
 
 import CreatePostForm from "@/components/Admin/CreatePost/createPostForm";
@@ -68,9 +69,7 @@ describe("CreatePostForm", () => {
     render(<CreatePostForm />);
     const form = screen.getByRole("button", { name: /crear publicación/i }).closest("form")!;
     fireEvent.submit(form);
-    await waitFor(() =>
-      expect(screen.getByText(/título es requerido/i)).toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.getByText(/título es requerido/i)).toBeInTheDocument());
   });
 
   it("shows validation error when body is missing", async () => {
@@ -78,13 +77,18 @@ describe("CreatePostForm", () => {
     await userEvent.type(screen.getByLabelText(/título/i), "Mi Título");
     const form = screen.getByRole("button", { name: /crear publicación/i }).closest("form")!;
     fireEvent.submit(form);
-    await waitFor(() =>
-      expect(screen.getByText(/contenido es requerido/i)).toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.getByText(/contenido es requerido/i)).toBeInTheDocument());
   });
 
   it("creates post successfully and shows success message", async () => {
-    mockCreatePost.mockResolvedValue({ pid: 1, header: "Test", body: "Body", is_pinned: false, image_url: null, created_at: "2026-01-01T00:00:00Z" });
+    mockCreatePost.mockResolvedValue({
+      pid: 1,
+      header: "Test",
+      body: "Body",
+      is_pinned: false,
+      image_url: null,
+      created_at: "2026-01-01T00:00:00Z",
+    });
 
     render(<CreatePostForm />);
     await userEvent.type(screen.getByLabelText(/título/i), "Mi Título");
@@ -98,7 +102,14 @@ describe("CreatePostForm", () => {
   });
 
   it("redirects to /admin/posts after success", async () => {
-    mockCreatePost.mockResolvedValue({ pid: 2, header: "T", body: "B", is_pinned: false, image_url: null, created_at: "2026-01-01T00:00:00Z" });
+    mockCreatePost.mockResolvedValue({
+      pid: 2,
+      header: "T",
+      body: "B",
+      is_pinned: false,
+      image_url: null,
+      created_at: "2026-01-01T00:00:00Z",
+    });
 
     render(<CreatePostForm />);
     await userEvent.type(screen.getByLabelText(/título/i), "T");
@@ -107,7 +118,9 @@ describe("CreatePostForm", () => {
     fireEvent.submit(form);
 
     await waitFor(() => screen.getByText(/publicación creada exitosamente/i));
-    await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith("/admin/posts"), { timeout: 3000 });
+    await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith("/admin/posts"), {
+      timeout: 3000,
+    });
   }, 10000);
 
   it("shows error when createPost throws", async () => {
@@ -119,9 +132,7 @@ describe("CreatePostForm", () => {
     const form = screen.getByRole("button", { name: /crear publicación/i }).closest("form")!;
     fireEvent.submit(form);
 
-    await waitFor(() =>
-      expect(screen.getByText(/Network error/i)).toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.getByText(/Network error/i)).toBeInTheDocument());
   });
 
   it("renders is_pinned checkbox", () => {

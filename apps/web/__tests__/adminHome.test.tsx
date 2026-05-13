@@ -4,7 +4,9 @@ import { render, screen, waitFor } from "@testing-library/react";
 jest.mock("recharts", () => {
   const React = require("react");
   return {
-    AreaChart: ({ children }: { children: React.ReactNode }) => <div data-testid="AreaChart">{children}</div>,
+    AreaChart: ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="AreaChart">{children}</div>
+    ),
     Area: () => null,
     XAxis: () => null,
     YAxis: () => null,
@@ -27,7 +29,9 @@ jest.mock("@/components/ui/select", () => {
   const React = require("react");
   return {
     Select: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-    SelectTrigger: ({ children }: { children: React.ReactNode }) => <button type="button">{children}</button>,
+    SelectTrigger: ({ children }: { children: React.ReactNode }) => (
+      <button type="button">{children}</button>
+    ),
     SelectValue: () => null,
     SelectContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
     SelectItem: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
@@ -65,9 +69,7 @@ const ACTIVE_DATA = [
   { species: "gato", created_at: "2026-01-20T00:00:00Z" },
 ];
 
-const ADOPTED_DATA = [
-  { species: "gato", created_at: "2026-01-25T00:00:00Z" },
-];
+const ADOPTED_DATA = [{ species: "gato", created_at: "2026-01-25T00:00:00Z" }];
 
 function buildPromiseChain(resolvedValue: unknown) {
   const chain: Record<string, jest.Mock> = {};

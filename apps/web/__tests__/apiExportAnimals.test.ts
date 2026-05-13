@@ -44,9 +44,18 @@ function mockRes() {
     _body: undefined as unknown,
     _headers: {} as Record<string, string | number | readonly string[]>,
   };
-  res.status = function (code: number) { res._status = code; return res; };
-  res.json = function (data: unknown) { res._body = data; return res; };
-  res.send = function (data: unknown) { res._body = data; return res; };
+  res.status = function (code: number) {
+    res._status = code;
+    return res;
+  };
+  res.json = function (data: unknown) {
+    res._body = data;
+    return res;
+  };
+  res.send = function (data: unknown) {
+    res._body = data;
+    return res;
+  };
   res.setHeader = function (name: string, value: string | number | readonly string[]) {
     res._headers[name] = value;
     return res;
@@ -121,13 +130,33 @@ describe("pages/api/export/animals", () => {
 
   it("returns xlsx buffer on success", async () => {
     const mockAnimals = [
-      { aid: 1, name: "Rex", description: "Dog", species: "perro", gender: "macho", size: "mediano", status: "disponible", created_at: "2026-01-01T00:00:00Z", tags: ["amigable"], is_sterilized: true, estimated_age: 2 },
+      {
+        aid: 1,
+        name: "Rex",
+        description: "Dog",
+        species: "perro",
+        gender: "macho",
+        size: "mediano",
+        status: "disponible",
+        created_at: "2026-01-01T00:00:00Z",
+        tags: ["amigable"],
+        is_sterilized: true,
+        estimated_age: 2,
+      },
     ];
     const mockRecords = [
-      { aid: 1, record_type: "vacunación", date_given: "2026-01-10T00:00:00Z", vet_name: "Dr. Rivera", notes: "Rabies vaccine", created_at: "2026-01-10T00:00:00Z" },
+      {
+        aid: 1,
+        record_type: "vacunación",
+        date_given: "2026-01-10T00:00:00Z",
+        vet_name: "Dr. Rivera",
+        notes: "Rabies vaccine",
+        created_at: "2026-01-10T00:00:00Z",
+      },
     ];
 
-    global.fetch = jest.fn()
+    global.fetch = jest
+      .fn()
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true, data: mockAnimals, pagination: { hasMore: false } }),
@@ -147,7 +176,8 @@ describe("pages/api/export/animals", () => {
   });
 
   it("returns 502 when records fetch fails", async () => {
-    global.fetch = jest.fn()
+    global.fetch = jest
+      .fn()
       .mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true, data: [], pagination: { hasMore: false } }),

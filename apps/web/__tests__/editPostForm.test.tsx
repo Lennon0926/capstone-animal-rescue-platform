@@ -35,7 +35,8 @@ jest.mock("@/services/postService", () => ({
 jest.mock("@/services/animalImageUploadService", () => ({
   fetchUploadConfig: (...args: unknown[]) => mockFetchUploadConfig(...args),
   isUploadStorageAvailable: (...args: unknown[]) => mockIsUploadStorageAvailable(...args),
-  getUploadStorageUnavailableMessage: (...args: unknown[]) => mockGetUploadStorageUnavailableMessage(...args),
+  getUploadStorageUnavailableMessage: (...args: unknown[]) =>
+    mockGetUploadStorageUnavailableMessage(...args),
 }));
 
 import EditPostForm from "@/components/Admin/EditPost/editPostForm";
@@ -102,9 +103,7 @@ describe("EditPostForm — with post", () => {
     await userEvent.clear(titleInput);
     const form = screen.getByRole("button", { name: /guardar cambios/i }).closest("form")!;
     fireEvent.submit(form);
-    await waitFor(() =>
-      expect(screen.getByText(/título es requerido/i)).toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.getByText(/título es requerido/i)).toBeInTheDocument());
   });
 
   it("shows validation error when body is cleared", async () => {
@@ -113,9 +112,7 @@ describe("EditPostForm — with post", () => {
     await userEvent.clear(bodyInput);
     const form = screen.getByRole("button", { name: /guardar cambios/i }).closest("form")!;
     fireEvent.submit(form);
-    await waitFor(() =>
-      expect(screen.getByText(/contenido es requerido/i)).toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.getByText(/contenido es requerido/i)).toBeInTheDocument());
   });
 
   it("calls updatePost and shows success message on valid submit", async () => {
@@ -129,10 +126,11 @@ describe("EditPostForm — with post", () => {
     const form = screen.getByRole("button", { name: /guardar cambios/i }).closest("form")!;
     fireEvent.submit(form);
 
-    await waitFor(() =>
-      expect(screen.getByText(/publicación actualizada/i)).toBeInTheDocument()
+    await waitFor(() => expect(screen.getByText(/publicación actualizada/i)).toBeInTheDocument());
+    expect(mockUpdatePost).toHaveBeenCalledWith(
+      5,
+      expect.objectContaining({ header: "Updated Title" })
     );
-    expect(mockUpdatePost).toHaveBeenCalledWith(5, expect.objectContaining({ header: "Updated Title" }));
   });
 
   it("redirects to /admin/posts after successful update", async () => {
@@ -143,7 +141,9 @@ describe("EditPostForm — with post", () => {
     fireEvent.submit(form);
 
     await waitFor(() => screen.getByText(/publicación actualizada/i));
-    await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith("/admin/posts"), { timeout: 3000 });
+    await waitFor(() => expect(mockRouterPush).toHaveBeenCalledWith("/admin/posts"), {
+      timeout: 3000,
+    });
   }, 10000);
 
   it("shows error message when updatePost throws", async () => {
@@ -153,9 +153,7 @@ describe("EditPostForm — with post", () => {
     const form = screen.getByRole("button", { name: /guardar cambios/i }).closest("form")!;
     fireEvent.submit(form);
 
-    await waitFor(() =>
-      expect(screen.getByText(/Update failed/i)).toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.getByText(/Update failed/i)).toBeInTheDocument());
   });
 
   it("updates is_pinned when checkbox toggled", async () => {

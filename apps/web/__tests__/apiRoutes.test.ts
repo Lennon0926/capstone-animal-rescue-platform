@@ -133,7 +133,9 @@ describe("pages/api/facebook-posts", () => {
   });
 
   it("returns 200 with Facebook posts on success", async () => {
-    const mockPosts = [{ id: "1", message: "Hello", created_time: "2026-01-01", permalink_url: "https://fb.com/1" }];
+    const mockPosts = [
+      { id: "1", message: "Hello", created_time: "2026-01-01", permalink_url: "https://fb.com/1" },
+    ];
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       status: 200,
