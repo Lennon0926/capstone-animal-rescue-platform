@@ -48,3 +48,4 @@ supabase/.env
 
 # Playwright local run artifacts
 **/test-results/
+.vercel

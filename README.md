@@ -117,6 +117,10 @@ NEXT_PUBLIC_GOOGLE_FORM_URL=your-google-form-url
 NEXT_PUBLIC_VOLUNTEER_GOOGLE_FORM_URL=your-volunteer-google-form-url
 ```
 
+**Important (password reset links):**
+
+- If you send password recovery emails from the client or server, set `NEXT_PUBLIC_APP_URL` (or `NEXT_PUBLIC_SITE_URL`) in `apps/web/.env.local` to the public URL of your frontend (for example `https://app.your-domain.com`). The frontend now prefers this variable when building the reset link.
+
 > See [docs/guides/SECRETS_MANAGEMENT.md](docs/guides/SECRETS_MANAGEMENT.md) for the full variable reference, optional vars, and secret rotation procedures.
 > See [docs/guides/SUPABASE_SETUP.md](docs/guides/SUPABASE_SETUP.md) for Supabase project setup instructions.
 
