@@ -1,8 +1,6 @@
 .hero {
   --hero-reveal-half-size: clamp(4.4rem, 9.5vw, 6.5rem);
-  --hero-square-size: calc(
-    var(--hero-reveal-half-size) + var(--hero-reveal-half-size)
-  );
+  --hero-square-size: calc(var(--hero-reveal-half-size) + var(--hero-reveal-half-size));
   --hero-drop-start-top: -12rem;
   --hero-drop-start-scale: 0.88;
   --hero-drop-bounce-offset: 0.5rem;
@@ -45,8 +43,8 @@
   will-change: top, width, height, transform;
   animation:
     introDrop var(--hero-fall-duration) var(--hero-drop-easing) forwards,
-    introExpand var(--hero-reveal-duration) var(--hero-reveal-easing)
-      var(--hero-reveal-delay) forwards;
+    introExpand var(--hero-reveal-duration) var(--hero-reveal-easing) var(--hero-reveal-delay)
+      forwards;
 }
 
 .video {
@@ -64,8 +62,8 @@
   opacity: 1;
   animation:
     introDrop var(--hero-fall-duration) var(--hero-drop-easing) forwards,
-    introExpand var(--hero-reveal-duration) var(--hero-reveal-easing)
-      var(--hero-reveal-delay) forwards,
+    introExpand var(--hero-reveal-duration) var(--hero-reveal-easing) var(--hero-reveal-delay)
+      forwards,
     frameFade 0.32s ease var(--hero-frame-fade-delay) forwards;
   will-change: top, width, height, transform, opacity;
 }
@@ -73,11 +71,7 @@
 .overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(8, 16, 21, 0.42) 0%,
-    rgba(8, 16, 21, 0.6) 100%
-  );
+  background: linear-gradient(180deg, rgba(8, 16, 21, 0.42) 0%, rgba(8, 16, 21, 0.6) 100%);
   opacity: 0;
   pointer-events: none;
   animation: overlayFade 0.72s ease var(--hero-overlay-delay) forwards;

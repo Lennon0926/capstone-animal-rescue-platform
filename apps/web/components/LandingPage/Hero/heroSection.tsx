@@ -24,16 +24,13 @@ export default function HeroSection() {
 
       <div className={styles.content}>
         <h1 className={styles.title}>
-          Una donación{" "}
-          <span className={styles.accent}>rescata</span>,{" "}
+          Una donación <span className={styles.accent}>rescata</span>,{" "}
           <span className={styles.accent}>ayuda</span>, y{" "}
-          <span className={styles.accent}>salva</span>{" "}
-          las vidas más vulnerables
+          <span className={styles.accent}>salva</span> las vidas más vulnerables
         </h1>
 
         <p className={styles.subtitle}>
-          Sé parte de una de las redes de ayuda para animales sin hogar más
-          importantes
+          Sé parte de una de las redes de ayuda para animales sin hogar más importantes
         </p>
       </div>
     </section>
