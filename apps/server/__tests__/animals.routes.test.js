@@ -39,6 +39,12 @@ jest.mock("../lib/supabase", () => ({
   verifyConnection: () => Promise.resolve({ connected: true }),
 }));
 
+jest.mock("../services/petMatchService", () => ({
+  rankAnimalsByPrompt: jest.fn(),
+}));
+
+const { rankAnimalsByPrompt: mockRankAnimals } = require("../services/petMatchService");
+
 beforeAll(() => {
   jest.spyOn(console, "error").mockImplementation(() => {});
   process.env.PORT = "4000";
@@ -1103,5 +1109,137 @@ describe("PATCH /api/animals/:aid", () => {
       p_animal_updates: { name: "Buddy" },
       p_medical_records: [],
     });
+  });
+});
+
+describe("POST /api/animals/ai-match", () => {
+  const AVAILABLE_ANIMAL = {
+    aid: 1,
+    name: "Buddy",
+    species: "perro",
+    status: "disponible",
+    size: "mediano",
+    gender: "macho",
+    image_object_key: null,
+    created_at: "2025-01-01T00:00:00Z",
+  };
+
+  const MOCK_MATCH = {
+    animal: AVAILABLE_ANIMAL,
+    score: 0.85,
+    matchedAttributes: ["Perro", "Mediano"],
+    componentScores: { species: 1, size: 1, gender: 0.5, embedding: 0.5 },
+  };
+
+  beforeEach(() => {
+    mockFrom.mockReturnValue(
+      buildChainableMock({ data: [AVAILABLE_ANIMAL], error: null, count: 1 }),
+    );
+    mockRankAnimals.mockResolvedValue({
+      matches: [MOCK_MATCH],
+      alternatives: [],
+      threshold: 0.5,
+      requestedFields: { species: true, size: true, gender: false },
+    });
+  });
+
+  it("returns 415 when Content-Type is not application/json", async () => {
+    const res = await request(getApp())
+      .post("/api/animals/ai-match")
+      .send("plain text");
+    expect(res.status).toBe(415);
+  });
+
+  it("returns 400 when prompt is missing", async () => {
+    const res = await request(getApp())
+      .post("/api/animals/ai-match")
+      .set("Content-Type", "application/json")
+      .send({});
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.error.message).toMatch(/prompt is required/i);
+  });
+
+  it("returns 400 when prompt is too short", async () => {
+    const res = await request(getApp())
+      .post("/api/animals/ai-match")
+      .set("Content-Type", "application/json")
+      .send({ prompt: "ab" });
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+  });
+
+  it("returns 400 when prompt exceeds 500 characters", async () => {
+    const res = await request(getApp())
+      .post("/api/animals/ai-match")
+      .set("Content-Type", "application/json")
+      .send({ prompt: "a".repeat(501) });
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+  });
+
+  it("returns 400 when limit is out of range", async () => {
+    const res = await request(getApp())
+      .post("/api/animals/ai-match")
+      .set("Content-Type", "application/json")
+      .send({ prompt: "quiero un perro mediano", limit: 99 });
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+  });
+
+  it("returns ranked matches on a valid request", async () => {
+    const res = await request(getApp())
+      .post("/api/animals/ai-match")
+      .set("Content-Type", "application/json")
+      .send({ prompt: "quiero un perro mediano" });
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.data).toHaveLength(1);
+    expect(res.body.data[0].score).toBe(0.85);
+    expect(res.body.alternatives).toEqual([]);
+    expect(res.body.promptEcho).toBe("quiero un perro mediano");
+    expect(res.body.requestedFields).toEqual({
+      species: true,
+      size: true,
+      gender: false,
+    });
+  });
+
+  it("passes a custom limit to rankAnimalsByPrompt", async () => {
+    await request(getApp())
+      .post("/api/animals/ai-match")
+      .set("Content-Type", "application/json")
+      .send({ prompt: "perro tranquilo", limit: 3 });
+    expect(mockRankAnimals).toHaveBeenCalledWith(
+      expect.objectContaining({ limit: 3 }),
+    );
+  });
+
+  it("includes alternatives in the response when returned by the service", async () => {
+    const ALT = { ...MOCK_MATCH, score: 0.4 };
+    mockRankAnimals.mockResolvedValueOnce({
+      matches: [MOCK_MATCH],
+      alternatives: [ALT],
+      threshold: 0.5,
+      requestedFields: { species: false, size: false, gender: false },
+    });
+    const res = await request(getApp())
+      .post("/api/animals/ai-match")
+      .set("Content-Type", "application/json")
+      .send({ prompt: "quiero un perro mediano" });
+    expect(res.status).toBe(200);
+    expect(res.body.alternatives).toHaveLength(1);
+  });
+
+  it("returns 500 when the database fails to fetch animals", async () => {
+    mockFrom.mockReturnValue(
+      buildChainableMock({ data: null, error: { message: "DB error" } }),
+    );
+    const res = await request(getApp())
+      .post("/api/animals/ai-match")
+      .set("Content-Type", "application/json")
+      .send({ prompt: "quiero un perro mediano" });
+    expect(res.status).toBe(500);
+    expect(res.body.success).toBe(false);
   });
 });
