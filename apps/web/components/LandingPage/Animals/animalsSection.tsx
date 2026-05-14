@@ -52,16 +52,16 @@ export default function AnimalsSection({ animals, fetchError = false }: AnimalsS
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     style={{ objectFit: "cover", width: "100%", height: "100%" }}
                   />
-                  {showAdoptCatalog && (
-                    <Link
-                      href={`/adopt/${animal.aid}`}
-                      className={styles.learnMore}
-                      aria-label={`Conocer más sobre ${animal.name}`}
-                    >
-                      Conocer más
-                    </Link>
-                  )}
                 </div>
+                {showAdoptCatalog && (
+                  <Link
+                    href={`/adopt/${animal.aid}`}
+                    className={styles.learnMore}
+                    aria-label={`Conocer más sobre ${animal.name}`}
+                  >
+                    Conocer más
+                  </Link>
+                )}
               </article>
             ))}
           </div>

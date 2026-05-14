@@ -50,13 +50,9 @@ export default function TimelineSection() {
   });
 
   return (
-    <section
-      className={styles.section}
-      aria-labelledby="timeline-heading"
-      ref={sectionRef}
-    >
+    <section className={styles.section} aria-labelledby="timeline-heading" ref={sectionRef}>
       <div className={styles.inner}>
-        <h2 id="timeline-heading" className={styles.sectionLabel}>
+        <h2 id="timeline-heading" className={styles.visuallyHidden}>
           Nuestra historia
         </h2>
 

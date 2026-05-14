@@ -1,3 +1,10 @@
 .page {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
+
+.main {
+  min-height: 0;
+  padding: 0;
+  max-width: 100%;
+  margin: 0;
+}

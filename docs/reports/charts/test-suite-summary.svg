@@ -1,101 +1,48 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="380" viewBox="0 0 720 380" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="13">
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="400" viewBox="0 0 760 400" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="13">
+  <rect width="760" height="400" fill="#ffffff" rx="8"/>
 
-  <!-- Background -->
-  <rect width="720" height="380" fill="#ffffff" rx="8"/>
+  <text x="380" y="26" text-anchor="middle" font-size="15" font-weight="bold" fill="#111827">Test Suite Summary — Section 3.4</text>
+  <text x="380" y="45" text-anchor="middle" font-size="11" fill="#6b7280">523 total tests · 523 passed · 100% pass rate · 2026-05-14 · AI Pet Match local coverage preserved</text>
 
-  <!-- Title -->
-  <text x="360" y="30" text-anchor="middle" font-size="15" font-weight="bold" fill="#111827">Test Suite Results — Section 3.4</text>
-  <text x="360" y="50" text-anchor="middle" font-size="11" fill="#6b7280">Node.js v24.13.1 · 2026-05-09 · fix/security-medical-records-fb-token</text>
+  <rect x="286" y="58" width="14" height="14" fill="#3a9d5c" rx="2"/>
+  <text x="304" y="68" font-size="11" fill="#374151">Passed</text>
+  <rect x="368" y="58" width="14" height="14" fill="#ef4444" rx="2"/>
+  <text x="386" y="68" font-size="11" fill="#374151">Failed</text>
+  <rect x="450" y="58" width="14" height="14" fill="#f4a261" rx="2"/>
+  <text x="468" y="68" font-size="11" fill="#374151">Skipped</text>
 
-  <!--
-    3 suites (excl. Mobile Safari):
-      Server Jest:   161 pass, 0 fail, 0 skip  → total 161
-      Web Jest:       60 pass, 0 fail, 0 skip  → total 60
-      E2E Chrome:    153 pass, 2 fail, 1 skip  → total 156
+  <line x1="70" y1="90" x2="70" y2="300" stroke="#9ca3af" stroke-width="1.5"/>
+  <line x1="70" y1="300" x2="700" y2="300" stroke="#9ca3af" stroke-width="1.5"/>
+  <text x="25" y="195" text-anchor="middle" font-size="11" fill="#6b7280" transform="rotate(-90 25 195)">Test Count</text>
 
-    Stacked horizontal bar chart
-    Chart area: x=190..680, y=70..260  (width=490)
-    Max scale: 165 (padded past 161)
-    Scale: 490/165 = 2.97px per test
+  <line x1="70" y1="300" x2="700" y2="300" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="62" y="304" text-anchor="end" font-size="10" fill="#6b7280">0</text>
+  <line x1="70" y1="265" x2="700" y2="265" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="62" y="269" text-anchor="end" font-size="10" fill="#6b7280">50</text>
+  <line x1="70" y1="230" x2="700" y2="230" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="62" y="234" text-anchor="end" font-size="10" fill="#6b7280">100</text>
+  <line x1="70" y1="195" x2="700" y2="195" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="62" y="199" text-anchor="end" font-size="10" fill="#6b7280">150</text>
+  <line x1="70" y1="160" x2="700" y2="160" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="62" y="164" text-anchor="end" font-size="10" fill="#6b7280">200</text>
+  <line x1="70" y1="125" x2="700" y2="125" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="62" y="129" text-anchor="end" font-size="10" fill="#6b7280">250</text>
+  <line x1="70" y1="90" x2="700" y2="90" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="62" y="94" text-anchor="end" font-size="10" fill="#6b7280">300</text>
 
-    Row height = 50px, centers at y=100, 160, 220
-    Bar height = 28px
-  -->
+  <rect x="210" y="110.3" width="54" height="189.7" fill="#3a9d5c" rx="3"/>
+  <text x="237" y="103" text-anchor="middle" font-size="10" font-weight="bold" fill="#3a9d5c">271</text>
+  <text x="237" y="318" text-anchor="middle" font-size="10" fill="#374151">Server Jest</text>
+  <text x="237" y="333" text-anchor="middle" font-size="10" font-weight="bold" fill="#065f46">100%</text>
 
-  <!-- Legend -->
-  <rect x="360" y="58" width="14" height="14" fill="#10b981" rx="2"/>
-  <text x="378" y="70" fill="#374151" font-size="11">Pass</text>
-  <rect x="420" y="58" width="14" height="14" fill="#ef4444" rx="2"/>
-  <text x="438" y="70" fill="#374151" font-size="11">Fail</text>
-  <rect x="478" y="58" width="14" height="14" fill="#f59e0b" rx="2"/>
-  <text x="496" y="70" fill="#374151" font-size="11">Skip</text>
+  <rect x="492" y="123.6" width="54" height="176.4" fill="#3a9d5c" rx="3"/>
+  <text x="519" y="116" text-anchor="middle" font-size="10" font-weight="bold" fill="#3a9d5c">252</text>
+  <text x="519" y="318" text-anchor="middle" font-size="10" fill="#374151">Web Jest</text>
+  <text x="519" y="333" text-anchor="middle" font-size="10" font-weight="bold" fill="#065f46">100%</text>
 
-  <!-- Y axis -->
-  <line x1="190" y1="65" x2="190" y2="245" stroke="#9ca3af" stroke-width="1.5"/>
-
-  <!-- X axis grid lines at 50, 100, 150 tests -->
-  <!-- scale: x = 190 + (n/165)*490 -->
-  <!-- 50 → 339, 100 → 487, 150 → 636 -->
-  <line x1="190" y1="245" x2="680" y2="245" stroke="#9ca3af" stroke-width="1.5"/>
-  <line x1="339" y1="65" x2="339" y2="245" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="339" y="258" text-anchor="middle" font-size="10" fill="#6b7280">50</text>
-  <line x1="487" y1="65" x2="487" y2="245" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="487" y="258" text-anchor="middle" font-size="10" fill="#6b7280">100</text>
-  <line x1="636" y1="65" x2="636" y2="245" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
-  <text x="636" y="258" text-anchor="middle" font-size="10" fill="#6b7280">150</text>
-  <text x="190" y="258" text-anchor="middle" font-size="10" fill="#6b7280">0</text>
-  <text x="435" y="272" text-anchor="middle" font-size="10" fill="#6b7280">Number of Tests</text>
-
-  <!-- ── Row 1: Server Jest (161 pass) ── -->
-  <text x="185" y="103" text-anchor="end" font-size="11" fill="#374151">Server Jest</text>
-  <!-- 161 pass: 161/165*490 = 478px -->
-  <rect x="191" y="89" width="478" height="28" fill="#10b981" rx="3"/>
-  <text x="461" y="108" text-anchor="end" font-size="11" font-weight="bold" fill="#ffffff">161 pass</text>
-  <!-- pass rate badge -->
-  <rect x="585" y="89" width="90" height="28" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
-  <text x="630" y="108" text-anchor="middle" font-size="12" font-weight="bold" fill="#065f46">100%</text>
-
-  <!-- ── Row 2: Web Jest (60 pass) ── -->
-  <text x="185" y="163" text-anchor="end" font-size="11" fill="#374151">Web Jest</text>
-  <!-- 60 pass: 60/165*490 = 178px -->
-  <rect x="191" y="149" width="178" height="28" fill="#10b981" rx="3"/>
-  <text x="361" y="168" text-anchor="end" font-size="11" font-weight="bold" fill="#ffffff">60 pass</text>
-  <rect x="585" y="149" width="90" height="28" fill="#d1fae5" rx="3" stroke="#10b981" stroke-width="1"/>
-  <text x="630" y="168" text-anchor="middle" font-size="12" font-weight="bold" fill="#065f46">100%</text>
-
-  <!-- ── Row 3: E2E Chrome (153 pass, 2 fail, 1 skip) ── -->
-  <text x="185" y="223" text-anchor="end" font-size="11" fill="#374151">E2E Chrome</text>
-  <!-- 153 pass: 153/165*490 = 455px -->
-  <rect x="191" y="209" width="455" height="28" fill="#10b981" rx="3"/>
-  <!-- 2 fail: 2/165*490 = 6px -->
-  <rect x="646" y="209" width="6" height="28" fill="#ef4444" rx="1"/>
-  <!-- 1 skip: 1/165*490 = 3px -->
-  <rect x="652" y="209" width="3" height="28" fill="#f59e0b" rx="1"/>
-  <text x="438" y="228" text-anchor="end" font-size="11" font-weight="bold" fill="#ffffff">153 pass</text>
-  <rect x="585" y="209" width="90" height="28" fill="#fef3c7" rx="3" stroke="#f59e0b" stroke-width="1"/>
-  <text x="630" y="228" text-anchor="middle" font-size="12" font-weight="bold" fill="#92400e">98.7%</text>
-
-  <!-- ── Totals summary row ── -->
-  <rect x="70" y="285" width="580" height="50" fill="#f8fafc" rx="6" stroke="#e2e8f0" stroke-width="1"/>
-
-  <!-- Total: 377 tests, 374 pass, 2 fail, 1 skip — 99.5% -->
-  <text x="155" y="305" text-anchor="middle" font-size="11" fill="#6b7280">Total Tests</text>
-  <text x="155" y="323" text-anchor="middle" font-size="14" font-weight="bold" fill="#111827">377</text>
-
-  <text x="285" y="305" text-anchor="middle" font-size="11" fill="#10b981">Passed</text>
-  <text x="285" y="323" text-anchor="middle" font-size="14" font-weight="bold" fill="#10b981">374</text>
-
-  <text x="415" y="305" text-anchor="middle" font-size="11" fill="#ef4444">Failed</text>
-  <text x="415" y="323" text-anchor="middle" font-size="14" font-weight="bold" fill="#ef4444">2</text>
-
-  <text x="525" y="305" text-anchor="middle" font-size="11" fill="#f59e0b">Skipped</text>
-  <text x="525" y="323" text-anchor="middle" font-size="14" font-weight="bold" fill="#f59e0b">1</text>
-
-  <rect x="585" y="288" width="58" height="44" fill="#dbeafe" rx="4"/>
-  <text x="614" y="308" text-anchor="middle" font-size="11" fill="#1e40af">Pass Rate</text>
-  <text x="614" y="325" text-anchor="middle" font-size="14" font-weight="bold" fill="#1e40af">99.5%</text>
-
-  <!-- Source note -->
-  <text x="360" y="372" text-anchor="middle" font-size="10" fill="#9ca3af">Source: docs/reports/section-3-4-test-results.md · excl. Mobile Safari (WebKit not installed locally)</text>
-
+  <rect x="122" y="356" width="516" height="28" fill="#f8fafc" stroke="#e2e8f0" rx="5"/>
+  <text x="190" y="374" text-anchor="middle" font-size="11" fill="#374151">54 spec files</text>
+  <text x="318" y="374" text-anchor="middle" font-size="11" fill="#3a9d5c">523 passed</text>
+  <text x="444" y="374" text-anchor="middle" font-size="11" fill="#ef4444">0 failed</text>
+  <text x="568" y="374" text-anchor="middle" font-size="11" fill="#f4a261">0 skipped</text>
 </svg>

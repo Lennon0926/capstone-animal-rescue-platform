@@ -30,7 +30,7 @@ test.describe("Blog page (/blog)", () => {
 
   test("header and footer are visible", async ({ page }) => {
     await expect(page.locator("header").first()).toBeVisible();
-    await expect(page.locator("footer")).toBeVisible();
+    await expect(page.getByRole("contentinfo")).toBeVisible();
   });
 
   // ── Posts rendering ─────────────────────────────────────────────────────────

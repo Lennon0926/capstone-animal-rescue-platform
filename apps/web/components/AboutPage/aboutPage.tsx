@@ -21,7 +21,7 @@ import styles from "./aboutPage.module.css";
 
 // Hook for scroll-reveal animation
 function useScrollReveal() {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -103,22 +103,19 @@ export default function AboutPage() {
   const containerRef = useScrollReveal();
 
   return (
-    <div className={styles.page} ref={containerRef}>
+    <main className={styles.page} ref={containerRef}>
       {/* Hero Section */}
       <section className={styles.hero}>
         <div className={styles.heroOverlay} />
         <div className={styles.heroContent}>
-          <p className={`${styles.heroTagline} ${styles.fadeInUp}`}>
-            Desde 1990 Protegiendo Vidas
-          </p>
+          <p className={`${styles.heroTagline} ${styles.fadeInUp}`}>Desde 1990 Protegiendo Vidas</p>
           <h1 className={`${styles.heroTitle} ${styles.fadeInUp}`}>
             Ciudadanos Pro Albergue de Animales de Aguadilla
           </h1>
           <p className={`${styles.heroSubtitle} ${styles.fadeInUp}`}>
-            Somos un grupo de voluntarios trabajando arduamente en pro del
-            bienestar de animales maltratados o abandonados. Les proveemos
-            atención médica, alimento y albergue mientras buscamos hogares
-            permanentes y amorosos.
+            Somos un grupo de voluntarios trabajando arduamente en pro del bienestar de animales
+            maltratados o abandonados. Les proveemos atención médica, alimento y albergue mientras
+            buscamos hogares permanentes y amorosos.
           </p>
         </div>
       </section>
@@ -129,8 +126,8 @@ export default function AboutPage() {
           <div className={`${styles.sectionHeader} ${styles.fadeInUp}`}>
             <h2 className={styles.sectionTitle}>Nuestra Razón de Ser</h2>
             <p className={styles.sectionSubtitle}>
-              Guiados por nuestros valores, trabajamos para crear una sociedad
-              más justa y compasiva con los animales.
+              Guiados por nuestros valores, trabajamos para crear una sociedad más justa y compasiva
+              con los animales.
             </p>
           </div>
 
@@ -141,14 +138,12 @@ export default function AboutPage() {
               </div>
               <h3 className={styles.cardTitle}>Nuestra Misión</h3>
               <p className={styles.cardText}>
-                Estamos comprometidos con el establecimiento de programas que
-                mejoren la calidad de vida de los animales en Puerto Rico y
-                ayuden a reducir la cantidad de animales desamparados. Nos
-                proponemos crear consciencia entre la comunidad de las
-                necesidades, cuidado y trato humanitario y leyes para la
-                protección de animales. Esto lo lograremos con programas de
-                esterilización y educación así como promoviendo la adopción de
-                mascotas.
+                Estamos comprometidos con el establecimiento de programas que mejoren la calidad de
+                vida de los animales en Puerto Rico y ayuden a reducir la cantidad de animales
+                desamparados. Nos proponemos crear consciencia entre la comunidad de las
+                necesidades, cuidado y trato humanitario y leyes para la protección de animales.
+                Esto lo lograremos con programas de esterilización y educación así como promoviendo
+                la adopción de mascotas.
               </p>
             </div>
 
@@ -158,12 +153,11 @@ export default function AboutPage() {
               </div>
               <h3 className={styles.cardTitle}>Nuestra Visión</h3>
               <p className={styles.cardText}>
-                Lograr alcanzar una reducción significativa en el maltrato y
-                negligencia hacia los animales para convertirnos en una sociedad
-                ejemplar en su atención hacia estas criaturas. Nuestra meta es
-                establecer un albergue que se convierta en un centro comunitario
-                de adopción y educación donde podamos atender, rehabilitar y
-                esterilizar animales para ser dados en adopción.
+                Lograr alcanzar una reducción significativa en el maltrato y negligencia hacia los
+                animales para convertirnos en una sociedad ejemplar en su atención hacia estas
+                criaturas. Nuestra meta es establecer un albergue que se convierta en un centro
+                comunitario de adopción y educación donde podamos atender, rehabilitar y esterilizar
+                animales para ser dados en adopción.
               </p>
             </div>
           </div>
@@ -177,25 +171,21 @@ export default function AboutPage() {
             <div className={`${styles.storyContent} ${styles.fadeInLeft}`}>
               <h2 className={styles.storyTitle}>Nuestra Historia</h2>
               <p className={styles.storyText}>
-                En noviembre de 1990, un grupo de ciudadanos de Aguadilla,
-                conscientes del problema de maltrato y de la falta de control en
-                la población de animales, decidieron crear una organización
-                protectora para buscar soluciones a esta problemática.
+                En noviembre de 1990, un grupo de ciudadanos de Aguadilla, conscientes del problema
+                de maltrato y de la falta de control en la población de animales, decidieron crear
+                una organización protectora para buscar soluciones a esta problemática.
               </p>
               <p className={styles.storyText}>
-                Ciudadanos Pro Albergue de Animales de Aguadilla se incorpora el
-                3 de diciembre de 1990 bajo las leyes del Departamento de Estado
-                de Puerto Rico. Desde entonces, hemos ofrecido servicios de
-                esterilización y castración de mascotas, educación, rescate y
-                adopción de animales no solo en nuestro pueblo, sino también en
-                toda el área oeste.
+                Ciudadanos Pro Albergue de Animales de Aguadilla se incorpora el 3 de diciembre de
+                1990 bajo las leyes del Departamento de Estado de Puerto Rico. Desde entonces, hemos
+                ofrecido servicios de esterilización y castración de mascotas, educación, rescate y
+                adopción de animales no solo en nuestro pueblo, sino también en toda el área oeste.
               </p>
               <p className={styles.storyText}>
-                Aunque la organización se llama Ciudadanos Pro Albergue de
-                Animales de Aguadilla, lamentablemente no contamos todavía con
-                un albergue físico. Solo disponemos de nuestros hogares y
-                familia para brindar cuidados a aquellos que nuestra capacidad
-                de espacio y económica nos permite.
+                Aunque la organización se llama Ciudadanos Pro Albergue de Animales de Aguadilla,
+                lamentablemente no contamos todavía con un albergue físico. Solo disponemos de
+                nuestros hogares y familia para brindar cuidados a aquellos que nuestra capacidad de
+                espacio y económica nos permite.
               </p>
               <div className={styles.storyHighlight}>
                 <Calendar size={20} />
@@ -224,8 +214,8 @@ export default function AboutPage() {
           <div className={`${styles.sectionHeader} ${styles.fadeInUp}`}>
             <h2 className={styles.sectionTitle}>Nuestros Valores</h2>
             <p className={styles.sectionSubtitle}>
-              Nuestros valores se fundamentan en que creemos en el deber del
-              hombre de cuidar y proteger todas las criaturas del mundo.
+              Nuestros valores se fundamentan en que creemos en el deber del hombre de cuidar y
+              proteger todas las criaturas del mundo.
             </p>
           </div>
 
@@ -251,8 +241,8 @@ export default function AboutPage() {
           <div className={`${styles.sectionHeader} ${styles.fadeInUp}`}>
             <h2 className={styles.sectionTitle}>Nuestra Comunidad en Acción</h2>
             <p className={styles.sectionSubtitle}>
-              Momentos de nuestras ferias de mascotas, programas educativos y
-              actividades comunitarias.
+              Momentos de nuestras ferias de mascotas, programas educativos y actividades
+              comunitarias.
             </p>
           </div>
 
@@ -282,8 +272,7 @@ export default function AboutPage() {
           <div className={`${styles.sectionHeader} ${styles.fadeInUp}`}>
             <h2 className={styles.sectionTitle}>Nuestro Equipo</h2>
             <p className={styles.sectionSubtitle}>
-              Un grupo dedicado de voluntarios que trabajan incansablemente por
-              el bienestar animal.
+              Un grupo dedicado de voluntarios que trabajan incansablemente por el bienestar animal.
             </p>
           </div>
 
@@ -316,8 +305,8 @@ export default function AboutPage() {
           <div className={`${styles.sectionHeader} ${styles.fadeInUp}`}>
             <h2 className={styles.sectionTitle}>Contáctenos</h2>
             <p className={styles.sectionSubtitle}>
-              Estamos aquí para ayudarte. Somos una organización de voluntarios,
-              por lo que te pedimos paciencia con cualquier solicitud.
+              Estamos aquí para ayudarte. Somos una organización de voluntarios, por lo que te
+              pedimos paciencia con cualquier solicitud.
             </p>
           </div>
 
@@ -327,7 +316,7 @@ export default function AboutPage() {
                 <Phone size={24} />
               </div>
               <div className={styles.contactDetails}>
-                <h4>Teléfono</h4>
+                <h3>Teléfono</h3>
                 <p>
                   <a href="tel:787-505-8255">787-505-8255</a>
                 </p>
@@ -342,7 +331,7 @@ export default function AboutPage() {
                 <Mail size={24} />
               </div>
               <div className={styles.contactDetails}>
-                <h4>Correo Electrónico</h4>
+                <h3>Correo Electrónico</h3>
                 <p>
                   <a href="mailto:info@cpaaa.org">info@cpaaa.org</a>
                 </p>
@@ -357,7 +346,7 @@ export default function AboutPage() {
                 <MapPin size={24} />
               </div>
               <div className={styles.contactDetails}>
-                <h4>Dirección Postal</h4>
+                <h3>Dirección Postal</h3>
                 <p>
                   Ciudadanos Pro Albergue de Animales de Aguadilla, Inc.
                   <br />
@@ -392,9 +381,8 @@ export default function AboutPage() {
         <div className={`${styles.ctaContent} ${styles.fadeInUp}`}>
           <h2 className={styles.ctaTitle}>Tú También Puedes Hacer la Diferencia</h2>
           <p className={styles.ctaText}>
-            Actívate, esteriliza tus mascotas, respeta la Ley 154 y contribuye
-            con tus ideas, comentarios y donativos. Juntos podemos ayudar a más
-            animales.
+            Actívate, esteriliza tus mascotas, respeta la Ley 154 y contribuye con tus ideas,
+            comentarios y donativos. Juntos podemos ayudar a más animales.
           </p>
           <DonationModalTrigger className={styles.ctaButton}>
             Ayúdanos a Ayudar
@@ -402,6 +390,6 @@ export default function AboutPage() {
           </DonationModalTrigger>
         </div>
       </section>
-    </div>
+    </main>
   );
 }
