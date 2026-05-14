@@ -13,7 +13,7 @@ const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
 
-const REPO_ROOT = path.resolve(__dirname, "..", "..", "..", "..", "..");
+const REPO_ROOT = path.resolve(__dirname, "..", "..", "..", "..");
 
 const SUITES = [
   {
@@ -72,13 +72,21 @@ function summariseSuite(raw, suiteMeta) {
     };
   }
 
-  const files = (raw.testResults ?? []).map((r) => ({
-    file: path.relative(suiteMeta.dir, r.testFilePath),
-    passed: r.numPassingTests,
-    failed: r.numFailingTests,
-    skipped: r.numPendingTests,
-    total: r.numPassingTests + r.numFailingTests + r.numPendingTests,
-  }));
+  const files = (raw.testResults ?? []).map((r) => {
+    const assertions = r.assertionResults ?? [];
+    const passed = assertions.filter((a) => a.status === "passed").length;
+    const failed = assertions.filter((a) => a.status === "failed").length;
+    const skipped = assertions.filter(
+      (a) => a.status === "pending" || a.status === "skipped" || a.status === "todo"
+    ).length;
+    return {
+      file: path.relative(suiteMeta.dir, r.name ?? r.testFilePath),
+      passed,
+      failed,
+      skipped,
+      total: assertions.length,
+    };
+  });
 
   const total = raw.numTotalTests ?? 0;
   const passed = raw.numPassedTests ?? 0;

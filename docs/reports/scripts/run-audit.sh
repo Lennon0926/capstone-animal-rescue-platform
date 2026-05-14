@@ -36,9 +36,11 @@ API_URL="${2%/}"
 
 # ── Env checks ───────────────────────────────────────────────────────────────
 
+SKIP_REPORT=false
 if [[ -z "${ANTHROPIC_API_KEY:-}" ]]; then
-  echo "[run-audit] ERROR: ANTHROPIC_API_KEY is not set"
-  exit 1
+  echo "[run-audit] NOTE: ANTHROPIC_API_KEY not set — will skip AI report generation"
+  echo "[run-audit]       Share output JSON with Claude in-chat to generate sections manually"
+  SKIP_REPORT=true
 fi
 
 # ── Dependencies ─────────────────────────────────────────────────────────────
@@ -89,9 +91,15 @@ node "$SCRIPT_DIR/generate/charts.js"
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "[run-audit] Step 5b/5 — Generating report sections (Claude API)"
+echo "[run-audit] Step 5b/5 — Generating report sections"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-node "$SCRIPT_DIR/generate/report.js"
+if [[ "$SKIP_REPORT" == "true" ]]; then
+  echo "[run-audit] Skipping (no ANTHROPIC_API_KEY)"
+  echo "[run-audit] → Open this chat and say: 'generate report sections from audit output'"
+  echo "[run-audit] → Claude will read the JSON files and write the sections in-chat"
+else
+  node "$SCRIPT_DIR/generate/report.js"
+fi
 
 # ── Done ─────────────────────────────────────────────────────────────────────
 
