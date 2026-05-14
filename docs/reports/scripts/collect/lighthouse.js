@@ -12,7 +12,7 @@
 const fs = require("fs");
 const path = require("path");
 const chromeLauncher = require("chrome-launcher");
-const lighthouse = require("lighthouse");
+const { default: lighthouse } = require("lighthouse");
 
 const PAGES = [
   { name: "Home", path: "/home" },
