@@ -106,7 +106,7 @@
 
 .accent {
   font-style: italic;
-  color: var(--color-accent);
+  color: var(--color-text-inverse);
 }
 
 .subtitle {

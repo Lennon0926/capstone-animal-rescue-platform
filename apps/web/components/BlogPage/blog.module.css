@@ -38,7 +38,7 @@
   font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #b55830;
+  color: #8c3215;
   margin-bottom: 12px;
 }
 .mastheadEyebrow::before,
@@ -61,7 +61,7 @@
 }
 .mastheadTitle em {
   font-style: italic;
-  color: var(--color-accent);
+  color: var(--color-accent-accessible);
   font-weight: 400;
 }
 .mastheadLede {
@@ -131,7 +131,7 @@
   font-size: 11px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-accent);
+  color: var(--color-accent-accessible);
   margin-bottom: 20px;
 }
 .featuredDot {
@@ -266,9 +266,9 @@
   padding: 3px 8px;
   border-radius: var(--radius-sm);
 }
-.badgeReel     { background: rgba(231, 111, 81, 0.1); color: var(--color-accent); }
+.badgeReel     { background: rgba(184, 74, 37, 0.1); color: var(--color-accent-accessible); }
 .badgeShared   { background: var(--color-primary-soft); color: var(--color-primary); }
-.badgeFacebook { background: rgba(24, 119, 242, 0.1); color: #1877f2; }
+.badgeFacebook { background: rgba(24, 119, 242, 0.1); color: #0d4fa8; }
 .badgeWeb      { background: rgba(34, 197, 94, 0.1); color: #16a34a; }
 
 .sourceWarning {

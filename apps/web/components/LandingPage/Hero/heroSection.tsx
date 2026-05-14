@@ -12,6 +12,7 @@ export default function HeroSection() {
           playsInline
           preload="auto"
           poster="/videos/close-up-dog-poster.jpg"
+          aria-hidden="true"
         >
           <source src="/videos/close-up-dog.mp4" type="video/mp4" />
         </video>
