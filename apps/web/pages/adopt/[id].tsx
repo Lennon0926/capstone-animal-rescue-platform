@@ -20,8 +20,17 @@ export default function AdoptAnimalPage({ animal }: AnimalInfoPageProps) {
   return (
     <div>
       <Head>
-        <title>{animal ? `${animal.name} | Huellitas Sin Hogar` : "Animal | Huellitas Sin Hogar"}</title>
-        <meta name="description" content={animal ? `Adopta a ${animal.name} en Huellitas Sin Hogar. ${animal.description ?? ""}`.trim() : "Conoce a los animales disponibles para adopción en Huellitas Sin Hogar."} />
+        <title>
+          {animal ? `${animal.name} | Huellitas Sin Hogar` : "Animal | Huellitas Sin Hogar"}
+        </title>
+        <meta
+          name="description"
+          content={
+            animal
+              ? `Adopta a ${animal.name} en Huellitas Sin Hogar. ${animal.description ?? ""}`.trim()
+              : "Conoce a los animales disponibles para adopción en Huellitas Sin Hogar."
+          }
+        />
       </Head>
       <HeaderSection />
       <main className={styles.main}>
@@ -31,7 +40,8 @@ export default function AdoptAnimalPage({ animal }: AnimalInfoPageProps) {
               Animal no encontrado
             </h1>
             <p className={styles.notFoundText}>
-              Este perfil no está disponible en este momento. Puedes volver al listado para conocer otros animales listos para adopción.
+              Este perfil no está disponible en este momento. Puedes volver al listado para conocer
+              otros animales listos para adopción.
             </p>
             <h2 className={styles.notFoundSubtitle}>Explora otros perfiles</h2>
             <Link href="/adopt" className={styles.notFoundLink}>
@@ -51,9 +61,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.params || {};
 
   try {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals/${id}`
-    );
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/animals/${id}`);
 
     if (!res.ok) {
       return {

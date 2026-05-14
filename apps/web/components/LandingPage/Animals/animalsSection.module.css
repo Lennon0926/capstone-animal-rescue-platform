@@ -51,7 +51,7 @@
 
 .viewAll:hover {
   background-color: var(--color-primary-hover);
-  color: var(--color-text-inverse); 
+  color: var(--color-text-inverse);
   transform: translateY(-2px);
 }
 

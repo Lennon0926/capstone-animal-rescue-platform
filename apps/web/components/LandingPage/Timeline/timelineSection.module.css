@@ -7,8 +7,7 @@
   position: relative;
   z-index: 3;
   margin-top: 0;
-  padding: clamp(4rem, 7vw, 6rem) clamp(1.5rem, 4vw, 4rem)
-    clamp(5rem, 10vw, 8.5rem);
+  padding: clamp(4rem, 7vw, 6rem) clamp(1.5rem, 4vw, 4rem) clamp(5rem, 10vw, 8.5rem);
   background-color: var(--color-bg);
 }
 
@@ -85,19 +84,19 @@
   inset: 0;
   background:
     linear-gradient(
-      90deg,
-      rgba(231, 111, 81, 0.18) 0%,
-      rgba(231, 111, 81, 0.08) 34%,
-      rgba(231, 111, 81, 0) 100%
-    )
-    left center / 0% 100% no-repeat,
+        90deg,
+        rgba(231, 111, 81, 0.18) 0%,
+        rgba(231, 111, 81, 0.08) 34%,
+        rgba(231, 111, 81, 0) 100%
+      )
+      left center / 0% 100% no-repeat,
     linear-gradient(
-      270deg,
-      rgba(231, 111, 81, 0.18) 0%,
-      rgba(231, 111, 81, 0.08) 34%,
-      rgba(231, 111, 81, 0) 100%
-    )
-    right center / 0% 100% no-repeat;
+        270deg,
+        rgba(231, 111, 81, 0.18) 0%,
+        rgba(231, 111, 81, 0.08) 34%,
+        rgba(231, 111, 81, 0) 100%
+      )
+      right center / 0% 100% no-repeat;
   background-repeat: no-repeat;
   opacity: 0;
   filter: blur(8px);

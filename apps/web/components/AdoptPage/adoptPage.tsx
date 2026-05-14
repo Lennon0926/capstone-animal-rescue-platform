@@ -26,8 +26,8 @@ function formatStatus(status: string) {
     disponible: "Disponible",
     adoptado: "Adoptado",
     pendiente: "Pendiente",
-    'atención médica': "Atención Médica",
-    'en hogar temporal': "En Hogar Temporal",
+    "atención médica": "Atención Médica",
+    "en hogar temporal": "En Hogar Temporal",
   };
 
   return map[status?.toLowerCase()] || status;
@@ -58,14 +58,14 @@ function getStatusClass(status: string) {
 // Extract all unique filter options from animals (tags + species + size + gender + status)
 function getAllFilterOptions(animals: Animal[]): string[] {
   const allOptions: string[] = [];
-  
+
   // Add tags
   animals.forEach((animal) => {
     if (animal.tags) {
       allOptions.push(...animal.tags);
     }
   });
-  
+
   // Add species, size, gender, status
   animals.forEach((animal) => {
     if (animal.species) allOptions.push(animal.species);
@@ -73,7 +73,7 @@ function getAllFilterOptions(animals: Animal[]): string[] {
     if (animal.gender) allOptions.push(animal.gender);
     if (animal.status) allOptions.push(animal.status);
   });
-  
+
   return [...new Set(allOptions)].sort();
 }
 
@@ -121,7 +121,7 @@ function FlipCard({ animal }: { animal: Animal }) {
                   animal.image_url,
                   animal.species,
                   animal.aid,
-                  animal.image_object_key,
+                  animal.image_object_key
                 )}
                 alt={animal.name}
                 fill
@@ -205,18 +205,23 @@ export default function AdoptPage({ animals }: AdoptPageProps) {
   const filteredAnimals = useMemo(() => {
     return animals.filter((animal) => {
       const query = searchQuery.toLowerCase();
-      
+
       // Search by name, species, size, gender, status, or tags
       const matchesName = animal.name.toLowerCase().includes(query);
       const matchesSpecies = animal.species?.toLowerCase().includes(query) ?? false;
       const matchesSize = animal.size?.toLowerCase().includes(query) ?? false;
       const matchesGender = animal.gender?.toLowerCase().includes(query) ?? false;
       const matchesStatus = animal.status?.toLowerCase().includes(query) ?? false;
-      const matchesTags = animal.tags?.some((tag) =>
-        tag.toLowerCase().includes(query)
-      ) ?? false;
-      const matchesSearch = !searchQuery || matchesName || matchesSpecies || matchesSize || matchesGender || matchesStatus || matchesTags;
-      
+      const matchesTags = animal.tags?.some((tag) => tag.toLowerCase().includes(query)) ?? false;
+      const matchesSearch =
+        !searchQuery ||
+        matchesName ||
+        matchesSpecies ||
+        matchesSize ||
+        matchesGender ||
+        matchesStatus ||
+        matchesTags;
+
       // Filter by selected tags - animal must match ALL selected filters (AND logic)
       const matchesTagFilter =
         activeTagFilters.length === 0 ||

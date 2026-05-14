@@ -29,7 +29,10 @@ function Home({ animals, fetchError }: HomeProps) {
     <div className={styles.page}>
       <Head>
         <title>Inicio | Huellitas Sin Hogar</title>
-        <meta name="description" content="Huellitas Sin Hogar — adopta, dona y apoya a los animales sin hogar de Aguadilla, Puerto Rico." />
+        <meta
+          name="description"
+          content="Huellitas Sin Hogar — adopta, dona y apoya a los animales sin hogar de Aguadilla, Puerto Rico."
+        />
       </Head>
       <HeaderSection revealOnFirstScroll />
       <main className={styles.main}>

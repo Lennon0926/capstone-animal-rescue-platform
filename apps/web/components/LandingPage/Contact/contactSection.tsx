@@ -7,8 +7,8 @@ export default function ContactSection() {
       <div className={styles.inner}>
         <h2 className={styles.heading}>Contáctanos</h2>
         <p className={styles.description}>
-          ¿Tienes preguntas o quieres saber cómo puedes ayudar? No dudes en
-          comunicarte con nosotros.
+          ¿Tienes preguntas o quieres saber cómo puedes ayudar? No dudes en comunicarte con
+          nosotros.
         </p>
 
         <div className={styles.contactGrid}>
@@ -36,9 +36,7 @@ export default function ContactSection() {
             <MapPin size={24} className={styles.icon} />
             <div>
               <h3 className={styles.contactLabel}>Dirección</h3>
-              <p className={styles.contactValue}>
-                Box 4152, Aguadilla, Puerto Rico 00605
-              </p>
+              <p className={styles.contactValue}>Box 4152, Aguadilla, Puerto Rico 00605</p>
             </div>
           </div>
         </div>
