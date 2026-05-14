@@ -115,20 +115,19 @@ function FlipCard({ animal }: { animal: Animal }) {
         {/* Front - Photo */}
         <div className={`${styles.cardFace} ${styles.cardFront}`}>
           <div className={styles.imageWrapper}>
-            <Image
-              src={getAnimalImageUrl(
-                animal.image_url,
-                animal.species,
-                animal.aid,
-                animal.image_object_key,
-              )}
-              alt={animal.name}
-              fill
-              sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 25vw"
-              style={{ objectFit: "cover" }}
-            />
-            <div className={styles.cardOverlay}>
-              <h3 className={styles.cardName}>{animal.name}</h3>
+            <div className={styles.cardPhoto}>
+              <Image
+                src={getAnimalImageUrl(
+                  animal.image_url,
+                  animal.species,
+                  animal.aid,
+                  animal.image_object_key,
+                )}
+                alt={animal.name}
+                fill
+                sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 25vw"
+                style={{ objectFit: "cover" }}
+              />
             </div>
             <div className={styles.flipHint}>
               <RotateCcw size={12} />
@@ -144,7 +143,7 @@ function FlipCard({ animal }: { animal: Animal }) {
         >
           <div className={styles.cardBackContent}>
             <div className={styles.cardBackHeader}>
-              <h3 className={styles.cardBackName}>{animal.name}</h3>
+              <span className={styles.cardBackName}>{animal.name}</span>
               <span className={`${styles.status} ${getStatusClass(animal.status)}`}>
                 {formatStatus(animal.status)}
               </span>
@@ -188,6 +187,7 @@ function FlipCard({ animal }: { animal: Animal }) {
           </div>
         </div>
       </div>
+      <span className={styles.cardCaption}>{animal.name}</span>
     </div>
   );
 }
@@ -256,12 +256,20 @@ export default function AdoptPage({ animals }: AdoptPageProps) {
   };
 
   return (
-    <div className={styles.page}>
+    <main className={styles.page}>
+      <header className={styles.header}>
+        <h1 className={styles.pageTitle}>Animales en adopción</h1>
+        <p className={styles.pageIntro}>
+          Explora los animales disponibles y filtra por nombre, especie, tamaño, género o estado.
+        </p>
+      </header>
+
       {/* Search Bar */}
       <div className={styles.searchBar}>
         <Search size={20} className={styles.searchIcon} />
         <input
           type="text"
+          aria-label="Buscar animales"
           placeholder="Buscar animales..."
           value={searchQuery}
           onChange={handleSearchChange}
@@ -277,6 +285,7 @@ export default function AdoptPage({ animals }: AdoptPageProps) {
               key={tag}
               className={`${styles.tag} ${activeTagFilters.includes(tag) ? styles.tagActive : ""}`}
               onClick={() => handleTagFilterToggle(tag)}
+              aria-pressed={activeTagFilters.includes(tag)}
             >
               {tag}
             </button>
@@ -285,6 +294,7 @@ export default function AdoptPage({ animals }: AdoptPageProps) {
       </div>
 
       {/* Animals Grid */}
+      <h2 className={styles.gridHeading}>Perfiles disponibles</h2>
       <div className={styles.grid}>
         {paginatedAnimals.map((animal) => (
           <FlipCard key={animal.aid} animal={animal} />
@@ -307,6 +317,6 @@ export default function AdoptPage({ animals }: AdoptPageProps) {
           <p>No se encontraron animales</p>
         </div>
       )}
-    </div>
+    </main>
   );
 }

@@ -1174,7 +1174,7 @@ export default function Blog() {
   const hasPosts = allPosts.length > 0;
 
   return (
-    <div className={styles.page}>
+    <main className={styles.page}>
       {showLoginModal && (
         <LoginModal
           onClose={() => setShowLoginModal(false)}
@@ -1227,7 +1227,7 @@ export default function Blog() {
       </section>
 
       {/* ── Feed ───────────────────────────────────────────────────── */}
-      <main className={styles.feed} ref={feedRef}>
+      <div className={styles.feed} ref={feedRef}>
         {isAdmin && <CreatePostForm onCreated={handlePostCreated} />}
 
         {loading && (
@@ -1304,7 +1304,7 @@ export default function Blog() {
             </div>
           </>
         )}
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }

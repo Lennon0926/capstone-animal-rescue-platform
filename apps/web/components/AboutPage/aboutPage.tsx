@@ -21,7 +21,7 @@ import styles from "./aboutPage.module.css";
 
 // Hook for scroll-reveal animation
 function useScrollReveal() {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -103,7 +103,7 @@ export default function AboutPage() {
   const containerRef = useScrollReveal();
 
   return (
-    <div className={styles.page} ref={containerRef}>
+    <main className={styles.page} ref={containerRef}>
       {/* Hero Section */}
       <section className={styles.hero}>
         <div className={styles.heroOverlay} />
@@ -327,7 +327,7 @@ export default function AboutPage() {
                 <Phone size={24} />
               </div>
               <div className={styles.contactDetails}>
-                <h4>Teléfono</h4>
+                <h3>Teléfono</h3>
                 <p>
                   <a href="tel:787-505-8255">787-505-8255</a>
                 </p>
@@ -342,7 +342,7 @@ export default function AboutPage() {
                 <Mail size={24} />
               </div>
               <div className={styles.contactDetails}>
-                <h4>Correo Electrónico</h4>
+                <h3>Correo Electrónico</h3>
                 <p>
                   <a href="mailto:info@cpaaa.org">info@cpaaa.org</a>
                 </p>
@@ -357,7 +357,7 @@ export default function AboutPage() {
                 <MapPin size={24} />
               </div>
               <div className={styles.contactDetails}>
-                <h4>Dirección Postal</h4>
+                <h3>Dirección Postal</h3>
                 <p>
                   Ciudadanos Pro Albergue de Animales de Aguadilla, Inc.
                   <br />
@@ -402,6 +402,6 @@ export default function AboutPage() {
           </DonationModalTrigger>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

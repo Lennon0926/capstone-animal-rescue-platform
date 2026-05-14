@@ -56,7 +56,7 @@ export default function TimelineSection() {
       ref={sectionRef}
     >
       <div className={styles.inner}>
-        <h2 id="timeline-heading" className={styles.sectionLabel}>
+        <h2 id="timeline-heading" className={styles.visuallyHidden}>
           Nuestra historia
         </h2>
 

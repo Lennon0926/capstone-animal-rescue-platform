@@ -43,6 +43,10 @@
 /* Page Container */
 .page {
   background-color: var(--color-bg);
+  min-height: 0;
+  padding: 0;
+  max-width: 100%;
+  margin: 0;
 }
 
 /* ================= HERO SECTION ================= */
@@ -53,7 +57,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-dark) 100%);
+  background: linear-gradient(135deg, #102c3f 0%, #05070c 100%);
   overflow: hidden;
   padding: var(--space-20) var(--space-4);
 }
@@ -63,7 +67,7 @@
   inset: 0;
   background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
   background-size: 20px 20px;
-  opacity: 0.3;
+  opacity: 0.08;
 }
 
 .heroContent {
@@ -75,28 +79,48 @@
 }
 
 .heroTagline {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  background: #05070c;
   font-size: var(--text-lg);
   color: var(--color-text-inverse);
   text-transform: uppercase;
   letter-spacing: 2px;
   font-weight: var(--font-weight-semibold);
   margin-bottom: var(--space-4);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.48);
 }
 
 .heroTitle {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--radius-sm);
+  background: #05070c;
   font-size: var(--text-hero-xl);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-inverse);
   margin-bottom: var(--space-6);
   line-height: 1.2;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.52);
 }
 
 .heroSubtitle {
+  display: inline-block;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: #05070c;
   font-size: var(--text-lg);
-  color: var(--color-banner-benefit);
+  color: #fff;
   max-width: 700px;
   margin: 0 auto;
   line-height: 1.7;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.46);
+}
+
+.hero .fadeInUp {
+  opacity: 1;
+  transform: none;
 }
 
 /* ================= SECTION BASE ================= */
@@ -404,7 +428,7 @@
   justify-content: center;
 }
 
-.contactDetails h4 {
+.contactDetails h3 {
   font-size: var(--text-base);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text);

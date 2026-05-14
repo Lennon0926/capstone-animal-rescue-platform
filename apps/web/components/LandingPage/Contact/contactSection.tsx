@@ -15,7 +15,7 @@ export default function ContactSection() {
           <div className={styles.contactItem}>
             <Mail size={24} className={styles.icon} />
             <div>
-              <h4 className={styles.contactLabel}>Email</h4>
+              <h3 className={styles.contactLabel}>Email</h3>
               <a href="mailto:info@animalrescue.org" className={styles.contactValue}>
                 info@animalrescue.org
               </a>
@@ -25,7 +25,7 @@ export default function ContactSection() {
           <div className={styles.contactItem}>
             <Phone size={24} className={styles.icon} />
             <div>
-              <h4 className={styles.contactLabel}>Teléfono</h4>
+              <h3 className={styles.contactLabel}>Teléfono</h3>
               <a href="tel:+17875058255" className={styles.contactValue}>
                 (787) 505-8255
               </a>
@@ -35,7 +35,7 @@ export default function ContactSection() {
           <div className={styles.contactItem}>
             <MapPin size={24} className={styles.icon} />
             <div>
-              <h4 className={styles.contactLabel}>Dirección</h4>
+              <h3 className={styles.contactLabel}>Dirección</h3>
               <p className={styles.contactValue}>
                 Box 4152, Aguadilla, Puerto Rico 00605
               </p>
