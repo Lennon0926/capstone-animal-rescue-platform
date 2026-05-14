@@ -21,7 +21,7 @@ export default function Footer() {
         </div>
 
         <div className={styles.column}>
-          <h4 className={styles.heading}>Enlaces Rápidos</h4>
+          <h3 className={styles.heading}>Enlaces Rápidos</h3>
           <ul>
             {quickLinks.map((link) => (
               <li key={link.href}>
@@ -32,7 +32,7 @@ export default function Footer() {
         </div>
 
         <div className={styles.column}>
-          <h4 className={styles.heading}>Apoyo</h4>
+          <h3 className={styles.heading}>Apoyo</h3>
           <ul>
             <li>
               <DonationModalTrigger className={styles.footerDonateButton}>
@@ -55,7 +55,7 @@ export default function Footer() {
         </div>
 
         <div className={styles.column}>
-          <h4 className={styles.heading}>Contacto</h4>
+          <h3 className={styles.heading}>Contacto</h3>
 
           <div className={styles.contactItem}>
             <Mail size={18} />
