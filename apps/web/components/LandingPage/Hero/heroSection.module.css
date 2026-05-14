@@ -71,7 +71,7 @@
 .overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(8, 16, 21, 0.42) 0%, rgba(8, 16, 21, 0.6) 100%);
+  background: linear-gradient(180deg, rgba(8, 16, 21, 0.74) 0%, rgba(8, 16, 21, 0.88) 100%);
   opacity: 0;
   pointer-events: none;
   animation: overlayFade 0.72s ease var(--hero-overlay-delay) forwards;
@@ -87,32 +87,46 @@
 }
 
 .title {
+  display: inline;
+  padding: 0 0.12em;
+  background: #061017;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
   font-size: var(--text-hero-xl);
   font-weight: var(--font-weight-bold);
   color: var(--color-text-inverse);
   line-height: 1.1;
   max-width: 800px;
   letter-spacing: var(--letter-tight);
-  opacity: 0;
-  transform: translateY(32px);
-  animation: demureFade 0.9s ease var(--hero-title-delay) forwards;
+  opacity: 1;
+  transform: none;
+  animation: none;
+  text-shadow: 0 3px 14px rgba(0, 0, 0, 0.72);
 }
 
 .accent {
   font-style: italic;
   color: var(--color-text-inverse);
+  background: #061017;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 .subtitle {
+  display: inline-block;
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-sm);
+  background: #061017;
   margin-top: var(--space-6);
   font-size: var(--text-lg);
-  color: rgba(255, 255, 255, 0.85);
+  color: #fff;
   max-width: 600px;
   line-height: 1.6;
   font-weight: var(--font-weight-regular);
-  opacity: 0;
-  transform: translateY(28px);
-  animation: demureFade 0.9s ease var(--hero-subtitle-delay) forwards;
+  opacity: 1;
+  transform: none;
+  animation: none;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
 }
 
 @keyframes introDrop {

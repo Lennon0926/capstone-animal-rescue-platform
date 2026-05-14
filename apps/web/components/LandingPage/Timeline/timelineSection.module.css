@@ -6,10 +6,9 @@
 
   position: relative;
   z-index: 3;
-  margin-top: clamp(-15rem, -18vw, -9rem);
-  padding: clamp(1.25rem, 2.8vw, 2.4rem) clamp(1.5rem, 4vw, 4rem)
-    clamp(5rem, 10vw, 8.5rem);
-  background-color: transparent;
+  margin-top: 0;
+  padding: clamp(4rem, 7vw, 6rem) clamp(1.5rem, 4vw, 4rem) clamp(5rem, 10vw, 8.5rem);
+  background-color: var(--color-bg);
 }
 
 .section::before {
@@ -37,12 +36,16 @@
   margin: 0 auto;
 }
 
-.sectionLabel {
-  font-size: clamp(1.1rem, 1.15vw, 1.45rem);
-  font-weight: var(--font-weight-semibold);
-  color: var(--color-text);
-  letter-spacing: -0.02em;
-  margin: 0 0 clamp(0.5rem, 1.5vw, 1rem);
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .timeline {
@@ -81,19 +84,19 @@
   inset: 0;
   background:
     linear-gradient(
-      90deg,
-      rgba(231, 111, 81, 0.18) 0%,
-      rgba(231, 111, 81, 0.08) 34%,
-      rgba(231, 111, 81, 0) 100%
-    )
-    left center / 0% 100% no-repeat,
+        90deg,
+        rgba(231, 111, 81, 0.18) 0%,
+        rgba(231, 111, 81, 0.08) 34%,
+        rgba(231, 111, 81, 0) 100%
+      )
+      left center / 0% 100% no-repeat,
     linear-gradient(
-      270deg,
-      rgba(231, 111, 81, 0.18) 0%,
-      rgba(231, 111, 81, 0.08) 34%,
-      rgba(231, 111, 81, 0) 100%
-    )
-    right center / 0% 100% no-repeat;
+        270deg,
+        rgba(231, 111, 81, 0.18) 0%,
+        rgba(231, 111, 81, 0.08) 34%,
+        rgba(231, 111, 81, 0) 100%
+      )
+      right center / 0% 100% no-repeat;
   background-repeat: no-repeat;
   opacity: 0;
   filter: blur(8px);
@@ -184,16 +187,12 @@
 
 @media (max-width: 768px) {
   .section {
-    margin-top: clamp(-8rem, -20vw, -5rem);
+    margin-top: 0;
     padding: var(--space-6) var(--space-5) var(--space-20);
   }
 
   .inner {
     width: 100%;
-  }
-
-  .sectionLabel {
-    margin-bottom: var(--space-3);
   }
 
   .entry {

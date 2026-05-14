@@ -96,6 +96,6 @@ test.describe("Animal detail page (/adopt/[id])", () => {
   // --- Error state ---
   test("shows error message for invalid animal ID", async ({ page }) => {
     await page.goto("/adopt/99999");
-    await expect(page.getByText(/No se encontró el animal/i)).toBeVisible();
+      await expect(page.getByRole("heading", { name: /Animal no encontrado/i })).toBeVisible();
   });
 });

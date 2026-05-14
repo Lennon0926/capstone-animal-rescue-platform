@@ -13,7 +13,7 @@ test.describe("Adopt listing page (/adopt)", () => {
   // --- Page load ---
   test("page loads with header and footer", async ({ page }) => {
     await expect(page).toHaveURL(/\/adopt/);
-    await expect(page.locator("header")).toBeVisible();
+      await expect(page.getByRole("banner")).toBeVisible();
     await expect(page.locator("footer")).toBeVisible();
   });
 

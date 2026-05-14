@@ -29,18 +29,23 @@ function Home({ animals, fetchError }: HomeProps) {
     <div className={styles.page}>
       <Head>
         <title>Inicio | Huellitas Sin Hogar</title>
-        <meta name="description" content="Huellitas Sin Hogar — adopta, dona y apoya a los animales sin hogar de Aguadilla, Puerto Rico." />
+        <meta
+          name="description"
+          content="Huellitas Sin Hogar — adopta, dona y apoya a los animales sin hogar de Aguadilla, Puerto Rico."
+        />
       </Head>
       <HeaderSection revealOnFirstScroll />
-      <HeroSection />
-      <MissionVideoSection />
-      <TimelineSection />
-      <StoriesSection />
-      <GetInvolvedSection />
-      <VolunteerIntakeSection />
-      <AnimalsSection animals={animals} fetchError={fetchError} />
-      <DonationBanner />
-      <ContactSection />
+      <main className={styles.main}>
+        <HeroSection />
+        <MissionVideoSection />
+        <TimelineSection />
+        <StoriesSection />
+        <GetInvolvedSection />
+        <VolunteerIntakeSection />
+        <AnimalsSection animals={animals} fetchError={fetchError} />
+        <DonationBanner />
+        <ContactSection />
+      </main>
       <FooterSection />
     </div>
   );
