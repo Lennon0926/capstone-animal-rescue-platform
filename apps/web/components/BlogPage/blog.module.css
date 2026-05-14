@@ -1,7 +1,7 @@
 /* ── Blog layout tokens ─────────────────────────────────────────────── */
 .page {
   --serif: var(--font-serif);
-  --mono:  var(--font-mono);
+  --mono: var(--font-mono);
   --col-width: 720px;
   --feed-width: 1100px;
 
@@ -13,7 +13,9 @@
 .fadeInUp {
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  transition:
+    opacity 0.5s ease-out,
+    transform 0.5s ease-out;
 }
 .fadeInUp.visible {
   opacity: 1;
@@ -38,7 +40,7 @@
   font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #b55830;
+  color: #8c3215;
   margin-bottom: 12px;
 }
 .mastheadEyebrow::before,
@@ -61,7 +63,7 @@
 }
 .mastheadTitle em {
   font-style: italic;
-  color: var(--color-accent);
+  color: var(--color-accent-accessible);
   font-weight: 400;
 }
 .mastheadLede {
@@ -131,7 +133,7 @@
   font-size: 11px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-accent);
+  color: var(--color-accent-accessible);
   margin-bottom: 20px;
 }
 .featuredDot {
@@ -142,8 +144,15 @@
   animation: pulse 2s infinite;
 }
 @keyframes pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.5; transform: scale(1.4); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.4);
+  }
 }
 .featuredGrid {
   display: grid;
@@ -209,7 +218,9 @@
   border-bottom: 1px solid currentColor;
   padding-bottom: 2px;
   text-decoration: none;
-  transition: gap 0.2s ease, color 0.15s ease;
+  transition:
+    gap 0.2s ease,
+    color 0.15s ease;
 }
 .featuredLink:hover {
   gap: 10px;
@@ -220,8 +231,10 @@
 .imgPlaceholder {
   background-image: repeating-linear-gradient(
     135deg,
-    #f0e9dc 0,    #f0e9dc 12px,
-    #e9e2d2 12px, #e9e2d2 24px
+    #f0e9dc 0,
+    #f0e9dc 12px,
+    #e9e2d2 12px,
+    #e9e2d2 24px
   );
   display: grid;
   place-items: center;
@@ -266,10 +279,22 @@
   padding: 3px 8px;
   border-radius: var(--radius-sm);
 }
-.badgeReel     { background: rgba(231, 111, 81, 0.1); color: var(--color-accent); }
-.badgeShared   { background: var(--color-primary-soft); color: var(--color-primary); }
-.badgeFacebook { background: rgba(24, 119, 242, 0.1); color: #1877f2; }
-.badgeWeb      { background: rgba(34, 197, 94, 0.1); color: #16a34a; }
+.badgeReel {
+  background: rgba(184, 74, 37, 0.1);
+  color: var(--color-accent-accessible);
+}
+.badgeShared {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+.badgeFacebook {
+  background: rgba(24, 119, 242, 0.1);
+  color: #0d4fa8;
+}
+.badgeWeb {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+}
 
 .sourceWarning {
   text-align: center;
@@ -291,7 +316,9 @@
   background: none;
   color: var(--color-text-soft);
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
   flex-shrink: 0;
 }
 .pinBtn:hover {
@@ -319,7 +346,9 @@
   border: none;
   background: none;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
   flex-shrink: 0;
 }
 .editBtn {
@@ -382,8 +411,13 @@
   font-family: inherit;
   transition: background 0.15s ease;
 }
-.deleteConfirmBtn:hover:not(:disabled) { background: #b91c1c; }
-.deleteConfirmBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+.deleteConfirmBtn:hover:not(:disabled) {
+  background: #b91c1c;
+}
+.deleteConfirmBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
 /* remove image inline controls */
 .removeImageBtn {
@@ -401,8 +435,13 @@
   transition: background 0.15s ease;
   flex-shrink: 0;
 }
-.removeImageBtn:hover:not(:disabled) { background: rgba(220, 38, 38, 0.14); }
-.removeImageBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+.removeImageBtn:hover:not(:disabled) {
+  background: rgba(220, 38, 38, 0.14);
+}
+.removeImageBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 .removeImageNote {
   font-size: 12px;
   color: #dc2626;
@@ -449,7 +488,9 @@
   padding: 0;
   transition: color 0.15s ease;
 }
-.readMore:hover { color: var(--color-accent-hover); }
+.readMore:hover {
+  color: var(--color-accent-hover);
+}
 
 /* ── Post images ───────────────────────────────────────────────────── */
 .postImage {
@@ -468,8 +509,12 @@
   overflow: hidden;
   margin: 24px 0;
 }
-.postImageGrid2 { grid-template-columns: 1fr 1fr; }
-.postImageGrid4 { grid-template-columns: 1fr 1fr; }
+.postImageGrid2 {
+  grid-template-columns: 1fr 1fr;
+}
+.postImageGrid4 {
+  grid-template-columns: 1fr 1fr;
+}
 .postImageGridTile {
   position: relative;
   aspect-ratio: 1 / 1;
@@ -541,7 +586,9 @@
 }
 button.action {
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 button.action:hover {
   background: var(--color-border);
@@ -559,7 +606,9 @@ button.action:hover {
   text-decoration: none;
   transition: color 0.15s ease;
 }
-.postSource:hover { color: var(--color-primary); }
+.postSource:hover {
+  color: var(--color-primary);
+}
 
 /* ── Comments ──────────────────────────────────────────────────────── */
 .comments {
@@ -587,22 +636,34 @@ button.action:hover {
   font-weight: 600;
   font-size: 13px;
 }
-.commentBody { flex: 1; min-width: 0; }
+.commentBody {
+  flex: 1;
+  min-width: 0;
+}
 .commentHead {
   display: flex;
   align-items: baseline;
   gap: 8px;
   margin-bottom: 4px;
 }
-.commentName  { font-size: 13px; font-weight: 600; color: var(--color-text); }
-.commentDate  {
+.commentName {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.commentDate {
   font-family: var(--mono);
   font-size: 10px;
   color: var(--color-text-soft);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
-.commentText  { font-size: 14px; color: var(--color-text); line-height: 1.5; margin: 0; }
+.commentText {
+  font-size: 14px;
+  color: var(--color-text);
+  line-height: 1.5;
+  margin: 0;
+}
 
 /* ── Composer (UI only — no backend) ───────────────────────────────── */
 .composerCollapsed {
@@ -617,7 +678,9 @@ button.action:hover {
   text-align: left;
   cursor: pointer;
   margin-bottom: 56px;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 .composerCollapsed:hover {
   box-shadow: 0 6px 24px -8px rgba(31, 60, 79, 0.12);
@@ -648,7 +711,10 @@ button.action:hover {
   flex-direction: column;
   gap: 2px;
 }
-.composerPrompt > span:first-child { font-size: 14px; color: var(--color-text); }
+.composerPrompt > span:first-child {
+  font-size: 14px;
+  color: var(--color-text);
+}
 .composerHint {
   font-family: var(--mono);
   font-size: 10px;
@@ -670,7 +736,11 @@ button.action:hover {
   gap: 12px;
   margin-bottom: 16px;
 }
-.composerName { font-size: 14px; font-weight: 600; color: var(--color-text); }
+.composerName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
 .composerClose {
   margin-left: auto;
   width: 32px;
@@ -686,7 +756,10 @@ button.action:hover {
   place-items: center;
   transition: background 0.15s ease;
 }
-.composerClose:hover { background: var(--color-border); color: var(--color-text); }
+.composerClose:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}
 .composerField {
   display: flex;
   flex-direction: column;
@@ -720,8 +793,12 @@ button.action:hover {
   font-family: inherit;
   transition: border-color var(--transition-fast);
 }
-.composerInput:focus { border-color: var(--color-primary); }
-.composerInput::placeholder { color: var(--color-text-soft); }
+.composerInput:focus {
+  border-color: var(--color-primary);
+}
+.composerInput::placeholder {
+  color: var(--color-text-soft);
+}
 .composerBody {
   width: 100%;
   border: 1px solid var(--color-border);
@@ -737,8 +814,12 @@ button.action:hover {
   font-family: inherit;
   transition: border-color var(--transition-fast);
 }
-.composerBody:focus { border-color: var(--color-primary); }
-.composerBody::placeholder { color: var(--color-text-soft); }
+.composerBody:focus {
+  border-color: var(--color-primary);
+}
+.composerBody::placeholder {
+  color: var(--color-text-soft);
+}
 .composerImageUpload {
   display: flex;
   align-items: center;
@@ -775,7 +856,10 @@ button.action:hover {
   border-top: 1px solid var(--color-border);
   flex-wrap: wrap;
 }
-.composerAttach { display: flex; gap: 4px; }
+.composerAttach {
+  display: flex;
+  gap: 4px;
+}
 .composerAttachBtn {
   padding: 6px 10px;
   border-radius: 6px;
@@ -787,7 +871,10 @@ button.action:hover {
   cursor: not-allowed;
   font-family: inherit;
 }
-.composerSubmit { display: flex; gap: 8px; }
+.composerSubmit {
+  display: flex;
+  gap: 8px;
+}
 .btnPrimary {
   padding: 8px 18px;
   border-radius: 6px;
@@ -813,7 +900,10 @@ button.action:hover {
   transition: background 0.15s ease;
   font-family: inherit;
 }
-.btnGhost:hover { background: var(--color-border); color: var(--color-text); }
+.btnGhost:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}
 
 /* ── Skeleton loader (warm shimmer) ────────────────────────────────── */
 .skeleton {
@@ -823,7 +913,10 @@ button.action:hover {
   flex-direction: column;
   gap: 14px;
 }
-.skeleton:first-child { border-top: none; padding-top: 0; }
+.skeleton:first-child {
+  border-top: none;
+  padding-top: 0;
+}
 .skelLine {
   height: 14px;
   background: linear-gradient(90deg, #ece4d4 25%, #f6f0e3 50%, #ece4d4 75%);
@@ -831,8 +924,13 @@ button.action:hover {
   animation: shimmer 1.6s infinite;
   border-radius: 4px;
 }
-.skelLineShort { width: 60%; }
-.skelLineTitle { height: 28px; width: 80%; }
+.skelLineShort {
+  width: 60%;
+}
+.skelLineTitle {
+  height: 28px;
+  width: 80%;
+}
 .skelImg {
   height: 280px;
   background: linear-gradient(90deg, #ece4d4 25%, #f6f0e3 50%, #ece4d4 75%);
@@ -841,8 +939,12 @@ button.action:hover {
   border-radius: var(--radius-md);
 }
 @keyframes shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* ── Error / empty states ──────────────────────────────────────────── */
@@ -856,7 +958,10 @@ button.action:hover {
   text-align: center;
   color: var(--color-text-muted);
 }
-.errorText { font-size: 14px; color: #c0392b; }
+.errorText {
+  font-size: 14px;
+  color: #c0392b;
+}
 .retryBtn {
   display: inline-flex;
   align-items: center;
@@ -872,7 +977,9 @@ button.action:hover {
   transition: background 0.2s ease;
   font-family: inherit;
 }
-.retryBtn:hover { background: var(--color-primary-hover); }
+.retryBtn:hover {
+  background: var(--color-primary-hover);
+}
 
 /* ── Admin bar ─────────────────────────────────────────────────────── */
 .adminBar {
@@ -897,7 +1004,10 @@ button.action:hover {
   border: 1px solid var(--color-border-strong);
   background: none;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
 }
 .adminBarLogin {
   color: #736d68;
@@ -993,8 +1103,12 @@ button.action:hover {
   box-sizing: border-box;
   transition: border-color var(--transition-fast);
 }
-.loginModalInput:focus { border-color: var(--color-primary); }
-.loginModalInput::placeholder { color: var(--color-text-soft); }
+.loginModalInput:focus {
+  border-color: var(--color-primary);
+}
+.loginModalInput::placeholder {
+  color: var(--color-text-soft);
+}
 .loginModalPasswordWrapper {
   position: relative;
 }
@@ -1017,7 +1131,9 @@ button.action:hover {
   border-radius: 4px;
   transition: color 0.15s ease;
 }
-.loginModalEyeBtn:hover { color: var(--color-primary); }
+.loginModalEyeBtn:hover {
+  color: var(--color-primary);
+}
 .loginModalSubmit {
   padding: 10px 18px;
   border-radius: var(--radius-sm);
@@ -1031,8 +1147,13 @@ button.action:hover {
   transition: background 0.15s ease;
   margin-top: 4px;
 }
-.loginModalSubmit:hover:not(:disabled) { background: var(--color-primary-hover); }
-.loginModalSubmit:disabled { opacity: 0.6; cursor: not-allowed; }
+.loginModalSubmit:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+.loginModalSubmit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
 /* ── Create post button ────────────────────────────────────────────── */
 .createPostBtn {
@@ -1051,7 +1172,9 @@ button.action:hover {
   margin-bottom: 36px;
   transition: background 0.15s ease;
 }
-.createPostBtn:hover { background: var(--color-primary-hover); }
+.createPostBtn:hover {
+  background: var(--color-primary-hover);
+}
 
 /* ── Create post form ──────────────────────────────────────────────── */
 .createPostForm {
@@ -1105,8 +1228,12 @@ button.action:hover {
   margin-bottom: 12px;
   transition: border-color var(--transition-fast);
 }
-.createPostInput:focus { border-color: var(--color-primary); }
-.createPostInput::placeholder { color: var(--color-text-soft); }
+.createPostInput:focus {
+  border-color: var(--color-primary);
+}
+.createPostInput::placeholder {
+  color: var(--color-text-soft);
+}
 .createPostTextarea {
   width: 100%;
   border: 1px solid var(--color-border);
@@ -1124,8 +1251,12 @@ button.action:hover {
   margin-bottom: 14px;
   transition: border-color var(--transition-fast);
 }
-.createPostTextarea:focus { border-color: var(--color-primary); }
-.createPostTextarea::placeholder { color: var(--color-text-soft); }
+.createPostTextarea:focus {
+  border-color: var(--color-primary);
+}
+.createPostTextarea::placeholder {
+  color: var(--color-text-soft);
+}
 .createPostImageRow {
   display: flex;
   align-items: center;
@@ -1143,7 +1274,9 @@ button.action:hover {
   color: var(--color-text-soft);
   cursor: pointer;
   font-family: inherit;
-  transition: border-color 0.15s ease, color 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -1193,8 +1326,14 @@ button.action:hover {
   font-family: inherit;
   transition: background 0.15s ease;
 }
-.createPostCancel:hover:not(:disabled) { background: var(--color-border); color: var(--color-text); }
-.createPostCancel:disabled { opacity: 0.5; cursor: not-allowed; }
+.createPostCancel:hover:not(:disabled) {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+.createPostCancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 .createPostSubmit {
   padding: 8px 18px;
   border-radius: var(--radius-sm);
@@ -1207,19 +1346,46 @@ button.action:hover {
   font-family: inherit;
   transition: background 0.15s ease;
 }
-.createPostSubmit:hover:not(:disabled) { background: var(--color-accent-hover); }
-.createPostSubmit:disabled { opacity: 0.6; cursor: not-allowed; }
+.createPostSubmit:hover:not(:disabled) {
+  background: var(--color-accent-hover);
+}
+.createPostSubmit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
 /* ── Responsive ────────────────────────────────────────────────────── */
 @media (max-width: 640px) {
-  .mastheadInner { padding: 20px 20px 18px; }
-  .mastheadTitle { font-size: clamp(36px, 10vw, 52px); }
-  .mastheadLede  { font-size: 17px; }
-  .feed          { padding: 40px 20px 60px; }
-  .feedItem      { padding: 36px 0; }
-  .featured      { margin-bottom: 48px; padding-bottom: 40px; }
-  .featuredGrid  { grid-template-columns: 1fr; gap: 20px; }
-  .postTitle     { font-size: 22px; }
-  .postPara      { font-size: 15px; }
-  .postImageGrid3 { height: 180px; }
+  .mastheadInner {
+    padding: 20px 20px 18px;
+  }
+  .mastheadTitle {
+    font-size: clamp(36px, 10vw, 52px);
+  }
+  .mastheadLede {
+    font-size: 17px;
+  }
+  .feed {
+    padding: 40px 20px 60px;
+  }
+  .feedItem {
+    padding: 36px 0;
+  }
+  .featured {
+    margin-bottom: 48px;
+    padding-bottom: 40px;
+  }
+  .featuredGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .postTitle {
+    font-size: 22px;
+  }
+  .postPara {
+    font-size: 15px;
+  }
+  .postImageGrid3 {
+    height: 180px;
+  }
 }

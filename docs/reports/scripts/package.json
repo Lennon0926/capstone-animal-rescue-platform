@@ -1,0 +1,20 @@
+{
+  "name": "audit-scripts",
+  "private": true,
+  "description": "Automated audit pipeline: Lighthouse, accessibility, load test, test results → AI-generated reports",
+  "scripts": {
+    "audit": "bash run-audit.sh"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.52.0",
+    "chrome-launcher": "^1.1.2",
+    "lighthouse": "^12.6.0",
+    "pa11y": "^8.0.0"
+  },
+  "devDependencies": {
+    "autocannon": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
