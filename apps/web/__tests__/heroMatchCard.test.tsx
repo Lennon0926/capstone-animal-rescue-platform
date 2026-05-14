@@ -16,7 +16,9 @@ jest.mock("next/image", () => ({
 jest.mock("next/link", () => ({
   __esModule: true,
   default: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => (
-    <a href={href} {...rest}>{children}</a>
+    <a href={href} {...rest}>
+      {children}
+    </a>
   ),
 }));
 
@@ -44,7 +46,7 @@ function makeAnimal(overrides: Partial<Animal> = {}): Animal {
 
 function makeMatch(
   animalOverrides: Partial<Animal> = {},
-  matchOverrides: Partial<PetMatch> = {},
+  matchOverrides: Partial<PetMatch> = {}
 ): PetMatch {
   return {
     animal: makeAnimal(animalOverrides),
@@ -92,7 +94,12 @@ describe("HeroMatchCard", () => {
   });
 
   it("renders compatibility bars only for requested fields", () => {
-    render(<HeroMatchCard match={makeMatch()} requestedFields={{ species: true, size: false, gender: false }} />);
+    render(
+      <HeroMatchCard
+        match={makeMatch()}
+        requestedFields={{ species: true, size: false, gender: false }}
+      />
+    );
     expect(screen.getByRole("progressbar", { name: "Especie" })).toBeInTheDocument();
     expect(screen.queryByRole("progressbar", { name: "Tamaño" })).not.toBeInTheDocument();
     expect(screen.queryByRole("progressbar", { name: "Género" })).not.toBeInTheDocument();

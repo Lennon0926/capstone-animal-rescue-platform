@@ -16,7 +16,9 @@ jest.mock("next/image", () => ({
 jest.mock("next/link", () => ({
   __esModule: true,
   default: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => (
-    <a href={href} {...rest}>{children}</a>
+    <a href={href} {...rest}>
+      {children}
+    </a>
   ),
 }));
 
@@ -80,13 +82,11 @@ beforeEach(() => {
   // Redirect only the component's loading delay (MIN_LOADING_MS=1500 to MAX=3500)
   // to 0 ms so tests don't block, while leaving RTL's own timeouts (≤1000 ms) intact.
   const realSetTimeout = global.setTimeout;
-  jest.spyOn(global, "setTimeout").mockImplementation(
-    (fn: TimerHandler, delay?: number) => {
-      const ms = typeof delay === "number" ? delay : 0;
-      const effective = ms >= 1500 ? 0 : ms;
-      return realSetTimeout(fn, effective) as unknown as ReturnType<typeof setTimeout>;
-    },
-  );
+  jest.spyOn(global, "setTimeout").mockImplementation((fn: TimerHandler, delay?: number) => {
+    const ms = typeof delay === "number" ? delay : 0;
+    const effective = ms >= 1500 ? 0 : ms;
+    return realSetTimeout(fn, effective) as unknown as ReturnType<typeof setTimeout>;
+  });
   jest.spyOn(global, "requestAnimationFrame").mockImplementation((cb) => {
     cb(0);
     return 0;
@@ -105,44 +105,30 @@ describe("AIPetMatch — hero form", () => {
   it("renders the hero heading", () => {
     render(<AIPetMatch onSkip={jest.fn()} />);
     expect(
-      screen.getByRole("heading", { name: /encuentra a tu compañero ideal/i }),
+      screen.getByRole("heading", { name: /encuentra a tu compañero ideal/i })
     ).toBeInTheDocument();
   });
 
   it("renders the prompt textarea", () => {
     render(<AIPetMatch onSkip={jest.fn()} />);
-    expect(
-      screen.getByLabelText(/describe el animal que buscas/i),
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/describe el animal que buscas/i)).toBeInTheDocument();
   });
 
   it("submit button is disabled when prompt is empty", () => {
     render(<AIPetMatch onSkip={jest.fn()} />);
-    expect(
-      screen.getByRole("button", { name: /encontrar mi mejor match/i }),
-    ).toBeDisabled();
+    expect(screen.getByRole("button", { name: /encontrar mi mejor match/i })).toBeDisabled();
   });
 
   it("submit button is disabled when prompt is too short (< 3 chars)", async () => {
     render(<AIPetMatch onSkip={jest.fn()} />);
-    await userEvent.type(
-      screen.getByLabelText(/describe el animal que buscas/i),
-      "ab",
-    );
-    expect(
-      screen.getByRole("button", { name: /encontrar mi mejor match/i }),
-    ).toBeDisabled();
+    await userEvent.type(screen.getByLabelText(/describe el animal que buscas/i), "ab");
+    expect(screen.getByRole("button", { name: /encontrar mi mejor match/i })).toBeDisabled();
   });
 
   it("submit button is enabled when prompt meets minimum length", async () => {
     render(<AIPetMatch onSkip={jest.fn()} />);
-    await userEvent.type(
-      screen.getByLabelText(/describe el animal que buscas/i),
-      VALID_PROMPT,
-    );
-    expect(
-      screen.getByRole("button", { name: /encontrar mi mejor match/i }),
-    ).not.toBeDisabled();
+    await userEvent.type(screen.getByLabelText(/describe el animal que buscas/i), VALID_PROMPT);
+    expect(screen.getByRole("button", { name: /encontrar mi mejor match/i })).not.toBeDisabled();
   });
 
   it("shows validation error when submitted with a too-short prompt", () => {
@@ -150,18 +136,14 @@ describe("AIPetMatch — hero form", () => {
     fireEvent.change(screen.getByLabelText(/describe el animal que buscas/i), {
       target: { value: "ab" },
     });
-    fireEvent.submit(
-      screen.getByLabelText(/describe el animal que buscas/i).closest("form")!,
-    );
+    fireEvent.submit(screen.getByLabelText(/describe el animal que buscas/i).closest("form")!);
     expect(screen.getByRole("alert")).toHaveTextContent(/mínimo/i);
   });
 
   it("calls onSkip when 'Ver todos los animales' is clicked", async () => {
     const onSkip = jest.fn();
     render(<AIPetMatch onSkip={onSkip} />);
-    await userEvent.click(
-      screen.getByRole("button", { name: /ver todos los animales/i }),
-    );
+    await userEvent.click(screen.getByRole("button", { name: /ver todos los animales/i }));
     expect(onSkip).toHaveBeenCalledTimes(1);
   });
 });
@@ -174,25 +156,21 @@ describe("AIPetMatch — loading state", () => {
     (global.fetch as jest.Mock).mockReturnValue(
       new Promise((res) => {
         resolveResponse = res;
-      }),
+      })
     );
 
     render(<AIPetMatch onSkip={jest.fn()} />);
     fireEvent.change(screen.getByLabelText(/describe el animal que buscas/i), {
       target: { value: VALID_PROMPT },
     });
-    await userEvent.click(
-      screen.getByRole("button", { name: /encontrar mi mejor match/i }),
-    );
+    await userEvent.click(screen.getByRole("button", { name: /encontrar mi mejor match/i }));
 
     expect(screen.getByRole("status")).toBeInTheDocument();
 
     // Resolve so the component can settle cleanly (results view, not empty state)
     resolveResponse(makeFetchResponse(makeApiBody([makeMatch()])));
     await waitFor(() =>
-      expect(
-        screen.getByRole("heading", { name: /tus mejores matches/i }),
-      ).toBeInTheDocument(),
+      expect(screen.getByRole("heading", { name: /tus mejores matches/i })).toBeInTheDocument()
     );
   });
 });
@@ -201,22 +179,16 @@ describe("AIPetMatch — loading state", () => {
 
 describe("AIPetMatch — results", () => {
   beforeEach(() => {
-    (global.fetch as jest.Mock).mockResolvedValue(
-      makeFetchResponse(makeApiBody([makeMatch()])),
-    );
+    (global.fetch as jest.Mock).mockResolvedValue(makeFetchResponse(makeApiBody([makeMatch()])));
   });
 
   async function submitAndWaitForResults() {
     fireEvent.change(screen.getByLabelText(/describe el animal que buscas/i), {
       target: { value: VALID_PROMPT },
     });
-    await userEvent.click(
-      screen.getByRole("button", { name: /encontrar mi mejor match/i }),
-    );
+    await userEvent.click(screen.getByRole("button", { name: /encontrar mi mejor match/i }));
     await waitFor(() =>
-      expect(
-        screen.getByRole("heading", { name: /tus mejores matches/i }),
-      ).toBeInTheDocument(),
+      expect(screen.getByRole("heading", { name: /tus mejores matches/i })).toBeInTheDocument()
     );
   }
 
@@ -234,29 +206,23 @@ describe("AIPetMatch — results", () => {
   it("shows footer action buttons in results view", async () => {
     render(<AIPetMatch onSkip={jest.fn()} />);
     await submitAndWaitForResults();
-    expect(
-      screen.getByRole("button", { name: /ajustar preferencias/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /ver todos los animales/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /ajustar preferencias/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /ver todos los animales/i })).toBeInTheDocument();
   });
 
   it("clicking 'Ajustar preferencias' returns to the hero form", async () => {
     render(<AIPetMatch onSkip={jest.fn()} />);
     await submitAndWaitForResults();
-    await userEvent.click(
-      screen.getByRole("button", { name: /ajustar preferencias/i }),
-    );
+    await userEvent.click(screen.getByRole("button", { name: /ajustar preferencias/i }));
     expect(
-      screen.getByRole("heading", { name: /encuentra a tu compañero ideal/i }),
+      screen.getByRole("heading", { name: /encuentra a tu compañero ideal/i })
     ).toBeInTheDocument();
   });
 
   it("renders secondary match cards when multiple matches are returned", async () => {
     const second = makeMatch({ animal: makeAnimal({ aid: 2, name: "Milo" }) });
     (global.fetch as jest.Mock).mockResolvedValueOnce(
-      makeFetchResponse(makeApiBody([makeMatch(), second])),
+      makeFetchResponse(makeApiBody([makeMatch(), second]))
     );
     render(<AIPetMatch onSkip={jest.fn()} />);
     await submitAndWaitForResults();
@@ -266,13 +232,11 @@ describe("AIPetMatch — results", () => {
   it("renders the alternatives section when alternatives are returned", async () => {
     const alt = makeMatch({ animal: makeAnimal({ aid: 3, name: "Felix" }), score: 0.3 });
     (global.fetch as jest.Mock).mockResolvedValueOnce(
-      makeFetchResponse(makeApiBody([makeMatch()], [alt])),
+      makeFetchResponse(makeApiBody([makeMatch()], [alt]))
     );
     render(<AIPetMatch onSkip={jest.fn()} />);
     await submitAndWaitForResults();
-    expect(
-      screen.getByText(/otros animales que también podrían gustarte/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/otros animales que también podrían gustarte/i)).toBeInTheDocument();
     expect(screen.getByText("Felix")).toBeInTheDocument();
   });
 });
@@ -281,20 +245,14 @@ describe("AIPetMatch — results", () => {
 
 describe("AIPetMatch — empty state", () => {
   it("shows the empty state when API returns no matches", async () => {
-    (global.fetch as jest.Mock).mockResolvedValue(
-      makeFetchResponse(makeApiBody([])),
-    );
+    (global.fetch as jest.Mock).mockResolvedValue(makeFetchResponse(makeApiBody([])));
     render(<AIPetMatch onSkip={jest.fn()} />);
     fireEvent.change(screen.getByLabelText(/describe el animal que buscas/i), {
       target: { value: VALID_PROMPT },
     });
-    await userEvent.click(
-      screen.getByRole("button", { name: /encontrar mi mejor match/i }),
-    );
+    await userEvent.click(screen.getByRole("button", { name: /encontrar mi mejor match/i }));
     await waitFor(() =>
-      expect(
-        screen.getByRole("heading", { name: /no encontramos animales/i }),
-      ).toBeInTheDocument(),
+      expect(screen.getByRole("heading", { name: /no encontramos animales/i })).toBeInTheDocument()
     );
   });
 });
@@ -306,18 +264,13 @@ describe("AIPetMatch — error states", () => {
     fireEvent.change(screen.getByLabelText(/describe el animal que buscas/i), {
       target: { value: VALID_PROMPT },
     });
-    await userEvent.click(
-      screen.getByRole("button", { name: /encontrar mi mejor match/i }),
-    );
+    await userEvent.click(screen.getByRole("button", { name: /encontrar mi mejor match/i }));
     return waitFor(() => expect(screen.getByRole("alert")).toBeInTheDocument());
   }
 
   it("shows the API error message on a non-ok response", async () => {
     (global.fetch as jest.Mock).mockResolvedValue(
-      makeFetchResponse(
-        { success: false, error: { message: "Servicio no disponible" } },
-        false,
-      ),
+      makeFetchResponse({ success: false, error: { message: "Servicio no disponible" } }, false)
     );
     render(<AIPetMatch onSkip={jest.fn()} />);
     await submitAndWaitForAlert();
@@ -332,9 +285,7 @@ describe("AIPetMatch — error states", () => {
   });
 
   it("shows fallback error on success:false response without an error field", async () => {
-    (global.fetch as jest.Mock).mockResolvedValue(
-      makeFetchResponse({ success: false }, true),
-    );
+    (global.fetch as jest.Mock).mockResolvedValue(makeFetchResponse({ success: false }, true));
     render(<AIPetMatch onSkip={jest.fn()} />);
     await submitAndWaitForAlert();
     expect(screen.getByRole("alert")).toHaveTextContent(/no pudimos procesar/i);

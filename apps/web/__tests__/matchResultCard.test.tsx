@@ -14,7 +14,9 @@ jest.mock("next/image", () => ({
 jest.mock("next/link", () => ({
   __esModule: true,
   default: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => (
-    <a href={href} {...rest}>{children}</a>
+    <a href={href} {...rest}>
+      {children}
+    </a>
   ),
 }));
 
@@ -57,9 +59,7 @@ describe("MatchResultCard", () => {
 
   it("renders the score badge with correct aria-label", () => {
     render(<MatchResultCard match={makeMatch({ score: 0.85 })} />);
-    expect(
-      screen.getByLabelText("Compatibilidad 85%"),
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText("Compatibilidad 85%")).toBeInTheDocument();
   });
 
   it("renders 0% for score of 0", () => {
