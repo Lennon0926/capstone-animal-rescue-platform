@@ -11,7 +11,7 @@ All Lighthouse audits were executed on 2026-05-14 against the deployed Vercel fr
 | Tool | Lighthouse v12 |
 | Target | `https://capstone-animal-rescue-web.vercel.app` |
 | API Backend | `https://capstone-animal-rescue-server.vercel.app` |
-| Preset | Desktop (1350 x 940, no CPU/network throttling) |
+| Preset | Desktop (1350 × 940, no throttling) |
 | Runs per URL | 1 |
 | Run date | 2026-05-14 |
 
@@ -37,12 +37,12 @@ All Lighthouse audits were executed on 2026-05-14 against the deployed Vercel fr
 
 | Page | Performance | Accessibility | Best Practices | SEO |
 |------|:-----------:|:-------------:|:--------------:|:---:|
-| `/home` | 76 | **98** | **100** | **100** |
-| `/adopt` | **100** | **99** | **100** | **100** |
-| `/adopt/1` | **100** | **100** | **100** | **100** |
-| `/about` | **100** | **98** | **100** | **100** |
-| `/blog` | **94** | **96** | **100** | **100** |
-| **Average** | **94.0** | **98.2** | **100.0** | **100.0** |
+| `/home` | 75 | 100 | 100 | 100 |
+| `/adopt` | 98 | 99 | 100 | 100 |
+| `/adopt/1` | 100 | 100 | 100 | 100 |
+| `/about` | 100 | 100 | 100 | 100 |
+| `/blog` | 88 | 100 | 100 | 100 |
+| **Average** | **92.2** | **99.8** | **100.0** | **100.0** |
 
 Score scale: 0-49 Poor · 50-89 Needs Improvement · 90-100 Good.
 
@@ -52,11 +52,11 @@ Score scale: 0-49 Poor · 50-89 Needs Improvement · 90-100 Good.
 
 | Page | LCP | CLS | TTFB | Speed Index | TBT |
 |------|-----|-----|------|-------------|-----|
-| `/home` | 1,858 ms | 0.037 | 49 ms | 4,643 ms | 0 ms |
-| `/adopt` | 709 ms | 0.000 | 54 ms | 677 ms | 0 ms |
-| `/adopt/1` | 485 ms | 0.000 | 46 ms | 473 ms | 0 ms |
-| `/about` | 277 ms | 0.000 | 48 ms | 406 ms | 0 ms |
-| `/blog` | 1,561 ms | 0.000 | 47 ms | 821 ms | 0 ms |
+| `/home` | 1,904 ms | 0.036 | 46 ms | 5,223 ms | 0 ms |
+| `/adopt` | 899 ms | 0.000 | 48 ms | 866 ms | 0 ms |
+| `/adopt/1` | 650 ms | 0.000 | 48 ms | 636 ms | 0 ms |
+| `/about` | 402 ms | 0.000 | 46 ms | 405 ms | 0 ms |
+| `/blog` | 2,229 ms | 0.000 | 50 ms | 1,187 ms | 0 ms |
 
 > **LCP** = Largest Contentful Paint · **CLS** = Cumulative Layout Shift · **TTFB** = Time to First Byte · **TBT** = Total Blocking Time
 
@@ -68,21 +68,21 @@ Score scale: 0-49 Poor · 50-89 Needs Improvement · 90-100 Good.
 
 | Page | LCP | <= 3,000 ms? |
 |------|-----|:------------:|
-| `/home` | 1,858 ms | **PASS** |
-| `/adopt` | 709 ms | **PASS** |
-| `/adopt/1` | 485 ms | **PASS** |
-| `/about` | 277 ms | **PASS** |
-| `/blog` | 1,561 ms | **PASS** |
+| `/home` | 1,904 ms | **PASS** |
+| `/adopt` | 899 ms | **PASS** |
+| `/adopt/1` | 650 ms | **PASS** |
+| `/about` | 402 ms | **PASS** |
+| `/blog` | 2,229 ms | **PASS** |
 
 **Result: PASS**
 
-All audited deployed pages stayed under the 3-second LCP target. `/home` is the slowest page at 1,858 ms, followed by `/blog` at 1,561 ms, but both remain within the SMART objective threshold.
+All audited deployed pages stayed under the 3-second LCP target.
 
 ---
 
 ## Analysis
 
-The deployed frontend performs well overall, with Best Practices and SEO scoring 100 on every audited page. `/home` is the only page below the Lighthouse "Good" threshold for Performance, scoring 76 with a 4,643 ms Speed Index and 1,858 ms LCP. Total Blocking Time is 0 ms across all pages, and deployed TTFB remains consistently low at 46-54 ms.
+The deployed frontend remains strong in quality categories, with Accessibility, Best Practices, and SEO near-perfect or perfect across all pages. Performance is still good overall (average 92.2), but `/home` and `/blog` are below the 90 threshold and are the best candidates for optimization work.
 
 ---
 

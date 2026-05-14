@@ -2,7 +2,7 @@
   <rect width="760" height="420" fill="#ffffff" rx="8"/>
 
   <text x="380" y="26" text-anchor="middle" font-size="15" font-weight="bold" fill="#111827">Load Test — Response Time Distribution (overall)</text>
-  <text x="380" y="45" text-anchor="middle" font-size="11" fill="#6b7280">20 connections × 40s · 8537 total requests · https://capstone-animal-rescue-server.vercel.app · 2026-05-14</text>
+  <text x="380" y="45" text-anchor="middle" font-size="11" fill="#6b7280">20 connections × 40s · 8671 total requests · https://capstone-animal-rescue-server.vercel.app · 2026-05-14</text>
   <rect x="290" y="58" width="14" height="14" fill="#4361ee" rx="2"/>
   <text x="308" y="68" font-size="11" fill="#374151">p95</text>
   <rect x="351" y="58" width="14" height="14" fill="#ef4444" rx="2"/>
@@ -17,30 +17,30 @@
   <line x1="90" y1="90.0" x2="720" y2="90.0" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="4,3"/>
   <text x="82" y="94.0" text-anchor="end" font-size="10" fill="#6b7280">500</text>
 
-  <rect x="128.0" y="204.2" width="22" height="95.8" fill="#4361ee" rx="2"/>
-  <text x="139.0" y="201.2" text-anchor="middle" font-size="9" fill="#4361ee">228ms</text>
-  <rect x="156.0" y="169.0" width="22" height="131.0" fill="#ef4444" rx="2"/>
-  <text x="167.0" y="166.0" text-anchor="middle" font-size="9" fill="#ef4444">312ms</text>
+  <rect x="128.0" y="225.7" width="22" height="74.3" fill="#4361ee" rx="2"/>
+  <text x="139.0" y="222.7" text-anchor="middle" font-size="9" fill="#4361ee">177ms</text>
+  <rect x="156.0" y="162.2" width="22" height="137.8" fill="#ef4444" rx="2"/>
+  <text x="167.0" y="159.2" text-anchor="middle" font-size="9" fill="#ef4444">328ms</text>
   <text x="153.0" y="316" text-anchor="middle" font-size="10" fill="#6b7280">/health</text>
-  <rect x="254.0" y="204.2" width="22" height="95.8" fill="#4361ee" rx="2"/>
-  <text x="265.0" y="201.2" text-anchor="middle" font-size="9" fill="#4361ee">228ms</text>
-  <rect x="282.0" y="169.0" width="22" height="131.0" fill="#ef4444" rx="2"/>
-  <text x="293.0" y="166.0" text-anchor="middle" font-size="9" fill="#ef4444">312ms</text>
+  <rect x="254.0" y="225.7" width="22" height="74.3" fill="#4361ee" rx="2"/>
+  <text x="265.0" y="222.7" text-anchor="middle" font-size="9" fill="#4361ee">177ms</text>
+  <rect x="282.0" y="162.2" width="22" height="137.8" fill="#ef4444" rx="2"/>
+  <text x="293.0" y="159.2" text-anchor="middle" font-size="9" fill="#ef4444">328ms</text>
   <text x="279.0" y="316" text-anchor="middle" font-size="10" fill="#6b7280">/api/animals</text>
-  <rect x="380.0" y="204.2" width="22" height="95.8" fill="#4361ee" rx="2"/>
-  <text x="391.0" y="201.2" text-anchor="middle" font-size="9" fill="#4361ee">228ms</text>
-  <rect x="408.0" y="169.0" width="22" height="131.0" fill="#ef4444" rx="2"/>
-  <text x="419.0" y="166.0" text-anchor="middle" font-size="9" fill="#ef4444">312ms</text>
+  <rect x="380.0" y="225.7" width="22" height="74.3" fill="#4361ee" rx="2"/>
+  <text x="391.0" y="222.7" text-anchor="middle" font-size="9" fill="#4361ee">177ms</text>
+  <rect x="408.0" y="162.2" width="22" height="137.8" fill="#ef4444" rx="2"/>
+  <text x="419.0" y="159.2" text-anchor="middle" font-size="9" fill="#ef4444">328ms</text>
   <text x="405.0" y="316" text-anchor="middle" font-size="10" fill="#6b7280">/api/animals/filters</text>
-  <rect x="506.0" y="204.2" width="22" height="95.8" fill="#4361ee" rx="2"/>
-  <text x="517.0" y="201.2" text-anchor="middle" font-size="9" fill="#4361ee">228ms</text>
-  <rect x="534.0" y="169.0" width="22" height="131.0" fill="#ef4444" rx="2"/>
-  <text x="545.0" y="166.0" text-anchor="middle" font-size="9" fill="#ef4444">312ms</text>
+  <rect x="506.0" y="225.7" width="22" height="74.3" fill="#4361ee" rx="2"/>
+  <text x="517.0" y="222.7" text-anchor="middle" font-size="9" fill="#4361ee">177ms</text>
+  <rect x="534.0" y="162.2" width="22" height="137.8" fill="#ef4444" rx="2"/>
+  <text x="545.0" y="159.2" text-anchor="middle" font-size="9" fill="#ef4444">328ms</text>
   <text x="531.0" y="316" text-anchor="middle" font-size="10" fill="#6b7280">/api/animals/:id</text>
-  <rect x="632.0" y="204.2" width="22" height="95.8" fill="#4361ee" rx="2"/>
-  <text x="643.0" y="201.2" text-anchor="middle" font-size="9" fill="#4361ee">228ms</text>
-  <rect x="660.0" y="169.0" width="22" height="131.0" fill="#ef4444" rx="2"/>
-  <text x="671.0" y="166.0" text-anchor="middle" font-size="9" fill="#ef4444">312ms</text>
+  <rect x="632.0" y="225.7" width="22" height="74.3" fill="#4361ee" rx="2"/>
+  <text x="643.0" y="222.7" text-anchor="middle" font-size="9" fill="#4361ee">177ms</text>
+  <rect x="660.0" y="162.2" width="22" height="137.8" fill="#ef4444" rx="2"/>
+  <text x="671.0" y="159.2" text-anchor="middle" font-size="9" fill="#ef4444">328ms</text>
   <text x="657.0" y="316" text-anchor="middle" font-size="10" fill="#6b7280">/api/uploads/config</text>
 
 </svg>
