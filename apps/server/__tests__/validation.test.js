@@ -6,6 +6,7 @@ const {
   validateAnimalFilters,
   validateCreateAnimal,
   validateUpdateAnimal,
+  validateAiMatchBody,
 } = require("../middleware/validation");
 
 describe("sanitizeString", () => {
@@ -340,5 +341,115 @@ describe("image object key middleware validation", () => {
     validateUpdateAnimal(req, {}, next);
 
     expect(next.mock.calls[0][0].message).toMatch(/medical_records\[0\]\.record_id/i);
+  });
+});
+
+describe("validateAiMatchBody", () => {
+  it("returns 400 when prompt is missing", () => {
+    const req = { body: {} };
+    const next = jest.fn();
+    validateAiMatchBody(req, {}, next);
+    expect(next.mock.calls[0][0].statusCode).toBe(400);
+    expect(next.mock.calls[0][0].message).toMatch(/prompt is required/i);
+  });
+
+  it("returns 400 when prompt is not a string", () => {
+    const req = { body: { prompt: 42 } };
+    const next = jest.fn();
+    validateAiMatchBody(req, {}, next);
+    expect(next.mock.calls[0][0].statusCode).toBe(400);
+    expect(next.mock.calls[0][0].message).toMatch(/prompt is required/i);
+  });
+
+  it("returns 400 when prompt is too short (< 3 chars after trim)", () => {
+    const req = { body: { prompt: "ab" } };
+    const next = jest.fn();
+    validateAiMatchBody(req, {}, next);
+    expect(next.mock.calls[0][0].statusCode).toBe(400);
+    expect(next.mock.calls[0][0].message).toMatch(/at least 3 characters/i);
+  });
+
+  it("returns 400 when prompt is blank whitespace", () => {
+    const req = { body: { prompt: "   " } };
+    const next = jest.fn();
+    validateAiMatchBody(req, {}, next);
+    expect(next.mock.calls[0][0].statusCode).toBe(400);
+  });
+
+  it("returns 400 when prompt exceeds 500 characters", () => {
+    const req = { body: { prompt: "a".repeat(501) } };
+    const next = jest.fn();
+    validateAiMatchBody(req, {}, next);
+    expect(next.mock.calls[0][0].statusCode).toBe(400);
+    expect(next.mock.calls[0][0].message).toMatch(/500 characters/i);
+  });
+
+  it("returns 400 when limit is non-numeric", () => {
+    const req = { body: { prompt: "quiero un perro", limit: "abc" } };
+    const next = jest.fn();
+    validateAiMatchBody(req, {}, next);
+    expect(next.mock.calls[0][0].statusCode).toBe(400);
+    expect(next.mock.calls[0][0].message).toMatch(/integer between 1 and 20/i);
+  });
+
+  it("returns 400 when limit is below 1", () => {
+    const req = { body: { prompt: "quiero un perro", limit: 0 } };
+    const next = jest.fn();
+    validateAiMatchBody(req, {}, next);
+    expect(next.mock.calls[0][0].statusCode).toBe(400);
+  });
+
+  it("returns 400 when limit is above 20", () => {
+    const req = { body: { prompt: "quiero un perro", limit: 21 } };
+    const next = jest.fn();
+    validateAiMatchBody(req, {}, next);
+    expect(next.mock.calls[0][0].statusCode).toBe(400);
+  });
+
+  it("defaults limit to 5 when not provided", () => {
+    const req = { body: { prompt: "quiero un perro" } };
+    const next = jest.fn();
+    validateAiMatchBody(req, {}, next);
+    expect(next).toHaveBeenCalledWith();
+    expect(req.validatedBody).toEqual({ prompt: "quiero un perro", limit: 5 });
+  });
+
+  it("accepts a valid prompt and custom limit", () => {
+    const req = { body: { prompt: "  perro mediano  ", limit: 10 } };
+    const next = jest.fn();
+    validateAiMatchBody(req, {}, next);
+    expect(next).toHaveBeenCalledWith();
+    expect(req.validatedBody).toEqual({ prompt: "perro mediano", limit: 10 });
+  });
+
+  it("trims leading and trailing whitespace from prompt", () => {
+    const req = { body: { prompt: "  gato tranquilo  " } };
+    const next = jest.fn();
+    validateAiMatchBody(req, {}, next);
+    expect(next).toHaveBeenCalledWith();
+    expect(req.validatedBody.prompt).toBe("gato tranquilo");
+  });
+
+  it("accepts a prompt exactly 500 characters long", () => {
+    const req = { body: { prompt: "a".repeat(500) } };
+    const next = jest.fn();
+    validateAiMatchBody(req, {}, next);
+    expect(next).toHaveBeenCalledWith();
+  });
+
+  it("accepts limit = 1 (lower boundary)", () => {
+    const req = { body: { prompt: "quiero un perro", limit: 1 } };
+    const next = jest.fn();
+    validateAiMatchBody(req, {}, next);
+    expect(next).toHaveBeenCalledWith();
+    expect(req.validatedBody.limit).toBe(1);
+  });
+
+  it("accepts limit = 20 (upper boundary)", () => {
+    const req = { body: { prompt: "quiero un perro", limit: 20 } };
+    const next = jest.fn();
+    validateAiMatchBody(req, {}, next);
+    expect(next).toHaveBeenCalledWith();
+    expect(req.validatedBody.limit).toBe(20);
   });
 });

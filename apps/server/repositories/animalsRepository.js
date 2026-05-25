@@ -15,6 +15,10 @@ const {
   getPublicObjectUrl,
   normalizeObjectKey,
 } = require("../services/r2Service");
+const {
+  generateTagEmbedding,
+  serializeEmbedding,
+} = require("../services/petMatchService");
 
 // In-memory cache for filter options — these change only when animals are
 // added/edited, so a 30-second TTL eliminates ~200 redundant DB round-trips
@@ -396,6 +400,50 @@ async function getFilterOptions() {
 }
 
 /**
+ * Persists the tag-derived embedding vector for a single animal.
+ * Vector is sent as the pgvector text format "[v1,v2,...]"; pass null to
+ * clear the column when an animal no longer has tags.
+ */
+async function setAnimalEmbedding(aid, vector) {
+  try {
+    const client = getSupabaseClient();
+    const value = vector === null ? null : serializeEmbedding(vector);
+    const { error } = await client
+      .from("animals")
+      .update({ animal_embedding: value })
+      .eq("aid", aid);
+    if (error) return { error: error.message };
+    return { error: null };
+  } catch (err) {
+    return { error: err.message };
+  }
+}
+
+/**
+ * Fire-and-forget: regenerate and persist the tag embedding for an animal
+ * after its tags change. Never throws — failure is logged. Awaiting is
+ * optional; callers may not await so writes aren't blocked by model warmup.
+ */
+async function regenerateEmbeddingForAnimal(animal) {
+  if (!animal || animal.aid == null) return;
+  try {
+    const vector = await generateTagEmbedding(animal);
+    const { error } = await setAnimalEmbedding(animal.aid, vector);
+    if (error) {
+      console.error(
+        `[embedding] failed to persist for animal ${animal.aid}:`,
+        error,
+      );
+    }
+  } catch (err) {
+    console.error(
+      `[embedding] failed to generate for animal ${animal.aid}:`,
+      err.message,
+    );
+  }
+}
+
+/**
  * Inserts a new animal record into the database.
  *
  * @param {*} animalData
@@ -417,7 +465,13 @@ async function createAnimal(animalData) {
     }
 
     _clearAnimalsCache();
-    return { data: serializeAnimalRecord(data), error: null };
+    const serialized = serializeAnimalRecord(data);
+    // Fire-and-forget: persist the tag embedding so AI Pet Match picks up
+    // the new animal without waiting on the model warmup.
+    if (Array.isArray(serialized.tags) && serialized.tags.length > 0) {
+      regenerateEmbeddingForAnimal(serialized);
+    }
+    return { data: serialized, error: null };
   } catch (err) {
     return { data: null, error: err.message };
   }
@@ -631,37 +685,49 @@ async function updateAnimalWithMedicalRecordsTransactionById(
 
 async function updateAnimalWithMedicalRecordsById(aid, updates) {
   const { medical_records, ...animalUpdates } = updates;
+  const tagsWereUpdated = Object.prototype.hasOwnProperty.call(
+    animalUpdates,
+    "tags",
+  );
 
+  let result;
   if (medical_records !== undefined) {
-    return updateAnimalWithMedicalRecordsTransactionById(
+    result = await updateAnimalWithMedicalRecordsTransactionById(
       aid,
       animalUpdates,
       medical_records,
     );
+  } else {
+    const animalResult =
+      Object.keys(animalUpdates).length > 0
+        ? await updateAnimalById(aid, animalUpdates)
+        : await getAnimalById(aid);
+
+    if (animalResult.error) {
+      return { data: null, error: animalResult.error };
+    }
+
+    const medicalRecordsResult = await getMedicalRecordsByAnimalId(aid);
+
+    if (medicalRecordsResult.error) {
+      return { data: null, error: medicalRecordsResult.error };
+    }
+
+    result = {
+      data: {
+        ...animalResult.data,
+        medical_records: medicalRecordsResult.data,
+      },
+      error: null,
+    };
   }
 
-  const animalResult =
-    Object.keys(animalUpdates).length > 0
-      ? await updateAnimalById(aid, animalUpdates)
-      : await getAnimalById(aid);
-
-  if (animalResult.error) {
-    return { data: null, error: animalResult.error };
+  // Fire-and-forget: refresh the tag embedding when tags were touched.
+  if (!result.error && tagsWereUpdated && result.data) {
+    regenerateEmbeddingForAnimal(result.data);
   }
 
-  const medicalRecordsResult = await getMedicalRecordsByAnimalId(aid);
-
-  if (medicalRecordsResult.error) {
-    return { data: null, error: medicalRecordsResult.error };
-  }
-
-  return {
-    data: {
-      ...animalResult.data,
-      medical_records: medicalRecordsResult.data,
-    },
-    error: null,
-  };
+  return result;
 }
 
 module.exports = {
@@ -676,6 +742,8 @@ module.exports = {
   deleteAnimal,
   updateAnimalById,
   updateAnimalWithMedicalRecordsById,
+  setAnimalEmbedding,
+  regenerateEmbeddingForAnimal,
   VALID_FILTERS,
   VALID_MEDICAL_RECORD_TYPES,
   VALID_SORT_FIELDS,

@@ -8,6 +8,15 @@ const animal3 = MOCK_ANIMALS[2];
 test.describe("Adopt listing page (/adopt)", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/adopt");
+    // /adopt now opens on the AI Pet Match stage; skip into the standard
+    // listing so the rest of the suite tests the flip-card grid.
+    await page
+      .getByRole("button", { name: "Ver todos los animales" })
+      .first()
+      .click();
+    await expect(
+      page.getByPlaceholder("Buscar animales..."),
+    ).toBeVisible();
   });
 
   // --- Page load ---
@@ -15,6 +24,23 @@ test.describe("Adopt listing page (/adopt)", () => {
     await expect(page).toHaveURL(/\/adopt/);
       await expect(page.getByRole("banner")).toBeVisible();
     await expect(page.locator("footer")).toBeVisible();
+  });
+
+  // --- AI Pet Match initial stage ---
+  test("AI Pet Match stage is the initial view on /adopt", async ({
+    page,
+  }) => {
+    // We're already in the listing because of beforeEach. Reload and re-check.
+    await page.goto("/adopt");
+    await expect(
+      page.getByRole("heading", { name: /Encuentra a tu compañero ideal/i }),
+    ).toBeVisible();
+    await expect(
+      page.getByPlaceholder(/perro mediano y tranquilo/i),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Ver todos los animales" }),
+    ).toBeVisible();
   });
 
   // --- Search bar ---

@@ -21,10 +21,12 @@ const {
   validateAnimalId,
   validateCreateAnimal,
   validateUpdateAnimal,
+  validateAiMatchBody,
 } = require("../middleware/validation");
 const { asyncHandler, ApiError } = require("../middleware/errorHandler");
 const { requireAuth } = require("../middleware/auth");
 const { requireJson } = require("../middleware/requireJson");
+const { rankAnimalsByPrompt } = require("../services/petMatchService");
 
 /**
  * GET /api/animals
@@ -115,6 +117,50 @@ router.get(
     res.json({
       success: true,
       data: result.data,
+    });
+  }),
+);
+
+/**
+ * POST /api/animals/ai-match
+ * Returns a ranked list of available pets matching a natural-language prompt
+ * via free, on-server semantic similarity. No paid AI APIs.
+ *
+ * Body: { prompt: string (3–500 chars), limit?: number (1–20, default 5) }
+ */
+router.post(
+  "/ai-match",
+  requireJson,
+  validateAiMatchBody,
+  asyncHandler(async (req, res) => {
+    const { prompt, limit } = req.validatedBody;
+
+    const animalsResult = await getAnimals({
+      filters: { status: "disponible" },
+      limit: 100,
+      offset: 0,
+      sortBy: "created_at",
+      sortOrder: "desc",
+    });
+
+    if (animalsResult.error) {
+      throw new ApiError(500, "Failed to fetch animals", animalsResult.error);
+    }
+
+    const { matches, alternatives, threshold, requestedFields } =
+      await rankAnimalsByPrompt({
+        prompt,
+        animals: animalsResult.data,
+        limit,
+      });
+
+    res.json({
+      success: true,
+      data: matches,
+      alternatives,
+      threshold,
+      requestedFields,
+      promptEcho: prompt,
     });
   }),
 );
