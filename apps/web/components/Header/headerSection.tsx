@@ -56,16 +56,16 @@ export default function Header({ revealOnFirstScroll = false }: HeaderProps) {
     >
       <div className={styles.inner}>
         <div className={styles.logoContainer}>
-          <Link href="/admin/login" aria-label="Go to admin login">
-            <Image
-              src="/org-logo.png"
-              className={styles.logoImage}
-              width={50}
-              height={42}
-              alt="CPAAA Logo"
-              sizes="50px"
-            />
-          </Link>
+          {/* <Link href="/admin/login" aria-label="Go to admin login"> */}
+          <Image
+            src="/org-logo.png"
+            className={styles.logoImage}
+            width={50}
+            height={42}
+            alt="CPAAA Logo"
+            sizes="50px"
+          />
+          {/* </Link> */}
           <div className={styles.logo}>
             <Link href="/">Ciudadanos Pro Albergue de Animales de Aguadilla</Link>
           </div>

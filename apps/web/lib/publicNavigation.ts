@@ -4,7 +4,8 @@ export type PublicNavigationLink = {
   requiresAdoptCatalog?: boolean;
 };
 
-const showAdoptCatalog = process.env.NEXT_PUBLIC_SHOW_ADOPT_PAGE !== "false";
+// const showAdoptCatalog = process.env.NEXT_PUBLIC_SHOW_ADOPT_PAGE !== "false";
+const showAdoptCatalog = false;
 
 const publicNavigationLinks: PublicNavigationLink[] = [
   { href: "/", label: "Home" },
